@@ -1,0 +1,11 @@
+# Meterwise pilot data pipeline (Python 3.12). Install into the project venv:
+#   .venv/Scripts/python -m pip install -r data/pipeline/requirements.txt
+# Versions in comments are the ones the published dataset was built with.
+numpy             # 2.5.3
+requests          # 2.34.2
+shapely>=2.0      # 2.1.2
+pyproj            # 3.8.0
+rasterio          # 1.5.2 (bundles GDAL)
+pystac-client     # 0.9.0
+planetary-computer  # 1.0.0
+matplotlib        # 3.11.2 (added for heat.png and preview.png)

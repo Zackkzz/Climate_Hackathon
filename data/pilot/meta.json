@@ -1,0 +1,189 @@
+{
+ "name": "Penrith and Kingswood pilot",
+ "description": "358 apartment buildings in Penrith and Kingswood (Western Sydney), mapped in OpenStreetMap, each with a satellite-derived summer heat value and the share of renting households in its 2021 Census neighbourhood (SA1).",
+ "centre": {
+  "lat": -33.75116,
+  "lon": 150.70373
+ },
+ "bbox": [
+  150.66154,
+  -33.77611,
+  150.74593,
+  -33.72622
+ ],
+ "building_count": 358,
+ "suburbs": [
+  "Kingswood",
+  "Penrith"
+ ],
+ "data_notes": [
+  "The 358 buildings are blocks tagged as apartments in OpenStreetMap (snapshot 2026-10-03) inside the suburbs of Penrith and Kingswood. Some blocks are not mapped or are tagged differently, so this is not a complete list.",
+  "We left out 145 OpenStreetMap 'apartment' buildings where the NSW address records show side-by-side villas or townhouses rather than flats stacked on top of each other, plus very small or single-storey buildings.",
+  "Storeys come from OpenStreetMap for 13% of buildings. For the rest we assumed 3 storeys, the usual walk-up. Some of those will really be 2 storeys.",
+  "Flat numbers are estimates. For 264 buildings they come from the number of unit addresses (like 1/32, 2/32) that NSW Spatial Services records at the building's street address, shared between blocks on the same lot by floor area. For the rest we divided floor area by 130 m² per flat, the typical figure for buildings where the unit count is known.",
+  "Street addresses come from NSW address points or OpenStreetMap (90% of buildings). Where several blocks share one address they are numbered north to south. Blocks with no address are named after the nearest street.",
+  "Heat values come from Landsat 8 and 9 satellite thermal images taken at about 10:45 am on 21 clear summer days between December 2023 and February 2026 (we use the middle value for each spot). They measure how hot the ground and roofs get, not air temperature and not temperature inside flats. Afternoon surfaces are usually hotter still.",
+  "The satellite's heat sensor sees spots about 100 m across, so a building's heat value describes its surroundings (roofs, roads, car parks and trees nearby), not the roof alone. Neighbouring blocks often get similar values.",
+  "heat_anomaly_c is how much hotter (or cooler) the building's surroundings are than the middle surface temperature of all land in Penrith and Kingswood (41.0 °C). Across the buildings it ranges from -1.4 to +3.2 °C. The heat bands split the buildings into five equal-sized groups, so 'hottest' means hottest fifth within this area.",
+  "Sanity check: the heat layer behaves as expected. Compared with the area's middle value, the Nepean River and lakes are about 10 °C cooler, bushland about 7 °C cooler, while shopping centres are about 1.5 °C warmer. Dry sports fields in summer can be as hot as streets.",
+  "We compared our heat layer with the NSW Government's Greater Sydney surface temperature map for summer 2022-23 (a different summer). Across all land in the two suburbs the rank correlation is 0.82; for the buildings it is 0.68, and 83% of buildings fall in the same or a neighbouring heat band. Both maps come from Landsat, so this checks our processing rather than being a fully independent measurement.",
+  "Renter share is the share of occupied homes that were rented at the 2021 Census in the small Census area (SA1, usually 200-800 people) around the building. It is not the figure for that building. In the 34 areas with pilot buildings, 65% of all homes and 72% of flats were rented. The ABS slightly adjusts small counts to protect privacy.",
+  "The quick score ranks buildings for a first look: 60% weight on being hotter than other blocks here and 40% on having more renters around it. It is a screening aid, not an assessment of any building.",
+  "Checks on flat numbers: where the unit count is known (152 buildings with their own address), the floor-area rule is typically 25% out. Our total of 4,459 flats compares with 3,656 occupied flats counted in the same Census areas in 2021; ours is higher partly because some blocks were finished after 2021 and the Census leaves out empty flats."
+ ],
+ "sources": [
+  {
+   "name": "OpenStreetMap (via the Overpass API)",
+   "url": "https://www.openstreetmap.org/copyright",
+   "licence": "ODbL 1.0 - © OpenStreetMap contributors",
+   "used_for": "Apartment building footprints, mapped storeys, some street addresses, street names for unaddressed blocks, and land-cover areas (parks, water, car parks, industrial land) for the heat sanity check"
+  },
+  {
+   "name": "Landsat 8 and Landsat 9 Collection 2 Level-2 Surface Temperature (USGS), via Microsoft Planetary Computer STAC API",
+   "url": "https://planetarycomputer.microsoft.com/dataset/landsat-c2-l2",
+   "licence": "Public domain (USGS Landsat data policy); no copyright restrictions",
+   "used_for": "Summer daytime land surface temperature (median of clear summer scenes, 2023-24 to 2025-26)"
+  },
+  {
+   "name": "ABS Census of Population and Housing 2021, General Community Profile table G37 (tenure and landlord type by dwelling structure), Statistical Area Level 1, via ABS ArcGIS REST service Hosted/ABS_2021_Census_G37_SA1",
+   "url": "https://geo.abs.gov.au/arcgis/rest/services/Hosted/ABS_2021_Census_G37_SA1/FeatureServer",
+   "licence": "CC BY 4.0 - © Commonwealth of Australia (Australian Bureau of Statistics)",
+   "used_for": "Share of occupied private dwellings that are rented, per SA1"
+  },
+  {
+   "name": "ABS Australian Statistical Geography Standard (ASGS) Edition 3, 2021 Suburbs and Localities (SAL)",
+   "url": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/SAL/FeatureServer",
+   "licence": "CC BY 4.0 - © Commonwealth of Australia (Australian Bureau of Statistics)",
+   "used_for": "Pilot-area boundary (Penrith and Kingswood) and suburb of each building"
+  },
+  {
+   "name": "NSW Geocoded Addressing Theme - AddressPoint layer (NSW Spatial Services)",
+   "url": "https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Geocoded_Addressing_Theme/FeatureServer/1",
+   "licence": "Public web service; the Data.NSW listing says 'Licence not specified'. Attribution: © Spatial Services, NSW Department of Customer Service. Check terms before redistributing.",
+   "used_for": "Street address labels where OpenStreetMap has none, and counts of unit addresses (for example 1/32, 2/32 ...) used to estimate the number of flats"
+  },
+  {
+   "name": "NSW DCCEEW Land Surface Temperature for Greater Sydney, Summer 2022-2023 (part of the 2022 Heat Vulnerability Index dataset, SEED portal)",
+   "url": "https://datasets.seed.nsw.gov.au/dataset/2022-heat-vulnerability-index-for-the-greater-sydney-region",
+   "licence": "CC BY 4.0 - © State of New South Wales (Department of Climate Change, Energy, the Environment and Water)",
+   "used_for": "Independent comparison only (not used in any building value)"
+  },
+  {
+   "name": "Python libraries: numpy, pandas, requests, shapely, pyproj, rasterio (GDAL), pystac-client, planetary-computer, matplotlib",
+   "url": "https://pypi.org/",
+   "licence": "BSD-3-Clause / MIT / Apache-2.0 (each library's own licence); GDAL is MIT",
+   "used_for": "Data download, geometry, raster processing and charts"
+  }
+ ],
+ "method": {
+  "buildings": "OpenStreetMap ways/relations tagged building=apartments, or building=residential with building:levels >= 2, or building=yes/residential with a flats count; kept if the footprint is at least 150 m2, not mapped as single storey, and inside the Penrith or Kingswood 2021 SAL boundary. Buildings whose NSW unit addresses show 80 m2 or more of footprint per dwelling (side-by-side villas or townhouses), without 3+ storeys mapped, are dropped.",
+  "storeys": "building:levels where mapped, otherwise 3 (assumed typical walk-up).",
+  "flats_est": "Count of distinct unit addresses (e.g. 1/32 ... 12/32) in the NSW address point data at the building's street address, split between buildings sharing that address by floor area; used only if it implies 35-250 m2 gross floor area per flat. Otherwise footprint x storeys / 130 m2 gross per flat (minimum 2), where 130 is the median gross floor area per unit address across buildings that have their own street address in this area.",
+  "heat_anomaly_c": "Mean of the per-pixel median Landsat summer land surface temperature over the footprint buffered by 30 m, minus the median over all land in the two suburbs.",
+  "heat_band": "Quintiles of heat_anomaly_c across the pilot buildings.",
+  "renter_share": "ABS 2021 Census G37: rented dwellings / all occupied private dwellings (including tenure not stated) in the SA1 containing the building.",
+  "quick_score": "round(100 x (0.6 x heat percentile + 0.4 x renter-share percentile)), percentiles taken across the pilot buildings; heat percentile only if renter share is missing."
+ },
+ "heat_overlay": {
+  "file": "heat.png",
+  "bounds": [
+   150.66,
+   -33.778,
+   150.746,
+   -33.726
+  ],
+  "image_crs": "EPSG:3857 (place with lon/lat bounds)",
+  "colormap": "RdYlBu_r",
+  "min_c": 31.0,
+  "max_c": 45.0,
+  "value": "median summer daytime land surface temperature, degrees C"
+ },
+ "landsat_scenes": [
+  {
+   "id": "LC09_L2SP_090083_20231202_02_T1",
+   "date": "2023-12-02"
+  },
+  {
+   "id": "LC08_L2SP_090083_20231210_02_T1",
+   "date": "2023-12-10"
+  },
+  {
+   "id": "LC09_L2SP_089083_20231227_02_T1",
+   "date": "2023-12-27"
+  },
+  {
+   "id": "LC09_L2SP_089083_20240112_02_T1",
+   "date": "2024-01-12"
+  },
+  {
+   "id": "LC08_L2SP_089083_20240120_02_T1",
+   "date": "2024-01-20"
+  },
+  {
+   "id": "LC09_L2SP_089083_20240128_02_T1",
+   "date": "2024-01-28"
+  },
+  {
+   "id": "LC08_L2SP_090083_20240212_02_T1",
+   "date": "2024-02-12"
+  },
+  {
+   "id": "LC08_L2SP_090083_20240228_02_T1",
+   "date": "2024-02-28"
+  },
+  {
+   "id": "LC08_L2SP_089083_20241205_02_T1",
+   "date": "2024-12-05"
+  },
+  {
+   "id": "LC08_L2SP_090083_20241212_02_T1",
+   "date": "2024-12-12"
+  },
+  {
+   "id": "LC09_L2SP_089084_20241213_02_T1",
+   "date": "2024-12-13"
+  },
+  {
+   "id": "LC09_L2SP_090083_20250105_02_T1",
+   "date": "2025-01-05"
+  },
+  {
+   "id": "LC09_L2SP_090083_20250206_02_T1",
+   "date": "2025-02-06"
+  },
+  {
+   "id": "LC08_L2SP_090083_20250214_02_T1",
+   "date": "2025-02-14"
+  },
+  {
+   "id": "LC09_L2SP_090083_20250222_02_T1",
+   "date": "2025-02-22"
+  },
+  {
+   "id": "LC08_L2SP_089083_20251208_02_T1",
+   "date": "2025-12-08"
+  },
+  {
+   "id": "LC09_L2SP_090083_20251223_02_T1",
+   "date": "2025-12-23"
+  },
+  {
+   "id": "LC09_L2SP_090083_20260108_02_T1",
+   "date": "2026-01-08"
+  },
+  {
+   "id": "LC08_L2SP_089083_20260109_02_T1",
+   "date": "2026-01-09"
+  },
+  {
+   "id": "LC09_L2SP_090083_20260124_02_T1",
+   "date": "2026-01-24"
+  },
+  {
+   "id": "LC08_L2SP_089083_20260210_02_T1",
+   "date": "2026-02-10"
+  }
+ ],
+ "osm_snapshot": "2026-10-03T08:21:55Z",
+ "generated": "2026-10-03"
+}

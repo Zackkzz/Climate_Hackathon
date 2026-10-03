@@ -1,0 +1,516 @@
+{
+ "osm_snapshot": "2026-10-03T08:21:55Z",
+ "candidates_from_osm": 628,
+ "excluded": {
+  "outside pilot suburbs": 40,
+  "not an apartment tag combination": 8,
+  "mapped as single storey": 14,
+  "footprint under 150 m2": 61,
+  "no usable geometry": 2,
+  "likely villas or townhouses (>= 80 m2 footprint per unit address)": 145
+ },
+ "m2_per_flat_used": 130.0,
+ "m2_per_flat_calibrated": true,
+ "flats_rule_vs_unit_addresses": {
+  "n_buildings": 152,
+  "median_gross_m2_per_unit_address": 129.5,
+  "iqr_gross_m2_per_unit_address": [
+   103.1,
+   163.8
+  ],
+  "median_gross_m2_per_unit_address_osm_storeys_only": 126.9,
+  "n_osm_storeys_only": 20,
+  "calibrated_rule_median_abs_pct_error": 25.0,
+  "calibrated_rule_spearman": 0.829,
+  "default_85m2_rule_median_abs_pct_error": 52.2,
+  "default_85m2_rule_median_ratio_to_units": 1.52,
+  "note": "in-sample: the calibrated constant is fitted on these same buildings"
+ },
+ "lst_area_median_c": 41.01,
+ "lst_scene_count": 21,
+ "lst_min_clear_scenes_per_pixel_in_area": 10,
+ "heat_band_breaks_c": [
+  -0.33,
+  0.16,
+  0.47,
+  0.98
+ ],
+ "census": {
+  "sa1_count_with_buildings": 34,
+  "dwellings": 7262,
+  "rented": 4742,
+  "renter_share_all_dwellings": 0.653,
+  "flat_dwellings": 3656,
+  "rented_flats": 2635,
+  "renter_share_flats": 0.721
+ },
+ "flats_est_vs_census_flats": {
+  "sa1s": 34,
+  "flats_est_total": 4459,
+  "census_2021_occupied_flats": 3656,
+  "ratio": 1.22,
+  "spearman_by_sa1": 0.708,
+  "note": "Census counts occupied flats in 2021 only (no vacant flats, no blocks finished after Aug 2021) and includes flats in buildings not mapped in OSM."
+ },
+ "independent_comparison": {
+  "available": true,
+  "dataset": "NSW DCCEEW Land Surface Temperature for Greater Sydney, summer 2022-2023 (SEED portal)",
+  "nsw_area_median_c": 38.12,
+  "buildings_compared": 358,
+  "spearman_building_lst": 0.676,
+  "pearson_building_lst": 0.648,
+  "same_quintile_share": 0.402,
+  "within_one_quintile_share": 0.827,
+  "pixels_compared": 19802,
+  "spearman_pixels_in_pilot_suburbs": 0.822
+ },
+ "landcover_check": {
+  "available": true,
+  "classes": [
+   {
+    "class": "Water (river, lakes, ponds)",
+    "pixels": 715,
+    "median_lst_c": 31.33,
+    "anomaly_vs_pilot_median_c": -9.67
+   },
+   {
+    "class": "Woodland and bushland",
+    "pixels": 2748,
+    "median_lst_c": 34.38,
+    "anomaly_vs_pilot_median_c": -6.62
+   },
+   {
+    "class": "Parks, sports grounds, golf",
+    "pixels": 2522,
+    "median_lst_c": 39.83,
+    "anomaly_vs_pilot_median_c": -1.18
+   },
+   {
+    "class": "Residential land",
+    "pixels": 17611,
+    "median_lst_c": 41.6,
+    "anomaly_vs_pilot_median_c": 0.59
+   },
+   {
+    "class": "Shopping centres and commercial",
+    "pixels": 559,
+    "median_lst_c": 42.49,
+    "anomaly_vs_pilot_median_c": 1.48
+   },
+   {
+    "class": "Industrial land",
+    "pixels": 2427,
+    "median_lst_c": 41.4,
+    "anomaly_vs_pilot_median_c": 0.39
+   },
+   {
+    "class": "Railway land",
+    "pixels": 28,
+    "median_lst_c": 42.85,
+    "anomaly_vs_pilot_median_c": 1.85
+   },
+   {
+    "class": "Open-air car parks",
+    "pixels": 10,
+    "median_lst_c": 41.67,
+    "anomaly_vs_pilot_median_c": 0.66
+   }
+  ]
+ },
+ "named_places": [
+  {
+   "place": "Ngurra Lake",
+   "class": "Water (river, lakes, ponds)",
+   "area_ha": 39.4,
+   "pixels": 348,
+   "mean_lst_c": 29.57,
+   "anomaly_vs_pilot_median_c": -11.43,
+   "lat": -33.72586,
+   "lon": 150.66303
+  },
+  {
+   "place": "Huntington Reserve",
+   "class": "Woodland and bushland",
+   "area_ha": 1.9,
+   "pixels": 22,
+   "mean_lst_c": 35.55,
+   "anomaly_vs_pilot_median_c": -5.46,
+   "lat": -33.76103,
+   "lon": 150.65982
+  },
+  {
+   "place": "Jamison Park",
+   "class": "Parks, sports grounds, golf",
+   "area_ha": 39.1,
+   "pixels": 355,
+   "mean_lst_c": 42.68,
+   "anomaly_vs_pilot_median_c": 1.67,
+   "lat": -33.76602,
+   "lon": 150.69141
+  },
+  {
+   "place": "Westwood Estate",
+   "class": "Residential land",
+   "area_ha": 12.1,
+   "pixels": 89,
+   "mean_lst_c": 41.37,
+   "anomaly_vs_pilot_median_c": 0.37,
+   "lat": -33.76783,
+   "lon": 150.73701
+  },
+  {
+   "place": "Penrith Homemaker Centre",
+   "class": "Shopping centres and commercial",
+   "area_ha": 13.0,
+   "pixels": 94,
+   "mean_lst_c": 42.25,
+   "anomaly_vs_pilot_median_c": 1.24,
+   "lat": -33.7702,
+   "lon": 150.67012
+  },
+  {
+   "place": "Penrith Water Recycling Plant",
+   "class": "Industrial land",
+   "area_ha": 29.3,
+   "pixels": 227,
+   "mean_lst_c": 37.66,
+   "anomaly_vs_pilot_median_c": -3.35,
+   "lat": -33.74006,
+   "lon": 150.69945
+  },
+  {
+   "place": "Largest mapped area of this type (near -33.7581, 150.7383)",
+   "class": "Railway land",
+   "area_ha": 14.4,
+   "pixels": 159,
+   "mean_lst_c": 41.84,
+   "anomaly_vs_pilot_median_c": 0.83,
+   "lat": -33.7581,
+   "lon": 150.73827
+  },
+  {
+   "place": "Largest mapped area of this type (near -33.7702, 150.6712)",
+   "class": "Open-air car parks",
+   "area_ha": 1.8,
+   "pixels": 21,
+   "mean_lst_c": 42.97,
+   "anomaly_vs_pilot_median_c": 1.97,
+   "lat": -33.77019,
+   "lon": 150.67122
+  }
+ ],
+ "building_count": 358,
+ "by_suburb": {
+  "Penrith": 262,
+  "Kingswood": 96
+ },
+ "share_storeys_mapped": 0.126,
+ "label_sources": {
+  "nsw_address_point": 301,
+  "osm_address": 21,
+  "nearest_osm_street": 36
+ },
+ "share_with_street_address": 0.899,
+ "flats_sources": {
+  "nsw_unit_addresses": 264,
+  "area_rule": 90,
+  "area_rule (unit-address count implausible)": 3,
+  "osm_flats_tag": 1
+ },
+ "flats_total": 4459,
+ "heat_anomaly_c": {
+  "min": -1.42,
+  "median": 0.34,
+  "max": 3.24,
+  "p10": -0.81,
+  "p90": 1.35
+ },
+ "renter_share": {
+  "n_with_value": 358,
+  "min": 0.205,
+  "median": 0.696,
+  "max": 0.865
+ },
+ "quick_score": {
+  "min": 6,
+  "median": 55.0,
+  "max": 87
+ },
+ "geojson": {
+  "features": 358,
+  "unique_ids": true,
+  "size_bytes": 242165,
+  "max_coordinate_decimals": 6,
+  "problems": [],
+  "problem_count": 0,
+  "passed": true
+ },
+ "lst_scenes": [
+  {
+   "id": "LC09_L2SP_090083_20231202_02_T1",
+   "date": "2023-12-02",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 13.48,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 41.43,
+   "acquired_utc": "2023-12-02T23:50:11.126573+00:00"
+  },
+  {
+   "id": "LC08_L2SP_090083_20231210_02_T1",
+   "date": "2023-12-10",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 3.15,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 40.28,
+   "acquired_utc": "2023-12-10T23:50:02.480154+00:00"
+  },
+  {
+   "id": "LC09_L2SP_089083_20231227_02_T1",
+   "date": "2023-12-27",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 5.4,
+   "window_clear_fraction": 0.98,
+   "window_median_lst_c": 39.97,
+   "acquired_utc": "2023-12-27T23:44:02.978945+00:00"
+  },
+  {
+   "id": "LC09_L2SP_089083_20240112_02_T1",
+   "date": "2024-01-12",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 3.57,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 39.7,
+   "acquired_utc": "2024-01-12T23:44:00.005496+00:00"
+  },
+  {
+   "id": "LC08_L2SP_089083_20240120_02_T1",
+   "date": "2024-01-20",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 0.29,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 40.57,
+   "acquired_utc": "2024-01-20T23:43:48.336157+00:00"
+  },
+  {
+   "id": "LC09_L2SP_089083_20240128_02_T1",
+   "date": "2024-01-28",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 13.23,
+   "window_clear_fraction": 0.927,
+   "window_median_lst_c": 37.77,
+   "acquired_utc": "2024-01-28T23:43:59.340710+00:00"
+  },
+  {
+   "id": "LC08_L2SP_090083_20240212_02_T1",
+   "date": "2024-02-12",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 0.9,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 39.05,
+   "acquired_utc": "2024-02-12T23:49:59.241485+00:00"
+  },
+  {
+   "id": "LC08_L2SP_090083_20240228_02_T1",
+   "date": "2024-02-28",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 3.41,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 38.86,
+   "acquired_utc": "2024-02-28T23:49:53.269040+00:00"
+  },
+  {
+   "id": "LC08_L2SP_089083_20241205_02_T1",
+   "date": "2024-12-05",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 22.12,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 42.62,
+   "acquired_utc": "2024-12-05T23:43:50.360136+00:00"
+  },
+  {
+   "id": "LC08_L2SP_090083_20241212_02_T1",
+   "date": "2024-12-12",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 0.19,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 42.28,
+   "acquired_utc": "2024-12-12T23:49:53.280969+00:00"
+  },
+  {
+   "id": "LC09_L2SP_089084_20241213_02_T1",
+   "date": "2024-12-13",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 20.73,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 43.41,
+   "acquired_utc": "2024-12-13T23:44:15.035561+00:00"
+  },
+  {
+   "id": "LC09_L2SP_090083_20250105_02_T1",
+   "date": "2025-01-05",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.64,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 46.57,
+   "acquired_utc": "2025-01-05T23:50:00.118747+00:00"
+  },
+  {
+   "id": "LC09_L2SP_090083_20250206_02_T1",
+   "date": "2025-02-06",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.52,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 40.89,
+   "acquired_utc": "2025-02-06T23:50:00.531971+00:00"
+  },
+  {
+   "id": "LC08_L2SP_090083_20250214_02_T1",
+   "date": "2025-02-14",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 6.6,
+   "window_clear_fraction": 0.997,
+   "window_median_lst_c": 33.79,
+   "acquired_utc": "2025-02-14T23:49:53.473806+00:00"
+  },
+  {
+   "id": "LC09_L2SP_090083_20250222_02_T1",
+   "date": "2025-02-22",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.54,
+   "window_clear_fraction": 0.992,
+   "window_median_lst_c": 34.05,
+   "acquired_utc": "2025-02-22T23:50:02.346424+00:00"
+  },
+  {
+   "id": "LC08_L2SP_089083_20251208_02_T1",
+   "date": "2025-12-08",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 0.33,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 45.56,
+   "acquired_utc": "2025-12-08T23:43:59.534482+00:00"
+  },
+  {
+   "id": "LC09_L2SP_090083_20251223_02_T1",
+   "date": "2025-12-23",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 3.44,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 42.87,
+   "acquired_utc": "2025-12-23T23:50:19.179112+00:00"
+  },
+  {
+   "id": "LC09_L2SP_090083_20260108_02_T1",
+   "date": "2026-01-08",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.0,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 44.68,
+   "acquired_utc": "2026-01-08T23:50:11.336826+00:00"
+  },
+  {
+   "id": "LC08_L2SP_089083_20260109_02_T1",
+   "date": "2026-01-09",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 0.02,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 46.83,
+   "acquired_utc": "2026-01-09T23:43:49.356104+00:00"
+  },
+  {
+   "id": "LC09_L2SP_090083_20260124_02_T1",
+   "date": "2026-01-24",
+   "platform": "landsat-9",
+   "scene_cloud_cover_pct": 0.07,
+   "window_clear_fraction": 1.0,
+   "window_median_lst_c": 40.47,
+   "acquired_utc": "2026-01-24T23:50:12.094394+00:00"
+  },
+  {
+   "id": "LC08_L2SP_089083_20260210_02_T1",
+   "date": "2026-02-10",
+   "platform": "landsat-8",
+   "scene_cloud_cover_pct": 6.83,
+   "window_clear_fraction": 0.996,
+   "window_median_lst_c": 37.03,
+   "acquired_utc": "2026-02-10T23:43:43.600757+00:00"
+  }
+ ],
+ "lst_scenes_rejected": [
+  {
+   "id": "LC09_L2SP_089083_20231211_02_T1",
+   "date": "2023-12-11",
+   "reason": "window clear fraction 0.30"
+  },
+  {
+   "id": "LC09_L2SP_089084_20231211_02_T1",
+   "date": "2023-12-11",
+   "reason": "window clear fraction 0.34"
+  },
+  {
+   "id": "LC08_L2SP_090083_20240127_02_T1",
+   "date": "2024-01-27",
+   "reason": "window clear fraction 0.20"
+  },
+  {
+   "id": "LC08_L2SP_089084_20240221_02_T1",
+   "date": "2024-02-21",
+   "reason": "window clear fraction 0.28"
+  },
+  {
+   "id": "LC09_L2SP_089083_20241229_02_T1",
+   "date": "2024-12-29",
+   "reason": "window clear fraction 0.03"
+  },
+  {
+   "id": "LC09_L2SP_089084_20241229_02_T1",
+   "date": "2024-12-29",
+   "reason": "window clear fraction 0.05"
+  },
+  {
+   "id": "LC09_L2SP_089083_20250130_02_T2",
+   "date": "2025-01-30",
+   "reason": "Tier 2 product"
+  },
+  {
+   "id": "LC08_L2SP_089083_20250207_02_T1",
+   "date": "2025-02-07",
+   "reason": "window clear fraction 0.43"
+  },
+  {
+   "id": "LC09_L2SP_089083_20250215_02_T1",
+   "date": "2025-02-15",
+   "reason": "window clear fraction 0.58"
+  },
+  {
+   "id": "LC09_L2SP_089084_20250215_02_T1",
+   "date": "2025-02-15",
+   "reason": "window clear fraction 0.65"
+  },
+  {
+   "id": "LC08_L2SP_089083_20250223_02_T1",
+   "date": "2025-02-23",
+   "reason": "window clear fraction 0.58"
+  },
+  {
+   "id": "LC08_L2SP_089084_20250223_02_T1",
+   "date": "2025-02-23",
+   "reason": "window clear fraction 0.68"
+  },
+  {
+   "id": "LC09_L2SP_090083_20251207_02_T1",
+   "date": "2025-12-07",
+   "reason": "window clear fraction 0.38"
+  },
+  {
+   "id": "LC09_L2SP_089084_20251216_02_T1",
+   "date": "2025-12-16",
+   "reason": "window clear fraction 0.52"
+  },
+  {
+   "id": "LC08_L2SP_090083_20260217_02_T1",
+   "date": "2026-02-17",
+   "reason": "window clear fraction 0.46"
+  }
+ ]
+}

@@ -1,0 +1,359 @@
+id,osm_type,osm_id,osm_building_tag,osm_building_levels,label_source,nsw_base_address,unit_addresses_at_base_address,buildings_sharing_base_address,flats_source,flats_area_rule,lst_median_summer_c,lst_pixels,sa1_code_2021,sa2_name_2021,renter_share_flats_only,lst_nsw_2022_23_c,lat,lon
+b_000001,way,596757415,apartments,7,nsw_address_point,101A Lord Sheffield Circuit Penrith,64,1,nsw_unit_addresses,46,40.02,8,12403146440,Penrith,0.728,39.27,-33.748637,150.697263
+b_000002,way,596757416,apartments,7,nsw_address_point,101C Lord Sheffield Circuit Penrith,49,1,nsw_unit_addresses,40,39.74,8,12403146440,Penrith,0.728,39.32,-33.748481,150.697683
+b_000003,way,596757417,apartments,4,nsw_address_point,101B Lord Sheffield Circuit Penrith,19,1,nsw_unit_addresses,17,40.16,8,12403146440,Penrith,0.728,39.13,-33.748911,150.69744
+b_000004,way,596757418,apartments,4,nsw_address_point,101D Lord Sheffield Circuit Penrith,19,1,nsw_unit_addresses,17,40.08,8,12403146440,Penrith,0.728,39.22,-33.748691,150.697925
+b_000005,way,596757419,apartments,9,nsw_address_point,81A Lord Sheffield Circuit Penrith,89,3,nsw_unit_addresses,78,40.92,11,12403146440,Penrith,0.728,39.12,-33.749446,150.697701
+b_000006,way,596757420,apartments,9,nsw_address_point,81A Lord Sheffield Circuit Penrith,89,3,nsw_unit_addresses,56,41.4,8,12403146440,Penrith,0.728,39.39,-33.74943,150.698156
+b_000007,way,596757421,apartments,5,nsw_address_point,81A Lord Sheffield Circuit Penrith,89,3,nsw_unit_addresses,26,40.79,8,12403146440,Penrith,0.728,39.16,-33.749156,150.698007
+b_000008,way,617187267,apartments,3,osm_address,14 Henry Street Penrith,30,1,nsw_unit_addresses,14,42.13,8,12403146416,Penrith,0.787,41.1,-33.754607,150.706489
+b_000009,way,633526120,apartments,5,nsw_address_point,10 Ransley Street Penrith,152,3,nsw_unit_addresses,64,40.17,12,12403146424,Penrith,0.512,38.08,-33.756448,150.685571
+b_000010,way,641825367,apartments,4,osm_address,40-50 Union Road Penrith,97,2,nsw_unit_addresses,37,41.45,9,12403146425,Penrith,0.724,36.36,-33.753846,150.69116
+b_000011,way,641825391,apartments,6,nsw_address_point,8 John Tipping Grove Penrith,32,1,nsw_unit_addresses,32,40.1,6,12403146423,Penrith,0.611,39.12,-33.753005,150.68795
+b_000012,way,641828718,apartments,3,nsw_address_point,15 Rodley Avenue Penrith,25,1,nsw_unit_addresses,31,40.58,9,12403146425,Penrith,0.724,36.21,-33.754298,150.690858
+b_000013,way,682395725,apartments,6,osm_address,12 Vista Street Penrith,79,2,nsw_unit_addresses,39,40.33,9,12403146423,Penrith,0.611,38.76,-33.754158,150.688276
+b_000014,way,682395727,apartments,,nsw_address_point,66-70 Union Road Penrith,20,2,nsw_unit_addresses,10,40.52,6,12403146423,Penrith,0.611,37.06,-33.753387,150.689787
+b_000015,way,682395728,apartments,,nsw_address_point,66-70 Union Road Penrith,20,2,nsw_unit_addresses,10,40.53,6,12403146423,Penrith,0.611,37.67,-33.753304,150.68952
+b_000016,way,682395729,apartments,,nsw_address_point,72-76 Union Road Penrith,18,2,nsw_unit_addresses,7,40.33,6,12403146423,Penrith,0.611,38.5,-33.753213,150.689253
+b_000017,way,682395730,apartments,,nsw_address_point,72-76 Union Road Penrith,18,2,nsw_unit_addresses,11,40.2,6,12403146423,Penrith,0.611,38.97,-33.753091,150.689016
+b_000018,way,682395731,apartments,,nsw_address_point,78-80 Union Road Penrith,10,1,nsw_unit_addresses,11,40.13,8,12403146423,Penrith,0.611,39.28,-33.752936,150.688704
+b_000019,way,768933373,apartments,4,nsw_address_point,79-81 Union Road Penrith,33,1,nsw_unit_addresses,32,40.65,10,12403146423,Penrith,0.611,37.31,-33.752465,150.689297
+b_000020,way,768933375,apartments,4,nsw_address_point,83-85 Union Road Penrith,50,1,nsw_unit_addresses,39,40.74,9,12403146423,Penrith,0.611,37.38,-33.75235,150.688964
+b_000021,way,772663623,apartments,5,osm_address,144-148 High Street Penrith,55,1,nsw_unit_addresses,54,40.0,10,12403146436,Penrith,0.72,38.96,-33.756624,150.709722
+b_000022,way,772663625,apartments,5,nsw_address_point,35-37 Barber Avenue Penrith,41,1,nsw_unit_addresses,40,39.9,8,12403146436,Penrith,0.72,38.88,-33.757083,150.709663
+b_000023,way,772663627,apartments,5,osm_address,4 Colless Street Penrith,,1,area_rule,39,39.9,10,12403146436,Penrith,0.72,39.1,-33.756878,150.708562
+b_000024,way,772663628,apartments,3,nsw_address_point,8-12 Colless Street Penrith,,2,area_rule,17,40.19,7,12403146435,Penrith,0.652,38.95,-33.757401,150.708527
+b_000025,way,772663629,apartments,3,nsw_address_point,8-12 Colless Street Penrith,,2,area_rule,17,40.2,9,12403146435,Penrith,0.652,39.0,-33.75761,150.708461
+b_000026,way,772663631,apartments,5,osm_address,40-42 Barber Avenue Penrith,43,1,nsw_unit_addresses,33,39.92,9,12403146435,Penrith,0.652,38.68,-33.757615,150.708912
+b_000027,way,772663632,apartments,6,osm_address,36 Barber Avenue Penrith,39,1,nsw_unit_addresses,39,39.77,8,12403146435,Penrith,0.652,38.53,-33.757695,150.709288
+b_000028,way,773717555,apartments,6,osm_address,5 Lethbridge Street Penrith,20,1,nsw_unit_addresses,30,41.24,8,12403146435,Penrith,0.652,39.68,-33.758598,150.711272
+b_000029,way,773717556,apartments,,osm_address,7-9 Lethbridge Street Penrith,,1,area_rule,26,41.09,8,12403146435,Penrith,0.652,39.64,-33.758526,150.71097
+b_000030,way,773717559,apartments,5,osm_address,48-56 Derby Street Kingswood,194,1,nsw_unit_addresses,139,41.17,18,12403146254,Kingswood - Werrington,0.672,37.51,-33.761762,150.713521
+b_000031,way,773758238,apartments,7,osm_address,107-111 Lethbridge Street Penrith,44,1,nsw_unit_addresses,47,41.71,9,12403146416,Penrith,0.787,40.22,-33.756296,150.7012
+b_000032,way,773863074,apartments,,osm_address,8 Fulton Street Penrith,29,1,nsw_unit_addresses,19,40.56,7,12403146416,Penrith,0.787,39.45,-33.756328,150.703627
+b_000033,way,774529350,apartments,,nsw_address_point,43-45 Rodgers Street Kingswood,18,1,nsw_unit_addresses,17,41.84,8,12403146244,Kingswood - Werrington,0.662,40.49,-33.758692,150.716487
+b_000034,way,774529351,apartments,,nsw_address_point,39-41 Rodgers Street Kingswood,15,1,nsw_unit_addresses,11,41.75,7,12403146244,Kingswood - Werrington,0.662,40.45,-33.758739,150.716855
+b_000035,way,774529352,apartments,,nsw_address_point,37 Rodgers Street Kingswood,15,1,nsw_unit_addresses,10,41.82,7,12403146244,Kingswood - Werrington,0.662,40.68,-33.758813,150.717162
+b_000036,way,774529353,apartments,3,nsw_address_point,29-33 Rodgers Street Kingswood,18,1,nsw_unit_addresses,21,42.36,10,12403146244,Kingswood - Werrington,0.662,40.58,-33.758945,150.717676
+b_000037,way,774529355,apartments,,nsw_address_point,15-17 Rodgers Street Kingswood,12,1,nsw_unit_addresses,14,43.49,7,12403146244,Kingswood - Werrington,0.662,40.59,-33.759201,150.718785
+b_000038,way,774529356,apartments,,nsw_address_point,9-13 Rodgers Street Kingswood,17,1,nsw_unit_addresses,21,43.18,10,12403146244,Kingswood - Werrington,0.662,40.32,-33.759342,150.719255
+b_000039,way,774909086,apartments,6,osm_address,12 Vista Street Penrith,79,2,nsw_unit_addresses,37,40.46,9,12403146423,Penrith,0.611,38.9,-33.754157,150.688667
+b_000040,way,774909087,apartments,6,osm_address,15 Vista Street Penrith,26,1,nsw_unit_addresses,27,39.88,8,12403146423,Penrith,0.611,38.76,-33.753628,150.688673
+b_000041,way,774909088,apartments,5,osm_address,50 Rodley Avenue Penrith,42,1,nsw_unit_addresses,38,40.86,8,12403146425,Penrith,0.724,38.79,-33.755072,150.688056
+b_000042,way,774909091,apartments,4,osm_address,40-50 Union Road Penrith,97,2,nsw_unit_addresses,31,41.73,7,12403146425,Penrith,0.724,36.72,-33.75388,150.691633
+b_000043,way,774909093,apartments,,nsw_address_point,86 Union Road Penrith,6,1,nsw_unit_addresses,4,40.75,4,12403146423,Penrith,0.611,38.94,-33.752514,150.688224
+b_000044,way,774909095,apartments,,nsw_address_point,4 John Tipping Grove Penrith,12,1,nsw_unit_addresses,10,40.41,6,12403146423,Penrith,0.611,39.07,-33.752738,150.688073
+b_000045,way,774909098,apartments,,nsw_address_point,82-84 Union Road Penrith,6,1,nsw_unit_addresses,8,40.12,7,12403146423,Penrith,0.611,39.2,-33.752927,150.688434
+b_000046,way,774909109,apartments,,nsw_address_point,4 De Vilnits Parade Penrith,4,1,nsw_unit_addresses,6,39.98,7,12403146423,Penrith,0.611,38.99,-33.753119,150.688381
+b_000047,way,774909116,apartments,,nearest_osm_street,,,,area_rule,8,39.81,6,12403146423,Penrith,0.611,38.77,-33.753819,150.687574
+b_000048,way,774909117,apartments,,nearest_osm_street,,,,area_rule,6,39.81,6,12403146423,Penrith,0.611,38.55,-33.75396,150.687909
+b_000049,way,774909118,apartments,,nsw_address_point,49 Rodley Avenue Penrith,19,2,nsw_unit_addresses,7,40.18,6,12403146423,Penrith,0.611,38.8,-33.754122,150.687873
+b_000050,way,774909119,apartments,,nsw_address_point,49 Rodley Avenue Penrith,19,2,nsw_unit_addresses,10,40.2,6,12403146423,Penrith,0.611,39.02,-33.75416,150.687563
+b_000051,way,774909120,apartments,,nearest_osm_street,,,,area_rule,4,40.56,6,12403146423,Penrith,0.611,39.06,-33.754334,150.687978
+b_000052,way,774909121,apartments,,nearest_osm_street,,,,area_rule,11,40.58,8,12403146423,Penrith,0.611,39.25,-33.754562,150.6876
+b_000053,way,774909122,apartments,,nsw_address_point,47 Rodley Avenue Penrith,12,1,nsw_unit_addresses,11,40.84,8,12403146423,Penrith,0.611,39.35,-33.75462,150.688107
+b_000054,way,774909124,apartments,,nearest_osm_street,,,,area_rule,5,40.93,5,12403146423,Penrith,0.611,39.37,-33.754559,150.688454
+b_000055,way,774909125,apartments,,nsw_address_point,43-45 Rodley Avenue Penrith,12,1,nsw_unit_addresses,5,40.87,7,12403146423,Penrith,0.611,39.14,-33.754482,150.688717
+b_000056,way,774909126,apartments,,nsw_address_point,8 Vista Street Penrith,4,1,nsw_unit_addresses,5,40.96,5,12403146423,Penrith,0.611,39.17,-33.754597,150.688738
+b_000057,way,774909127,apartments,,nsw_address_point,37 Rodley Avenue Penrith,,1,area_rule,5,40.75,6,12403146423,Penrith,0.611,38.62,-33.754515,150.689007
+b_000058,way,774909129,apartments,,nsw_address_point,6 Vista Street Penrith,,1,area_rule,10,40.45,8,12403146423,Penrith,0.611,38.65,-33.754177,150.68898
+b_000059,way,894524067,apartments,2,nsw_address_point,41 Fernandez Lane Penrith,,1,area_rule,3,40.81,6,12403146437,Penrith,0.622,39.97,-33.74736,150.696379
+b_000060,way,894524069,apartments,2,nsw_address_point,51 Fernandez Lane Penrith,,1,area_rule,3,40.75,6,12403146437,Penrith,0.622,39.68,-33.747461,150.696651
+b_000061,way,894524071,apartments,3,nsw_address_point,63 Fernandez Lane Penrith,3,1,nsw_unit_addresses,4,40.39,6,12403146437,Penrith,0.622,39.19,-33.747604,150.697045
+b_000062,way,894524086,apartments,2,nsw_address_point,17 Fernandez Lane Penrith,,1,area_rule,3,40.27,6,12403146437,Penrith,0.622,38.99,-33.747051,150.695572
+b_000063,way,894524087,apartments,2,nsw_address_point,31 Fernandez Lane Penrith,,1,area_rule,3,40.56,6,12403146437,Penrith,0.622,39.32,-33.747167,150.695879
+b_000064,way,947549301,apartments,4,nsw_address_point,10 Ransley Street Penrith,152,3,nsw_unit_addresses,26,40.16,7,12403146424,Penrith,0.512,38.24,-33.755994,150.685598
+b_000065,way,947549302,apartments,4,nsw_address_point,10 Ransley Street Penrith,152,3,nsw_unit_addresses,26,40.31,8,12403146424,Penrith,0.512,38.72,-33.756192,150.686056
+b_000066,way,949109140,apartments,,nsw_address_point,16 Colless Street Penrith,,1,area_rule,11,40.11,7,12403146435,Penrith,0.652,38.95,-33.757973,150.708235
+b_000067,way,949109141,apartments,,nsw_address_point,29-31 Lethbridge Street Penrith,45,1,nsw_unit_addresses,20,39.63,7,12403146435,Penrith,0.652,38.66,-33.758066,150.708777
+b_000068,way,949109142,apartments,,nsw_address_point,136-140 High Street Penrith,49,1,nsw_unit_addresses,24,40.71,8,12403146436,Penrith,0.72,39.54,-33.75687,150.710387
+b_000069,way,949257116,apartments,,nsw_address_point,77 Thornton Drive Penrith,,1,area_rule,10,41.17,6,12403146442,Penrith,,40.08,-33.746289,150.695728
+b_000070,way,949257130,apartments,,nsw_address_point,5 Hudson Street Penrith,,1,area_rule,4,42.73,6,12403146442,Penrith,,41.85,-33.745627,150.697589
+b_000071,way,956490084,apartments,,nsw_address_point,152-154 Lethbridge Street Penrith,11,1,nsw_unit_addresses,12,41.1,6,12403146406,Penrith,0.863,39.36,-33.756051,150.697162
+b_000072,way,956490087,apartments,,nsw_address_point,156 Lethbridge Street Penrith,12,1,nsw_unit_addresses,8,41.08,6,12403146406,Penrith,0.863,39.35,-33.755949,150.696916
+b_000073,way,956490088,apartments,,nsw_address_point,158-160 Lethbridge Street Penrith,13,1,nsw_unit_addresses,13,41.05,8,12403146406,Penrith,0.863,39.37,-33.755964,150.696635
+b_000074,way,956490092,apartments,,nsw_address_point,40 Woodriff Street Penrith,8,1,nsw_unit_addresses,10,40.94,7,12403146406,Penrith,0.863,39.09,-33.756091,150.695857
+b_000075,way,956490093,apartments,,nsw_address_point,42-44 Woodriff Street Penrith,12,1,nsw_unit_addresses,7,40.95,6,12403146406,Penrith,0.863,39.15,-33.756183,150.695576
+b_000076,way,956490094,apartments,,nsw_address_point,217 Derby Street Penrith,12,1,nsw_unit_addresses,7,40.61,4,12403146406,Penrith,0.863,38.72,-33.756337,150.695821
+b_000077,way,956490095,apartments,,nsw_address_point,215 Derby Street Penrith,12,1,nsw_unit_addresses,8,40.62,6,12403146406,Penrith,0.863,38.87,-33.756409,150.696102
+b_000078,way,956490096,apartments,,nsw_address_point,213 Derby Street Penrith,15,1,nsw_unit_addresses,9,40.71,7,12403146406,Penrith,0.863,38.96,-33.756545,150.696233
+b_000079,way,956490097,apartments,,nsw_address_point,209 Derby Street Penrith,15,1,nsw_unit_addresses,11,40.88,8,12403146406,Penrith,0.863,39.33,-33.75677,150.696587
+b_000080,way,956490098,apartments,,nsw_address_point,207 Derby Street Penrith,60,2,nsw_unit_addresses,15,41.09,8,12403146406,Penrith,0.863,39.77,-33.756999,150.696727
+b_000081,way,956490099,apartments,,nsw_address_point,207 Derby Street Penrith,60,2,nsw_unit_addresses,7,40.99,6,12403146406,Penrith,0.863,39.69,-33.756825,150.696939
+b_000082,way,956490114,apartments,,nsw_address_point,108 Lethbridge Street Penrith,20,1,nsw_unit_addresses,21,41.15,9,12403146405,Penrith,0.763,39.5,-33.756986,150.701531
+b_000083,way,956490115,apartments,,nsw_address_point,37A Evan Street Penrith,20,2,nsw_unit_addresses,8,41.22,6,12403146405,Penrith,0.763,40.01,-33.757096,150.701074
+b_000084,way,956490116,apartments,,nsw_address_point,37A Evan Street Penrith,20,2,nsw_unit_addresses,12,41.35,7,12403146405,Penrith,0.763,40.21,-33.757204,150.700678
+b_000085,way,956490117,apartments,,nsw_address_point,37-39 Evan Street Penrith,12,1,nsw_unit_addresses,16,40.84,7,12403146405,Penrith,0.763,39.38,-33.757374,150.70134
+b_000086,way,956490125,apartments,,nsw_address_point,41-45 Evan Street Penrith,18,1,nsw_unit_addresses,23,40.88,9,12403146405,Penrith,0.763,39.57,-33.757725,150.701159
+b_000087,way,956490126,apartments,,nsw_address_point,165-169 Derby Street Penrith,18,1,nsw_unit_addresses,13,41.08,8,12403146405,Penrith,0.763,39.68,-33.75808,150.700937
+b_000088,way,956490127,apartments,,nsw_address_point,171-173 Derby Street Penrith,24,2,nsw_unit_addresses,7,41.16,6,12403146405,Penrith,0.763,40.2,-33.757992,150.700621
+b_000089,way,1001391466,apartments,,nsw_address_point,69 Thornton Drive Penrith,,1,area_rule,8,41.7,6,12403146442,Penrith,,40.59,-33.746358,150.695992
+b_000090,way,1001573808,apartments,,nsw_address_point,17 Hudson Street Penrith,,1,area_rule,4,42.8,5,12403146442,Penrith,,41.67,-33.745978,150.697424
+b_000091,way,1039001697,apartments,,nsw_address_point,6 Orana Avenue Penrith,14,2,nsw_unit_addresses,5,40.66,5,12403146429,Penrith,0.833,38.49,-33.744461,150.712911
+b_000092,way,1039001781,apartments,,nsw_address_point,6 Orana Avenue Penrith,14,2,nsw_unit_addresses,11,40.58,6,12403146429,Penrith,0.833,38.63,-33.744373,150.712706
+b_000093,way,1039235300,apartments,,nsw_address_point,33 Robert Street Penrith,10,2,nsw_unit_addresses,5,40.93,6,12403146432,Penrith,0.574,38.31,-33.748352,150.705398
+b_000094,way,1039235301,apartments,,nsw_address_point,33 Robert Street Penrith,10,2,nsw_unit_addresses,5,40.84,6,12403146432,Penrith,0.574,38.28,-33.748523,150.705359
+b_000095,way,1039235302,apartments,,nsw_address_point,12 Robert Street Penrith,10,1,nsw_unit_addresses,14,41.55,6,12403146432,Penrith,0.574,39.69,-33.749346,150.707416
+b_000096,way,1039235328,apartments,,nsw_address_point,14-16 Robert Street Penrith,12,2,nsw_unit_addresses,9,41.36,8,12403146432,Penrith,0.574,39.34,-33.749411,150.707065
+b_000097,way,1039235329,apartments,,nsw_address_point,14-16 Robert Street Penrith,12,2,nsw_unit_addresses,5,41.41,6,12403146432,Penrith,0.574,39.08,-33.749171,150.707031
+b_000098,way,1039238545,apartments,,nsw_address_point,5-7 Thurston Street Penrith,16,2,nsw_unit_addresses,8,41.5,6,12403146432,Penrith,0.574,40.08,-33.749835,150.707768
+b_000099,way,1039238546,apartments,,nsw_address_point,5-7 Thurston Street Penrith,16,2,nsw_unit_addresses,8,41.53,7,12403146432,Penrith,0.574,40.2,-33.749865,150.707983
+b_000100,way,1039238559,apartments,,nsw_address_point,13 Thurston Street Penrith,9,1,nsw_unit_addresses,8,41.23,5,12403146432,Penrith,0.574,39.78,-33.749795,150.707101
+b_000101,way,1039238561,apartments,,nsw_address_point,19-21 Thurston Street Penrith,18,1,nsw_unit_addresses,20,40.85,9,12403146432,Penrith,0.574,39.1,-33.749683,150.706558
+b_000102,way,1039238567,apartments,,nsw_address_point,35-37 Thurston Street Penrith,5,1,nsw_unit_addresses,6,40.18,6,12403146432,Penrith,0.574,37.62,-33.749597,150.704958
+b_000103,way,1039238621,apartments,,nsw_address_point,1 Thurston Street Penrith,6,1,nsw_unit_addresses,8,41.56,6,12403146432,Penrith,0.574,40.46,-33.749931,150.708375
+b_000104,way,1039245913,apartments,,nsw_address_point,7-9 Lemongrove Road Penrith,11,1,nsw_unit_addresses,15,40.8,8,12403146433,Penrith,0.752,37.96,-33.749061,150.704354
+b_000105,way,1039245914,apartments,,nsw_address_point,5 Lemongrove Road Penrith,12,1,nsw_unit_addresses,12,40.85,7,12403146433,Penrith,0.752,38.08,-33.748942,150.704608
+b_000106,way,1054628833,apartments,,nsw_address_point,114 Station Street Penrith,25,1,nsw_unit_addresses,11,42.37,6,12403146426,Penrith,0.478,40.36,-33.75553,150.693513
+b_000107,way,1064239431,apartments,,nsw_address_point,18 Colless Street Penrith,46,1,nsw_unit_addresses,26,40.07,10,12403146417,Penrith,0.754,38.97,-33.758519,150.708081
+b_000108,way,1076272890,apartments,,osm_address,20-22 The Crescent Penrith,12,1,nsw_unit_addresses,12,41.7,9,12403146433,Penrith,0.752,40.59,-33.7521,150.704312
+b_000109,way,1076272892,apartments,,nsw_address_point,15 Hemmings Street Penrith,6,1,nsw_unit_addresses,6,41.76,6,12403146433,Penrith,0.752,40.38,-33.751646,150.704511
+b_000110,way,1076272893,apartments,,nsw_address_point,11-13 Hemmings Street Penrith,15,1,nsw_unit_addresses,13,41.67,6,12403146433,Penrith,0.752,40.21,-33.751441,150.704481
+b_000111,way,1076272895,apartments,,nsw_address_point,9 Hemmings Street Penrith,7,1,nsw_unit_addresses,9,41.48,6,12403146433,Penrith,0.752,39.96,-33.751124,150.704565
+b_000112,way,1076272896,apartments,,nsw_address_point,7 Hemmings Street Penrith,7,1,nsw_unit_addresses,9,41.2,6,12403146433,Penrith,0.752,39.86,-33.750945,150.704601
+b_000113,way,1076272897,apartments,,osm_address,5 Hemmings Street Penrith,7,1,nsw_unit_addresses,10,41.09,7,12403146433,Penrith,0.752,39.6,-33.750739,150.704683
+b_000114,way,1076272898,apartments,,nsw_address_point,3 Hemmings Street Penrith,6,1,nsw_unit_addresses,11,40.93,6,12403146433,Penrith,0.752,39.27,-33.75056,150.704682
+b_000115,way,1076272911,apartments,,nsw_address_point,8 Macquarie Avenue Penrith,8,1,nsw_unit_addresses,8,40.86,6,12403146433,Penrith,0.752,39.0,-33.750838,150.70402
+b_000116,way,1076272937,apartments,,nsw_address_point,10-12 Hemmings Street Penrith,,1,area_rule,13,41.99,7,12403146433,Penrith,0.752,40.99,-33.751378,150.705221
+b_000117,way,1076272948,apartments,,nsw_address_point,25 Blaxland Avenue Penrith,5,1,nsw_unit_addresses,9,42.46,8,12403146433,Penrith,0.752,41.64,-33.752147,150.705485
+b_000118,way,1076272950,apartments,,nsw_address_point,19 Blaxland Avenue Penrith,,1,area_rule,9,42.37,8,12403146433,Penrith,0.752,41.49,-33.751798,150.705566
+b_000119,way,1076272951,apartments,,nsw_address_point,17 Blaxland Avenue Penrith,5,1,nsw_unit_addresses,9,42.28,7,12403146433,Penrith,0.752,41.44,-33.751609,150.705608
+b_000120,way,1076272952,apartments,,nsw_address_point,13-15 Blaxland Avenue Penrith,10,1,nsw_unit_addresses,12,42.03,7,12403146433,Penrith,0.752,41.18,-33.751305,150.705572
+b_000121,way,1079359048,apartments,,nsw_address_point,20 Thurston Street Penrith,8,1,nsw_unit_addresses,8,40.63,6,12403146414,Penrith,0.772,39.19,-33.750343,150.706434
+b_000122,way,1079359049,apartments,,nsw_address_point,18 Thurston Street Penrith,8,1,nsw_unit_addresses,8,40.89,6,12403146414,Penrith,0.772,39.54,-33.750331,150.706652
+b_000123,way,1079359050,apartments,,nsw_address_point,16 Thurston Street Penrith,8,1,nsw_unit_addresses,8,41.16,8,12403146414,Penrith,0.772,39.72,-33.750366,150.706861
+b_000124,way,1079359051,apartments,,nsw_address_point,14 Thurston Street Penrith,6,1,nsw_unit_addresses,8,41.46,6,12403146414,Penrith,0.772,39.92,-33.75038,150.707061
+b_000125,way,1079359052,apartments,,nsw_address_point,2 Blaxland Avenue Penrith,28,2,nsw_unit_addresses,9,41.38,6,12403146414,Penrith,0.772,40.12,-33.750684,150.706869
+b_000126,way,1079359053,apartments,,nsw_address_point,2 Blaxland Avenue Penrith,28,2,nsw_unit_addresses,11,41.64,6,12403146414,Penrith,0.772,40.28,-33.750876,150.706822
+b_000127,way,1079359055,apartments,,nsw_address_point,9 Haynes Street Penrith,12,1,nsw_unit_addresses,12,42.02,6,12403146414,Penrith,0.772,41.0,-33.751448,150.706725
+b_000128,way,1079359056,apartments,,nsw_address_point,13-15 Haynes Street Penrith,12,1,nsw_unit_addresses,15,42.17,6,12403146414,Penrith,0.772,41.25,-33.75186,150.70659
+b_000129,way,1079359057,apartments,,nsw_address_point,17-19 Haynes Street Penrith,25,1,nsw_unit_addresses,24,42.13,8,12403146414,Penrith,0.772,41.2,-33.752214,150.70657
+b_000130,way,1079359058,apartments,,nsw_address_point,21-23 Haynes Street Penrith,14,1,nsw_unit_addresses,12,41.85,8,12403146414,Penrith,0.772,41.02,-33.752538,150.706497
+b_000131,way,1079359059,apartments,,nsw_address_point,25 Haynes Street Penrith,28,3,nsw_unit_addresses,11,41.71,8,12403146414,Penrith,0.772,40.85,-33.752939,150.706414
+b_000132,way,1079359060,apartments,,nsw_address_point,25 Haynes Street Penrith,28,3,nsw_unit_addresses,8,41.76,7,12403146414,Penrith,0.772,40.91,-33.753118,150.706225
+b_000133,way,1079359061,apartments,,nsw_address_point,25 Haynes Street Penrith,28,3,nsw_unit_addresses,7,41.53,6,12403146414,Penrith,0.772,40.72,-33.753181,150.70647
+b_000134,way,1079359066,apartments,,nsw_address_point,14 Blaxland Avenue Penrith,6,1,nsw_unit_addresses,8,42.32,7,12403146414,Penrith,0.772,41.44,-33.75186,150.706226
+b_000135,way,1079359067,apartments,,nsw_address_point,12 Blaxland Avenue Penrith,5,1,nsw_unit_addresses,7,42.34,6,12403146414,Penrith,0.772,41.43,-33.751724,150.706358
+b_000136,way,1079359072,apartments,,nsw_address_point,222 Blaxland Avenue Penrith,,1,area_rule,11,41.18,6,12403146414,Penrith,0.772,40.04,-33.750727,150.706444
+b_000137,way,1079359073,apartments,,nsw_address_point,12 Thurston Street Penrith,8,1,nsw_unit_addresses,10,41.59,8,12403146414,Penrith,0.772,40.18,-33.750502,150.707499
+b_000138,way,1079359074,apartments,,nsw_address_point,10 Thurston Street Penrith,8,1,nsw_unit_addresses,8,41.57,6,12403146414,Penrith,0.772,40.37,-33.750475,150.707726
+b_000139,way,1079359075,apartments,,nsw_address_point,8 Thurston Street Penrith,9,1,nsw_unit_addresses,8,41.73,6,12403146414,Penrith,0.772,40.55,-33.750481,150.707943
+b_000140,way,1079359076,apartments,,nsw_address_point,4 Thurston Street Penrith,5,1,nsw_unit_addresses,8,41.96,8,12403146414,Penrith,0.772,40.83,-33.750567,150.708163
+b_000141,way,1079359077,apartments,,nsw_address_point,21-23 King Street Penrith,13,1,nsw_unit_addresses,15,42.1,7,12403146414,Penrith,0.772,40.9,-33.750882,150.708112
+b_000142,way,1079359083,apartments,,nsw_address_point,37-39 King Street Penrith,10,1,nsw_unit_addresses,5,41.82,7,12403146414,Penrith,0.772,40.71,-33.751879,150.707905
+b_000143,way,1079359086,apartments,,nsw_address_point,47 King Street Penrith,6,2,nsw_unit_addresses,4,41.61,4,12403146414,Penrith,0.772,40.72,-33.752267,150.707713
+b_000144,way,1079359087,apartments,,osm_address,47 King Street Penrith,6,2,nsw_unit_addresses,4,41.89,4,12403146414,Penrith,0.772,40.63,-33.752268,150.707968
+b_000145,way,1079359088,apartments,,osm_address,49-51 King Street Penrith,12,1,nsw_unit_addresses,16,41.81,6,12403146414,Penrith,0.772,40.67,-33.752557,150.707696
+b_000146,way,1079359089,apartments,,osm_address,53-55 King Street Penrith,12,1,nsw_unit_addresses,11,41.83,6,12403146414,Penrith,0.772,40.68,-33.75282,150.707765
+b_000147,way,1079359092,apartments,,nsw_address_point,1-2 The Crescent Penrith,17,2,nsw_unit_addresses,7,41.55,7,12403146414,Penrith,0.772,40.72,-33.753483,150.707664
+b_000148,way,1079359093,apartments,,nsw_address_point,1-2 The Crescent Penrith,17,2,nsw_unit_addresses,7,41.47,5,12403146414,Penrith,0.772,40.72,-33.75366,150.707633
+b_000149,way,1079359094,apartments,,nsw_address_point,3 The Crescent Penrith,9,2,nsw_unit_addresses,4,41.44,4,12403146414,Penrith,0.772,40.7,-33.753601,150.70732
+b_000150,way,1079359095,apartments,,nsw_address_point,3 The Crescent Penrith,9,2,nsw_unit_addresses,6,41.46,6,12403146414,Penrith,0.772,40.7,-33.753413,150.707324
+b_000151,way,1079359096,apartments,,nsw_address_point,4 The Crescent Penrith,10,1,nsw_unit_addresses,9,41.46,7,12403146414,Penrith,0.772,40.67,-33.75338,150.707127
+b_000152,way,1079359097,apartments,,nsw_address_point,5 The Crescent Penrith,4,1,nsw_unit_addresses,5,41.48,5,12403146414,Penrith,0.772,40.65,-33.753363,150.706864
+b_000153,way,1079359106,apartments,,nsw_address_point,28-34 Haynes Street Penrith,20,2,nsw_unit_addresses,11,41.68,6,12403146414,Penrith,0.772,40.77,-33.752532,150.707249
+b_000154,way,1079359107,apartments,,nsw_address_point,28-34 Haynes Street Penrith,20,2,nsw_unit_addresses,11,41.75,8,12403146414,Penrith,0.772,40.87,-33.752332,150.707282
+b_000155,way,1079359108,apartments,,nsw_address_point,26A Haynes Street Penrith,,1,area_rule,5,41.84,6,12403146414,Penrith,0.772,40.94,-33.751991,150.707174
+b_000156,way,1079359109,apartments,,nsw_address_point,26C Haynes Street Penrith,,1,area_rule,5,41.65,5,12403146414,Penrith,0.772,40.83,-33.752048,150.707518
+b_000157,way,1079359111,apartments,,nsw_address_point,20 Haynes Street Penrith,,1,area_rule,5,41.69,5,12403146414,Penrith,0.772,40.85,-33.751841,150.707318
+b_000158,way,1079359112,apartments,,nsw_address_point,18 Haynes Street Penrith,,1,area_rule,4,41.73,4,12403146414,Penrith,0.772,40.78,-33.75172,150.707318
+b_000159,way,1079359119,apartments,,nsw_address_point,2-4 Haynes Street Penrith,10,1,nsw_unit_addresses,10,41.66,9,12403146414,Penrith,0.772,40.37,-33.750789,150.707579
+b_000160,way,1079364183,apartments,,nearest_osm_street,,,,area_rule,11,43.32,8,12403146413,Penrith,0.0,41.89,-33.750761,150.709172
+b_000161,way,1079364190,apartments,,nearest_osm_street,,,,area_rule,11,44.22,8,12403146413,Penrith,0.0,42.67,-33.751513,150.709393
+b_000162,way,1079364192,apartments,,nearest_osm_street,,,,area_rule,16,44.24,7,12403146413,Penrith,0.0,42.79,-33.751762,150.710316
+b_000163,way,1079364209,apartments,,nsw_address_point,2 Gascoigne Street Penrith,30,1,area_rule (unit-address count implausible),4,43.67,6,12403146413,Penrith,0.0,42.07,-33.752496,150.709354
+b_000164,way,1079404616,apartments,,nsw_address_point,20-32 Gascoigne Street Penrith,,1,area_rule,44,43.31,13,12403146413,Penrith,0.0,41.99,-33.752642,150.710214
+b_000165,way,1079404625,apartments,,nsw_address_point,14-18 Sherwood Circuit Penrith,10,1,nsw_unit_addresses,16,42.52,8,12403146413,Penrith,0.0,41.18,-33.752944,150.710758
+b_000166,way,1079416811,apartments,,nsw_address_point,1 Markham Avenue Penrith,47,1,nsw_unit_addresses,34,41.36,9,12403146412,Penrith,0.909,39.87,-33.754659,150.711275
+b_000167,way,1079416816,apartments,,nsw_address_point,139 Cox Avenue Penrith,,1,area_rule,11,41.39,8,12403146412,Penrith,0.909,39.85,-33.755011,150.710794
+b_000168,way,1079990472,apartments,,nsw_address_point,52-54 King Street Penrith,16,1,nsw_unit_addresses,18,41.53,8,12403146412,Penrith,0.909,40.67,-33.753831,150.708352
+b_000169,way,1080676573,apartments,,nsw_address_point,211 Derby Street Penrith,12,1,nsw_unit_addresses,10,40.79,7,12403146406,Penrith,0.863,39.17,-33.75661,150.69647
+b_000170,way,1080676576,apartments,,nsw_address_point,36 Castlereagh Street Penrith,8,1,nsw_unit_addresses,9,41.39,6,12403146405,Penrith,0.763,39.99,-33.75693,150.698101
+b_000171,way,1080676577,apartments,,nsw_address_point,38 Castlereagh Street Penrith,18,1,nsw_unit_addresses,11,41.57,8,12403146405,Penrith,0.763,40.36,-33.75713,150.697843
+b_000172,way,1080676590,apartments,,nsw_address_point,193-195 Derby Street Penrith,18,1,nsw_unit_addresses,13,41.37,9,12403146405,Penrith,0.763,39.96,-33.757402,150.698834
+b_000173,way,1080676592,apartments,,nsw_address_point,191 Derby Street Penrith,15,1,nsw_unit_addresses,9,41.29,6,12403146405,Penrith,0.763,39.61,-33.757346,150.699128
+b_000174,way,1080676593,apartments,,nsw_address_point,189 Derby Street Penrith,15,1,nsw_unit_addresses,18,41.22,10,12403146405,Penrith,0.763,39.93,-33.757535,150.699328
+b_000175,way,1080676594,apartments,,nsw_address_point,187 Derby Street Penrith,13,1,nsw_unit_addresses,13,41.14,9,12403146405,Penrith,0.763,40.15,-33.757691,150.699555
+b_000176,way,1080676595,apartments,,nsw_address_point,181 Derby Street Penrith,21,1,nsw_unit_addresses,20,41.15,9,12403146405,Penrith,0.763,40.21,-33.75767,150.69986
+b_000177,way,1080676596,apartments,,nsw_address_point,179A Derby Street Penrith,,1,area_rule,7,41.17,5,12403146405,Penrith,0.763,40.24,-33.757553,150.700143
+b_000178,way,1080676597,apartments,,nsw_address_point,179 Derby Street Penrith,9,1,nsw_unit_addresses,4,41.01,6,12403146405,Penrith,0.763,40.14,-33.757923,150.700034
+b_000179,way,1080676598,apartments,,nsw_address_point,175-177 Derby Street Penrith,24,2,nsw_unit_addresses,9,41.06,7,12403146405,Penrith,0.763,40.2,-33.757984,150.700299
+b_000180,way,1080676599,apartments,,nsw_address_point,175-177 Derby Street Penrith,24,2,nsw_unit_addresses,9,41.1,7,12403146405,Penrith,0.763,40.24,-33.757718,150.700386
+b_000181,way,1080676600,apartments,,nsw_address_point,171-173 Derby Street Penrith,24,2,nsw_unit_addresses,7,41.06,7,12403146405,Penrith,0.763,40.06,-33.757624,150.700783
+b_000182,way,1080676601,apartments,,nsw_address_point,132 Lethbridge Street Penrith,54,4,nsw_unit_addresses,4,41.53,5,12403146405,Penrith,0.763,40.49,-33.757088,150.700335
+b_000183,way,1080676602,apartments,,nsw_address_point,132 Lethbridge Street Penrith,54,4,nsw_unit_addresses,4,41.59,4,12403146405,Penrith,0.763,40.41,-33.756975,150.700045
+b_000184,way,1080676603,apartments,,nsw_address_point,132 Lethbridge Street Penrith,54,4,nsw_unit_addresses,4,41.6,5,12403146405,Penrith,0.763,40.13,-33.756862,150.699551
+b_000185,way,1080676605,apartments,,nsw_address_point,132 Lethbridge Street Penrith,54,4,nsw_unit_addresses,21,41.44,11,12403146405,Penrith,0.763,40.06,-33.757072,150.699698
+b_000186,way,1080899335,apartments,,nearest_osm_street,,,,area_rule,7,41.07,6,12403146420,Penrith,0.848,39.88,-33.757362,150.703491
+b_000187,way,1080899336,apartments,,nearest_osm_street,,,,area_rule,8,40.93,6,12403146420,Penrith,0.848,39.93,-33.757291,150.703164
+b_000188,way,1080899337,apartments,,nsw_address_point,86-88 Lethbridge Street Penrith,10,1,nsw_unit_addresses,15,40.65,8,12403146420,Penrith,0.848,39.85,-33.757583,150.703074
+b_000189,way,1080899340,apartments,,nsw_address_point,90 Lethbridge Street Penrith,6,1,nsw_unit_addresses,10,40.63,7,12403146420,Penrith,0.848,39.71,-33.757504,150.702846
+b_000190,way,1080899363,apartments,,nsw_address_point,42 Hope Street Penrith,,1,area_rule,6,40.45,7,12403146420,Penrith,0.848,38.91,-33.759137,150.70725
+b_000191,way,1080899364,apartments,,nsw_address_point,46 Hope Street Penrith,,1,area_rule,6,40.26,6,12403146420,Penrith,0.848,38.73,-33.759026,150.707019
+b_000192,way,1080899365,apartments,,nsw_address_point,52 Hope Street Penrith,,1,area_rule,46,39.78,18,12403146420,Penrith,0.848,38.17,-33.758853,150.706124
+b_000193,way,1080899374,apartments,,nsw_address_point,63 Hope Street Penrith,,1,area_rule,5,39.7,7,12403146420,Penrith,0.848,37.92,-33.757964,150.705679
+b_000194,way,1080899377,apartments,,nearest_osm_street,,,,area_rule,7,39.59,5,12403146420,Penrith,0.848,37.81,-33.758421,150.705828
+b_000195,way,1080899378,apartments,,nsw_address_point,60 Lethbridge Street Penrith,8,1,nsw_unit_addresses,9,39.58,6,12403146420,Penrith,0.848,37.72,-33.758173,150.705934
+b_000196,way,1080899379,apartments,,nearest_osm_street,,,,area_rule,7,39.63,7,12403146420,Penrith,0.848,37.66,-33.758,150.705998
+b_000197,way,1080899387,apartments,,nearest_osm_street,,,,area_rule,4,39.81,5,12403146420,Penrith,0.848,37.8,-33.75816,150.70683
+b_000198,way,1080899389,apartments,,nearest_osm_street,,,,area_rule,9,39.82,7,12403146420,Penrith,0.848,38.04,-33.758623,150.706776
+b_000199,way,1080899390,apartments,,nsw_address_point,46-48 Lethbridge Street Penrith,12,2,nsw_unit_addresses,4,39.85,5,12403146420,Penrith,0.848,38.02,-33.758429,150.706925
+b_000200,way,1080899391,apartments,,nsw_address_point,46-48 Lethbridge Street Penrith,12,2,nsw_unit_addresses,8,39.91,7,12403146420,Penrith,0.848,37.93,-33.75818,150.707002
+b_000201,way,1080899392,apartments,,nsw_address_point,41 Hope Street Penrith,30,1,nsw_unit_addresses,32,40.11,10,12403146420,Penrith,0.848,38.52,-33.758459,150.707169
+b_000202,way,1080899399,apartments,,nsw_address_point,38 Hope Street Penrith,24,1,nsw_unit_addresses,13,40.46,7,12403146417,Penrith,0.754,39.23,-33.759309,150.707774
+b_000203,way,1080899403,apartments,,nsw_address_point,25-31 Hope Street Penrith,61,2,nsw_unit_addresses,14,39.93,8,12403146417,Penrith,0.754,39.01,-33.75894,150.708707
+b_000204,way,1080899404,apartments,,nsw_address_point,25-31 Hope Street Penrith,61,2,nsw_unit_addresses,14,39.89,7,12403146417,Penrith,0.754,38.87,-33.759096,150.708964
+b_000205,way,1108103361,apartments,,nsw_address_point,7-13 Derby Street Kingswood,18,4,nsw_unit_addresses,7,41.32,6,12403146240,Kingswood - Werrington,1.0,40.19,-33.76195,150.717573
+b_000206,way,1108103362,apartments,,nsw_address_point,7-13 Derby Street Kingswood,18,4,nsw_unit_addresses,5,41.32,6,12403146240,Kingswood - Werrington,1.0,39.94,-33.761797,150.717665
+b_000207,way,1108103363,apartments,,nsw_address_point,7-13 Derby Street Kingswood,18,4,nsw_unit_addresses,5,41.42,5,12403146240,Kingswood - Werrington,1.0,40.07,-33.76173,150.717334
+b_000208,way,1108103364,apartments,,nsw_address_point,7-13 Derby Street Kingswood,18,4,nsw_unit_addresses,6,41.4,6,12403146240,Kingswood - Werrington,1.0,40.22,-33.761899,150.717316
+b_000209,way,1108103378,apartments,,nsw_address_point,25-27 Derby Street Kingswood,5,1,nsw_unit_addresses,7,41.39,6,12403146240,Kingswood - Werrington,1.0,40.13,-33.761561,150.716125
+b_000210,way,1108103413,apartments,,nsw_address_point,4-6 Orth Street Kingswood,10,1,nsw_unit_addresses,8,41.01,6,12403146240,Kingswood - Werrington,1.0,39.62,-33.761082,150.719095
+b_000211,way,1108106099,apartments,,nsw_address_point,7 Bringelly Road Kingswood,14,2,nsw_unit_addresses,13,41.56,7,12403146244,Kingswood - Werrington,0.662,38.24,-33.76028,150.719943
+b_000212,way,1108106100,apartments,,nsw_address_point,7 Bringelly Road Kingswood,14,2,nsw_unit_addresses,5,41.44,5,12403146244,Kingswood - Werrington,0.662,38.33,-33.760415,150.719687
+b_000213,way,1108106115,apartments,,nearest_osm_street,,,,area_rule,7,42.03,6,12403146244,Kingswood - Werrington,0.662,40.27,-33.760331,150.718259
+b_000214,way,1108106116,apartments,,nsw_address_point,21-25 Orth Street Kingswood,15,3,nsw_unit_addresses,5,42.25,6,12403146244,Kingswood - Werrington,0.662,40.16,-33.760095,150.718162
+b_000215,way,1108106117,apartments,,nsw_address_point,16-20 Rodgers Street Kingswood,26,2,nsw_unit_addresses,5,42.87,7,12403146244,Kingswood - Werrington,0.662,40.21,-33.759824,150.71825
+b_000216,way,1108106118,apartments,,nsw_address_point,14 Rodgers Street Kingswood,,1,area_rule,5,42.84,8,12403146244,Kingswood - Werrington,0.662,39.96,-33.759894,150.718566
+b_000217,way,1108106119,apartments,,nsw_address_point,13 Orth Street Kingswood,,1,area_rule,5,42.42,6,12403146244,Kingswood - Werrington,0.662,39.97,-33.760167,150.718478
+b_000218,way,1108106120,apartments,,nsw_address_point,16-20 Rodgers Street Kingswood,26,2,nsw_unit_addresses,12,42.66,8,12403146244,Kingswood - Werrington,0.662,40.15,-33.759998,150.71836
+b_000219,way,1108106121,apartments,,nearest_osm_street,,,,area_rule,7,43.16,7,12403146244,Kingswood - Werrington,0.662,40.31,-33.759653,150.718481
+b_000220,way,1108106122,apartments,,nsw_address_point,21-25 Orth Street Kingswood,15,3,nsw_unit_addresses,6,41.72,6,12403146244,Kingswood - Werrington,0.662,40.13,-33.760219,150.717782
+b_000221,way,1108106123,apartments,,nsw_address_point,22-26 Rodgers Street Kingswood,19,4,nsw_unit_addresses,6,42.9,6,12403146244,Kingswood - Werrington,0.662,40.22,-33.759548,150.717997
+b_000222,way,1108106124,apartments,,nsw_address_point,22-26 Rodgers Street Kingswood,19,4,nsw_unit_addresses,11,42.41,8,12403146244,Kingswood - Werrington,0.662,40.23,-33.759917,150.717882
+b_000223,way,1108106126,apartments,,nsw_address_point,21-25 Orth Street Kingswood,15,3,nsw_unit_addresses,6,42.18,6,12403146244,Kingswood - Werrington,0.662,40.3,-33.760067,150.718001
+b_000224,way,1108106127,apartments,,nsw_address_point,22-26 Rodgers Street Kingswood,19,4,nsw_unit_addresses,6,42.9,4,12403146244,Kingswood - Werrington,0.662,40.18,-33.759788,150.718096
+b_000225,way,1108106128,apartments,,nsw_address_point,22-26 Rodgers Street Kingswood,19,4,nsw_unit_addresses,8,42.53,6,12403146244,Kingswood - Werrington,0.662,40.13,-33.759745,150.717764
+b_000226,way,1108114157,apartments,,nsw_address_point,57 Stafford Street Kingswood,6,2,nsw_unit_addresses,4,40.66,4,12403146262,Kingswood - Werrington,,36.83,-33.762377,150.71386
+b_000227,way,1108114158,apartments,,nsw_address_point,57 Stafford Street Kingswood,6,2,nsw_unit_addresses,4,40.76,5,12403146262,Kingswood - Werrington,,36.87,-33.762589,150.713792
+b_000228,way,1108114161,apartments,,nsw_address_point,59 Stafford Street Kingswood,6,1,nsw_unit_addresses,4,40.67,6,12403146262,Kingswood - Werrington,,36.85,-33.762468,150.713652
+b_000229,way,1108114177,apartments,,nsw_address_point,77 Stafford Street Kingswood,6,2,nsw_unit_addresses,5,41.25,6,12403146262,Kingswood - Werrington,,38.76,-33.761921,150.711989
+b_000230,way,1108114181,apartments,,nsw_address_point,77 Stafford Street Kingswood,6,2,nsw_unit_addresses,6,41.29,6,12403146262,Kingswood - Werrington,,38.88,-33.761859,150.711803
+b_000231,way,1108114182,apartments,,nearest_osm_street,,,,area_rule,5,41.26,4,12403146262,Kingswood - Werrington,,39.06,-33.761813,150.711584
+b_000232,way,1108114183,apartments,,nsw_address_point,79 Stafford Street Kingswood,6,2,nsw_unit_addresses,5,41.35,6,12403146262,Kingswood - Werrington,,39.0,-33.761977,150.711564
+b_000233,way,1108114184,apartments,,nsw_address_point,79 Stafford Street Kingswood,6,2,nsw_unit_addresses,6,41.49,7,12403146262,Kingswood - Werrington,,38.78,-33.762221,150.711478
+b_000234,way,1108117982,apartments,,nsw_address_point,12-14 Hope Street Penrith,27,1,nsw_unit_addresses,13,40.66,8,12403146417,Penrith,0.754,38.94,-33.759775,150.709926
+b_000235,way,1108118007,apartments,,nsw_address_point,93-103 Derby Street Penrith,23,1,area_rule (unit-address count implausible),6,40.69,4,12403146417,Penrith,0.754,39.19,-33.759845,150.708367
+b_000236,way,1108118009,apartments,,nsw_address_point,97 Derby Street Penrith,,2,area_rule,5,40.57,6,12403146417,Penrith,0.754,39.34,-33.759672,150.708254
+b_000237,way,1108118010,apartments,,nsw_address_point,97 Derby Street Penrith,,2,area_rule,4,40.73,4,12403146417,Penrith,0.754,39.27,-33.759796,150.708058
+b_000238,way,1108118011,apartments,,nsw_address_point,101 Derby Street Penrith,,1,area_rule,13,40.8,7,12403146417,Penrith,0.754,39.28,-33.75964,150.707639
+b_000239,way,1109014682,apartments,,nsw_address_point,29 Santley Crescent Kingswood,7,1,nsw_unit_addresses,8,41.75,7,12403146227,Kingswood - Werrington,0.862,37.54,-33.759826,150.721228
+b_000240,way,1109014687,apartments,,nsw_address_point,27 Santley Crescent Kingswood,27,2,nsw_unit_addresses,7,41.74,6,12403146227,Kingswood - Werrington,0.862,38.99,-33.759588,150.721783
+b_000241,way,1109014688,apartments,,nsw_address_point,27 Santley Crescent Kingswood,27,2,nsw_unit_addresses,6,41.49,4,12403146227,Kingswood - Werrington,0.862,39.04,-33.759827,150.721712
+b_000242,way,1109014689,apartments,,nsw_address_point,23 Santley Crescent Kingswood,8,1,nsw_unit_addresses,7,41.21,6,12403146227,Kingswood - Werrington,0.862,39.8,-33.759948,150.721873
+b_000243,way,1109014692,apartments,,nsw_address_point,21 Santley Crescent Kingswood,34,4,nsw_unit_addresses,7,41.54,4,12403146227,Kingswood - Werrington,0.862,39.78,-33.759595,150.721978
+b_000244,way,1109014693,apartments,,nsw_address_point,21 Santley Crescent Kingswood,34,4,nsw_unit_addresses,13,41.47,8,12403146227,Kingswood - Werrington,0.862,39.78,-33.759464,150.722307
+b_000245,way,1109014694,apartments,,nsw_address_point,21 Santley Crescent Kingswood,34,4,nsw_unit_addresses,10,41.38,7,12403146227,Kingswood - Werrington,0.862,40.2,-33.75969,150.722318
+b_000246,way,1109014695,apartments,,nsw_address_point,162-164 Great Western Highway Kingswood,8,1,nsw_unit_addresses,9,41.35,6,12403146227,Kingswood - Werrington,0.862,40.34,-33.75964,150.722606
+b_000247,way,1109014696,apartments,,nsw_address_point,158-160 Great Western Highway Kingswood,24,2,nsw_unit_addresses,7,41.34,7,12403146227,Kingswood - Werrington,0.862,40.33,-33.759639,150.722844
+b_000248,way,1109014697,apartments,,nsw_address_point,158-160 Great Western Highway Kingswood,24,2,nsw_unit_addresses,7,41.31,6,12403146227,Kingswood - Werrington,0.862,40.3,-33.759678,150.723074
+b_000249,way,1109014698,apartments,,nsw_address_point,154-156 Great Western Highway Kingswood,18,1,nsw_unit_addresses,15,41.32,8,12403146227,Kingswood - Werrington,0.862,40.07,-33.759844,150.723293
+b_000250,way,1109014700,apartments,,nsw_address_point,150-152 Great Western Highway Kingswood,20,1,nsw_unit_addresses,14,41.29,8,12403146227,Kingswood - Werrington,0.862,39.4,-33.759945,150.723684
+b_000251,way,1109014711,apartments,,nsw_address_point,1 Santley Crescent Kingswood,,1,area_rule,13,40.77,7,12403146227,Kingswood - Werrington,0.862,38.83,-33.760537,150.724157
+b_000252,way,1109014714,apartments,,nsw_address_point,5 Santley Crescent Kingswood,7,2,nsw_unit_addresses,5,41.24,7,12403146227,Kingswood - Werrington,0.862,39.54,-33.760493,150.723741
+b_000253,way,1109014715,apartments,,nsw_address_point,5 Santley Crescent Kingswood,7,2,nsw_unit_addresses,6,41.22,7,12403146227,Kingswood - Werrington,0.862,39.79,-33.760289,150.723794
+b_000254,way,1109014716,apartments,,nsw_address_point,7 Santley Crescent Kingswood,8,1,nsw_unit_addresses,8,41.35,6,12403146227,Kingswood - Werrington,0.862,39.83,-33.76033,150.723559
+b_000255,way,1109014717,apartments,,nsw_address_point,9-11 Santley Crescent Kingswood,21,1,nsw_unit_addresses,12,41.28,7,12403146227,Kingswood - Werrington,0.862,39.87,-33.760261,150.723319
+b_000256,way,1109014718,apartments,,nsw_address_point,13 Santley Crescent Kingswood,6,1,nsw_unit_addresses,9,41.19,6,12403146227,Kingswood - Werrington,0.862,39.93,-33.760184,150.722946
+b_000257,way,1109014719,apartments,,nearest_osm_street,,,,area_rule,7,41.11,6,12403146227,Kingswood - Werrington,0.862,39.89,-33.760208,150.722687
+b_000258,way,1109014720,apartments,,nsw_address_point,17-19 Santley Crescent Kingswood,21,1,nsw_unit_addresses,14,41.21,8,12403146227,Kingswood - Werrington,0.862,40.14,-33.760043,150.722514
+b_000259,way,1109014721,apartments,,nsw_address_point,21 Santley Crescent Kingswood,34,4,nsw_unit_addresses,8,41.17,7,12403146227,Kingswood - Werrington,0.862,39.96,-33.760008,150.722093
+b_000260,way,1109014729,apartments,,nsw_address_point,14-18 Santley Crescent Kingswood,12,1,nsw_unit_addresses,11,40.7,8,12403146208,Kingswood - Werrington,0.798,37.18,-33.760411,150.721236
+b_000261,way,1109014730,apartments,,nsw_address_point,7 First Street Kingswood,10,1,nsw_unit_addresses,7,40.72,7,12403146208,Kingswood - Werrington,0.798,37.61,-33.760785,150.721233
+b_000262,way,1109014731,apartments,,nsw_address_point,9-11 First Street Kingswood,19,1,nsw_unit_addresses,21,40.97,9,12403146208,Kingswood - Werrington,0.798,38.28,-33.761068,150.721204
+b_000263,way,1109014734,apartments,,nsw_address_point,15-17 First Street Kingswood,15,1,nsw_unit_addresses,9,41.33,7,12403146208,Kingswood - Werrington,0.798,38.6,-33.761536,150.721207
+b_000264,way,1109014736,apartments,,nearest_osm_street,,,,area_rule,5,41.62,7,12403146208,Kingswood - Werrington,0.798,38.38,-33.762133,150.721065
+b_000265,way,1109014737,apartments,,nsw_address_point,23 First Street Kingswood,22,1,nsw_unit_addresses,11,41.51,6,12403146208,Kingswood - Werrington,0.798,38.6,-33.761894,150.720904
+b_000266,way,1109014738,apartments,,nsw_address_point,25 First Street Kingswood,9,1,nsw_unit_addresses,7,41.86,6,12403146208,Kingswood - Werrington,0.798,38.78,-33.762271,150.720931
+b_000267,way,1109014739,apartments,,nearest_osm_street,,,,area_rule,5,41.37,6,12403146208,Kingswood - Werrington,0.798,38.24,-33.761736,150.721178
+b_000268,way,1109014741,apartments,,nsw_address_point,29-31 First Street Kingswood,15,2,nsw_unit_addresses,6,41.97,6,12403146208,Kingswood - Werrington,0.798,38.84,-33.762694,150.721
+b_000269,way,1109014742,apartments,,nsw_address_point,29-31 First Street Kingswood,15,2,nsw_unit_addresses,8,42.12,6,12403146208,Kingswood - Werrington,0.798,39.22,-33.762791,150.720783
+b_000270,way,1109014743,apartments,,nsw_address_point,30 Bringelly Road Kingswood,6,1,nsw_unit_addresses,8,42.25,7,12403146208,Kingswood - Werrington,0.798,39.7,-33.762721,150.720297
+b_000271,way,1109014744,apartments,,nsw_address_point,28 Bringelly Road Kingswood,8,1,nsw_unit_addresses,7,42.24,4,12403146208,Kingswood - Werrington,0.798,39.68,-33.762571,150.720271
+b_000272,way,1109014745,apartments,,nsw_address_point,26 Bringelly Road Kingswood,8,1,nsw_unit_addresses,9,42.15,7,12403146208,Kingswood - Werrington,0.798,39.61,-33.762393,150.720378
+b_000273,way,1109014746,apartments,,nsw_address_point,24 Bringelly Road Kingswood,8,1,nsw_unit_addresses,9,42.04,6,12403146208,Kingswood - Werrington,0.798,39.48,-33.762226,150.720406
+b_000274,way,1109014747,apartments,,nsw_address_point,22 Bringelly Road Kingswood,8,1,nsw_unit_addresses,12,41.86,6,12403146208,Kingswood - Werrington,0.798,39.22,-33.762035,150.720466
+b_000275,way,1109014748,apartments,,nsw_address_point,20 Bringelly Road Kingswood,8,1,nsw_unit_addresses,7,41.8,7,12403146208,Kingswood - Werrington,0.798,39.12,-33.761851,150.720448
+b_000276,way,1109014751,apartments,,nsw_address_point,14 Bringelly Road Kingswood,8,1,nsw_unit_addresses,10,41.21,9,12403146208,Kingswood - Werrington,0.798,38.64,-33.761292,150.720625
+b_000277,way,1109014752,apartments,,nsw_address_point,18 Paskin Street Kingswood,15,1,nsw_unit_addresses,16,41.13,9,12403146258,Kingswood - Werrington,1.0,37.49,-33.762424,150.723033
+b_000278,way,1109024421,apartments,,nsw_address_point,40 Bringelly Road Kingswood,3,1,nsw_unit_addresses,5,41.99,5,12403146223,Kingswood - Werrington,,38.78,-33.763923,150.720187
+b_000279,way,1109024427,apartments,,nsw_address_point,37 First Street Kingswood,5,1,nsw_unit_addresses,9,42.23,9,12403146223,Kingswood - Werrington,,38.9,-33.7635,150.720685
+b_000280,way,1109024452,apartments,,nearest_osm_street,,,,area_rule,5,41.4,6,12403146203,Kingswood - Werrington,,40.23,-33.762686,150.718715
+b_000281,way,1109024453,apartments,,nsw_address_point,4-6 Derby Street Kingswood,10,3,nsw_unit_addresses,8,41.16,8,12403146203,Kingswood - Werrington,,39.91,-33.762951,150.718575
+b_000282,way,1109024455,apartments,,nsw_address_point,4-6 Derby Street Kingswood,10,3,nsw_unit_addresses,4,41.19,5,12403146203,Kingswood - Werrington,,40.14,-33.762818,150.718358
+b_000283,way,1109024456,apartments,,nsw_address_point,4-6 Derby Street Kingswood,10,3,nsw_unit_addresses,7,41.34,6,12403146203,Kingswood - Werrington,,40.23,-33.762685,150.718517
+b_000284,way,1109024774,apartments,,nearest_osm_street,,,,area_rule,4,41.86,4,12403146227,Kingswood - Werrington,0.862,38.79,-33.759279,150.721629
+b_000285,way,1124092700,apartments,,nsw_address_point,124 Derby Street Penrith,21,2,nsw_unit_addresses,5,41.44,7,12403146419,Penrith,,40.02,-33.760238,150.706367
+b_000286,way,1124092701,apartments,,nsw_address_point,124 Derby Street Penrith,21,2,nsw_unit_addresses,4,41.38,6,12403146419,Penrith,,39.66,-33.760272,150.706566
+b_000287,way,1124092702,apartments,,nearest_osm_street,,,,area_rule,4,41.66,6,12403146419,Penrith,,40.03,-33.760519,150.706459
+b_000288,way,1124092710,apartments,,nsw_address_point,130 Derby Street Penrith,3,1,nsw_unit_addresses,5,40.93,5,12403146419,Penrith,,39.9,-33.759747,150.705888
+b_000289,way,1124092712,apartments,,nsw_address_point,130-132 Derby Street Penrith,7,3,nsw_unit_addresses,4,41.51,4,12403146419,Penrith,,40.59,-33.760116,150.705759
+b_000290,way,1124092715,apartments,,nearest_osm_street,,,,area_rule,4,41.67,6,12403146419,Penrith,,40.52,-33.760245,150.705491
+b_000291,way,1124092716,apartments,,nsw_address_point,130-132 Derby Street Penrith,7,3,nsw_unit_addresses,4,41.46,4,12403146419,Penrith,,40.3,-33.760039,150.705546
+b_000292,way,1124092717,apartments,,nsw_address_point,130-132 Derby Street Penrith,7,3,nsw_unit_addresses,4,41.17,5,12403146419,Penrith,,39.81,-33.759847,150.705612
+b_000293,way,1124092718,apartments,,nearest_osm_street,,,,area_rule,4,40.84,5,12403146419,Penrith,,39.68,-33.759678,150.705665
+b_000294,way,1124092719,apartments,,nsw_address_point,134 Derby Street Penrith,,1,area_rule,11,40.84,6,12403146419,Penrith,,39.43,-33.759766,150.705463
+b_000295,way,1124092720,apartments,,nsw_address_point,136 Derby Street Penrith,18,3,nsw_unit_addresses,9,41.41,8,12403146419,Penrith,,39.91,-33.760067,150.705351
+b_000296,way,1124092721,apartments,,nsw_address_point,136 Derby Street Penrith,18,3,nsw_unit_addresses,11,41.51,6,12403146419,Penrith,,39.84,-33.760078,150.705119
+b_000297,way,1124092722,apartments,,nsw_address_point,136 Derby Street Penrith,18,3,nsw_unit_addresses,11,40.86,6,12403146419,Penrith,,39.15,-33.759727,150.705217
+b_000298,way,1124092747,apartments,,nsw_address_point,147 Stafford Street Penrith,5,1,nsw_unit_addresses,6,41.95,6,12403146419,Penrith,,40.51,-33.760686,150.704785
+b_000299,way,1124092759,apartments,,nsw_address_point,131 Stafford Street Penrith,16,2,nsw_unit_addresses,7,42.11,6,12403146419,Penrith,,40.8,-33.760978,150.706102
+b_000300,way,1124092761,apartments,,nearest_osm_street,,,,area_rule,7,41.99,8,12403146419,Penrith,,40.48,-33.761305,150.706209
+b_000301,way,1124092762,apartments,,nsw_address_point,131 Stafford Street Penrith,16,2,nsw_unit_addresses,7,41.96,7,12403146419,Penrith,,40.35,-33.761065,150.70629
+b_000302,way,1124092764,apartments,,nearest_osm_street,,,,area_rule,5,41.79,4,12403146419,Penrith,,40.31,-33.760709,150.70641
+b_000303,way,1124113457,apartments,,nsw_address_point,152 Derby Street Penrith,8,1,nsw_unit_addresses,7,40.85,5,12403146421,Penrith,1.0,39.21,-33.759257,150.703656
+b_000304,way,1124113472,apartments,,nsw_address_point,170 Derby Street Penrith,,1,area_rule,6,41.67,6,12403146421,Penrith,1.0,39.96,-33.758846,150.701653
+b_000305,way,1124113475,apartments,,nsw_address_point,25 Tornaros Avenue Penrith,,1,area_rule,9,42.15,7,12403146421,Penrith,1.0,40.65,-33.759363,150.701313
+b_000306,way,1124113486,apartments,,nsw_address_point,7-13 Tornaros Avenue Penrith,9,1,nsw_unit_addresses,9,42.13,7,12403146421,Penrith,1.0,40.74,-33.759652,150.702457
+b_000307,way,1124113501,apartments,,nsw_address_point,59 Doonmore Street Penrith,4,1,nsw_unit_addresses,6,42.28,5,12403146421,Penrith,1.0,40.95,-33.760366,150.703303
+b_000308,way,1124113502,apartments,,nsw_address_point,61 Doonmore Street Penrith,,1,area_rule,6,42.24,4,12403146421,Penrith,1.0,41.02,-33.760584,150.70318
+b_000309,way,1124113513,apartments,,nsw_address_point,12-20 Tornaros Avenue Penrith,19,4,nsw_unit_addresses,6,42.35,6,12403146421,Penrith,1.0,41.12,-33.759934,150.702149
+b_000310,way,1124113514,apartments,,nsw_address_point,12-20 Tornaros Avenue Penrith,19,4,nsw_unit_addresses,6,42.28,7,12403146421,Penrith,1.0,41.19,-33.760115,150.702145
+b_000311,way,1124113515,apartments,,nsw_address_point,12-20 Tornaros Avenue Penrith,19,4,nsw_unit_addresses,9,42.27,6,12403146421,Penrith,1.0,41.11,-33.760036,150.70165
+b_000312,way,1124113517,apartments,,nsw_address_point,12-20 Tornaros Avenue Penrith,19,4,nsw_unit_addresses,4,42.32,7,12403146421,Penrith,1.0,41.12,-33.759864,150.701818
+b_000313,way,1124113519,apartments,,nsw_address_point,64 Evan Street Penrith,,1,area_rule,5,42.23,5,12403146421,Penrith,1.0,40.98,-33.759809,150.701193
+b_000314,way,1171551491,apartments,,nsw_address_point,134-136 Lethbridge Street Penrith,18,1,nsw_unit_addresses,7,41.49,6,12403146405,Penrith,0.763,39.92,-33.756768,150.699067
+b_000315,way,1173696676,apartments,,nsw_address_point,47 Colless Street Penrith,10,1,nsw_unit_addresses,11,41.57,6,12403146419,Penrith,,39.9,-33.761797,150.706495
+b_000316,way,1173696691,apartments,,nsw_address_point,146 Stafford Street Penrith,,1,area_rule,4,42.13,5,12403146419,Penrith,,40.63,-33.761771,150.704807
+b_000317,way,1173696706,apartments,,nsw_address_point,150-152 Stafford Street Penrith,,3,area_rule,7,42.42,6,12403146419,Penrith,,41.04,-33.761438,150.704395
+b_000318,way,1173696707,apartments,,nsw_address_point,150-152 Stafford Street Penrith,,3,area_rule,7,42.38,6,12403146419,Penrith,,41.01,-33.761472,150.704572
+b_000319,way,1173696708,apartments,,nsw_address_point,150-152 Stafford Street Penrith,,3,area_rule,8,42.43,6,12403146419,Penrith,,40.97,-33.761679,150.704411
+b_000320,way,1173696709,apartments,,nsw_address_point,148 Stafford Street Penrith,5,1,nsw_unit_addresses,9,42.32,7,12403146419,Penrith,,40.81,-33.761612,150.704704
+b_000321,way,1173696710,apartments,,nsw_address_point,17 Cronin Street Penrith,5,1,nsw_unit_addresses,8,41.97,7,12403146419,Penrith,,40.46,-33.762069,150.704546
+b_000322,way,1173696718,apartments,,nsw_address_point,27 Cronin Street Penrith,4,1,nsw_unit_addresses,6,42.24,6,12403146419,Penrith,,41.0,-33.76181,150.703367
+b_000323,way,1173705217,apartments,,nsw_address_point,293 Jamison Road Penrith,,2,area_rule,7,40.89,6,12403146403,Penrith,1.0,38.66,-33.761384,150.691932
+b_000324,way,1173705218,apartments,,nsw_address_point,293 Jamison Road Penrith,,2,area_rule,5,41.04,5,12403146403,Penrith,1.0,38.85,-33.761336,150.692117
+b_000325,way,1173705220,apartments,,nsw_address_point,109 Castlereagh Street Penrith,,1,area_rule,4,41.01,4,12403146403,Penrith,1.0,39.0,-33.761458,150.692257
+b_000326,way,1173705235,apartments,,nsw_address_point,95 Castlereagh Street Penrith,,2,area_rule,7,41.2,5,12403146403,Penrith,1.0,39.28,-33.760394,150.693085
+b_000327,way,1173705236,apartments,,nsw_address_point,95 Castlereagh Street Penrith,,2,area_rule,7,41.31,7,12403146403,Penrith,1.0,39.46,-33.760455,150.693308
+b_000328,way,1174553975,residential,2,nsw_address_point,1 Torton Place Penrith,22,1,area_rule (unit-address count implausible),5,40.35,6,12403146404,Penrith,0.9,38.12,-33.760479,150.696898
+b_000329,way,1174553976,residential,2,nearest_osm_street,,,,area_rule,4,40.57,7,12403146404,Penrith,0.9,38.17,-33.760604,150.697083
+b_000330,way,1174553977,residential,2,nearest_osm_street,,,,osm_flats_tag,5,40.83,6,12403146404,Penrith,0.9,38.55,-33.760392,150.697211
+b_000331,way,1174759627,apartments,,nsw_address_point,80-82 Castlereagh Street Penrith,6,1,nsw_unit_addresses,9,41.7,8,12403146404,Penrith,0.9,39.71,-33.760058,150.694592
+b_000332,way,1179690760,apartments,2,nsw_address_point,61 Mulgoa Road Penrith,15,3,nsw_unit_addresses,3,41.07,6,12403146424,Penrith,0.512,37.37,-33.755809,150.686346
+b_000333,way,1179690761,apartments,2,nsw_address_point,61 Retreat Drive Penrith,15,2,nsw_unit_addresses,3,41.36,4,12403146424,Penrith,0.512,38.15,-33.755718,150.686117
+b_000334,way,1179690762,apartments,2,nsw_address_point,61 Mulgoa Road Penrith,15,3,nsw_unit_addresses,3,41.18,5,12403146424,Penrith,0.512,38.04,-33.75561,150.6859
+b_000335,way,1179690763,apartments,2,nsw_address_point,61 Retreat Drive Penrith,15,2,nsw_unit_addresses,3,41.03,5,12403146424,Penrith,0.512,37.93,-33.755523,150.68566
+b_000336,way,1179690764,apartments,2,nsw_address_point,61 Mulgoa Road Penrith,15,3,nsw_unit_addresses,3,40.56,4,12403146424,Penrith,0.512,37.83,-33.755671,150.68557
+b_000337,way,1181984496,apartments,,nsw_address_point,17 Hand Avenue Penrith,17,1,nsw_unit_addresses,14,41.86,8,12403146401,Penrith,1.133,40.09,-33.759968,150.699465
+b_000338,way,1181984497,apartments,,nsw_address_point,15 Hand Avenue Penrith,,1,area_rule,10,41.45,6,12403146401,Penrith,1.133,39.84,-33.75967,150.699539
+b_000339,way,1181984523,apartments,,nsw_address_point,3 Hand Avenue Penrith,8,1,nsw_unit_addresses,11,40.93,9,12403146401,Penrith,1.133,39.71,-33.758597,150.699914
+b_000340,way,1192051688,apartments,,nsw_address_point,28 Cronin Street Penrith,,1,area_rule,6,41.66,7,12403146419,Penrith,,40.41,-33.762465,150.703647
+b_000341,way,1192051720,apartments,,nsw_address_point,141 Jamison Road Penrith,3,1,nsw_unit_addresses,4,40.73,6,12403146419,Penrith,,39.5,-33.762932,150.70464
+b_000342,way,1192051727,apartments,,nsw_address_point,153 Jamison Road Penrith,5,1,nsw_unit_addresses,4,41.27,5,12403146419,Penrith,,40.22,-33.76271,150.703571
+b_000343,way,1192051728,apartments,,nsw_address_point,155 Jamison Road Penrith,,1,area_rule,6,41.13,6,12403146419,Penrith,,39.53,-33.762965,150.703486
+b_000344,way,1192051781,apartments,,nsw_address_point,24A Jipp Street Penrith,,1,area_rule,7,42.1,6,12403146421,Penrith,1.0,41.22,-33.761462,150.7007
+b_000345,way,1192548937,apartments,,nearest_osm_street,,,,area_rule,6,42.51,6,12403146262,Kingswood - Werrington,,39.06,-33.763882,150.71047
+b_000346,way,1192548938,apartments,,nsw_address_point,87 Jamison Road Kingswood,9,2,nsw_unit_addresses,6,42.41,5,12403146262,Kingswood - Werrington,,39.35,-33.763654,150.710544
+b_000347,way,1192548939,apartments,,nsw_address_point,87 Jamison Road Kingswood,9,2,nsw_unit_addresses,6,42.22,4,12403146262,Kingswood - Werrington,,39.31,-33.763426,150.710618
+b_000348,way,1192548940,apartments,,nearest_osm_street,,,,area_rule,6,42.31,4,12403146262,Kingswood - Werrington,,39.22,-33.763416,150.710845
+b_000349,way,1192548941,apartments,,nearest_osm_street,,,,area_rule,4,42.59,5,12403146262,Kingswood - Werrington,,39.08,-33.763936,150.710676
+b_000350,way,1192548942,apartments,,nsw_address_point,85 Jamison Road Kingswood,9,2,nsw_unit_addresses,4,42.55,6,12403146262,Kingswood - Werrington,,39.15,-33.76377,150.710729
+b_000351,way,1192548943,apartments,,nsw_address_point,85 Jamison Road Kingswood,9,2,nsw_unit_addresses,4,42.46,5,12403146262,Kingswood - Werrington,,39.25,-33.763605,150.710784
+b_000352,way,1192548951,apartments,,nearest_osm_street,,,,area_rule,5,42.55,4,12403146262,Kingswood - Werrington,,39.04,-33.763971,150.71089
+b_000353,way,1192549026,apartments,,nsw_address_point,60 Stafford Street Kingswood,,1,area_rule,5,41.35,5,12403146262,Kingswood - Werrington,,38.08,-33.763154,150.713396
+b_000354,way,1192549034,apartments,,nearest_osm_street,,,,area_rule,5,42.44,5,12403146262,Kingswood - Werrington,,39.02,-33.763387,150.712428
+b_000355,way,1192549043,apartments,,nearest_osm_street,,,,area_rule,5,42.51,6,12403146262,Kingswood - Werrington,,39.21,-33.763339,150.712209
+b_000356,way,1192549044,apartments,,nsw_address_point,74 Stafford Street Kingswood,8,1,nsw_unit_addresses,8,42.46,7,12403146262,Kingswood - Werrington,,39.25,-33.763287,150.712045
+b_000357,way,1192549045,apartments,,nearest_osm_street,,,,area_rule,6,42.53,6,12403146262,Kingswood - Werrington,,39.4,-33.763297,150.711723
+b_000358,way,1192549065,apartments,,nsw_address_point,60A Stafford Street Kingswood,,1,area_rule,4,41.61,5,12403146262,Kingswood - Werrington,,38.72,-33.76339,150.713417
