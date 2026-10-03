@@ -1,0 +1,18 @@
+{
+ "name": "Lakemba example area (fixture)",
+ "description": "Example blocks of flats around Lakemba, NSW, used until the real pilot data is loaded.",
+ "centre": {
+  "lat": -33.92,
+  "lon": 151.076
+ },
+ "bbox": [
+  151.06655,
+  -33.92711,
+  151.08541,
+  -33.91312
+ ],
+ "building_count": 25,
+ "data_notes": [
+  "Fixture data, not real buildings: positions, sizes and heat values are invented for testing."
+ ]
+}

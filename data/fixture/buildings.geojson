@@ -1,0 +1,1105 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.081986,
+       -33.9150866
+      ],
+      [
+       151.0820508,
+       -33.9149694
+      ],
+      [
+       151.0817968,
+       -33.9148713
+      ],
+      [
+       151.0817321,
+       -33.9149885
+      ],
+      [
+       151.081986,
+       -33.9150866
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_001",
+    "label": "Block near Colin Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 2,
+    "storeys_source": "assumed",
+    "flats_est": 9,
+    "footprint_m2": 368.7,
+    "roof_m2": 368.7,
+    "heat_anomaly_c": -1.1,
+    "renter_share": 0.76,
+    "heat_band": "average",
+    "quick_score": 54
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0703218,
+       -33.9267447
+      ],
+      [
+       151.0704824,
+       -33.9266533
+      ],
+      [
+       151.0703075,
+       -33.9264388
+      ],
+      [
+       151.0701469,
+       -33.9265302
+      ],
+      [
+       151.0703218,
+       -33.9267447
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_002",
+    "label": "Block near Lakemba Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 19,
+    "footprint_m2": 515.0,
+    "roof_m2": 515.0,
+    "heat_anomaly_c": -1.0,
+    "renter_share": 0.51,
+    "heat_band": "warm",
+    "quick_score": 49
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0792009,
+       -33.9271103
+      ],
+      [
+       151.0793944,
+       -33.9270838
+      ],
+      [
+       151.0793426,
+       -33.9268197
+      ],
+      [
+       151.0791491,
+       -33.9268462
+      ],
+      [
+       151.0792009,
+       -33.9271103
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_003",
+    "label": "Block near Croydon Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 20,
+    "footprint_m2": 535.8,
+    "roof_m2": 535.8,
+    "heat_anomaly_c": 1.6,
+    "renter_share": 0.56,
+    "heat_band": "hot",
+    "quick_score": 68
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0806604,
+       -33.9240213
+      ],
+      [
+       151.0807745,
+       -33.9238847
+      ],
+      [
+       151.0805124,
+       -33.9237319
+      ],
+      [
+       151.0803984,
+       -33.9238686
+      ],
+      [
+       151.0806604,
+       -33.9240213
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_004",
+    "label": "Block near Railway Parade (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 20,
+    "footprint_m2": 543.7,
+    "roof_m2": 543.7,
+    "heat_anomaly_c": -2.2,
+    "renter_share": 0.66,
+    "heat_band": "cooler",
+    "quick_score": 34
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0756801,
+       -33.924102
+      ],
+      [
+       151.0758336,
+       -33.9239511
+      ],
+      [
+       151.0756984,
+       -33.9238551
+      ],
+      [
+       151.0755449,
+       -33.9240059
+      ],
+      [
+       151.0756801,
+       -33.924102
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_005",
+    "label": "Block near Haldon Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 13,
+    "footprint_m2": 358.8,
+    "roof_m2": 358.8,
+    "heat_anomaly_c": 0.4,
+    "renter_share": 0.7,
+    "heat_band": "warm",
+    "quick_score": 62
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0719454,
+       -33.9252995
+      ],
+      [
+       151.0720388,
+       -33.9251861
+      ],
+      [
+       151.0717896,
+       -33.9250427
+      ],
+      [
+       151.0716962,
+       -33.9251561
+      ],
+      [
+       151.0719454,
+       -33.9252995
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_006",
+    "label": "Block near Railway Parade (example)",
+    "suburb": "Lakemba",
+    "storeys": 4,
+    "storeys_source": "assumed",
+    "flats_est": 21,
+    "footprint_m2": 425.2,
+    "roof_m2": 425.2,
+    "heat_anomaly_c": 2.0,
+    "renter_share": 0.55,
+    "heat_band": "hottest",
+    "quick_score": 75
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0812108,
+       -33.9158429
+      ],
+      [
+       151.0813389,
+       -33.9157492
+      ],
+      [
+       151.0812177,
+       -33.9156333
+      ],
+      [
+       151.0810895,
+       -33.915727
+      ],
+      [
+       151.0812108,
+       -33.9158429
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_007",
+    "label": "Block near Croydon Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 10,
+    "footprint_m2": 267.6,
+    "roof_m2": 267.6,
+    "heat_anomaly_c": 0.7,
+    "renter_share": 0.52,
+    "heat_band": "hot",
+    "quick_score": 59
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0762766,
+       -33.9199115
+      ],
+      [
+       151.0764234,
+       -33.919862
+      ],
+      [
+       151.076323,
+       -33.9196538
+      ],
+      [
+       151.0761762,
+       -33.9197032
+      ],
+      [
+       151.0762766,
+       -33.9199115
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_008",
+    "label": "Block near Gillies Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 13,
+    "footprint_m2": 362.8,
+    "roof_m2": 362.8,
+    "heat_anomaly_c": -1.0,
+    "renter_share": 0.7,
+    "heat_band": "warm",
+    "quick_score": 57
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0697085,
+       -33.920728
+      ],
+      [
+       151.069883,
+       -33.9206312
+      ],
+      [
+       151.0697578,
+       -33.9204735
+      ],
+      [
+       151.0695832,
+       -33.9205703
+      ],
+      [
+       151.0697085,
+       -33.920728
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_009",
+    "label": "Block near Colin Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 4,
+    "storeys_source": "assumed",
+    "flats_est": 20,
+    "footprint_m2": 405.0,
+    "roof_m2": 405.0,
+    "heat_anomaly_c": -1.2,
+    "renter_share": 0.55,
+    "heat_band": "average",
+    "quick_score": 41
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0838089,
+       -33.9240865
+      ],
+      [
+       151.083924,
+       -33.9239674
+      ],
+      [
+       151.0837383,
+       -33.9238421
+      ],
+      [
+       151.0836232,
+       -33.9239612
+      ],
+      [
+       151.0838089,
+       -33.9240865
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_010",
+    "label": "Block near Wangee Road (example)",
+    "suburb": "Lakemba",
+    "storeys": 4,
+    "storeys_source": "assumed",
+    "flats_est": 18,
+    "footprint_m2": 373.2,
+    "roof_m2": 373.2,
+    "heat_anomaly_c": -0.0,
+    "renter_share": 0.6,
+    "heat_band": "warm",
+    "quick_score": 55
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0801113,
+       -33.9217458
+      ],
+      [
+       151.0802061,
+       -33.9216235
+      ],
+      [
+       151.080002,
+       -33.9215131
+      ],
+      [
+       151.0799072,
+       -33.9216354
+      ],
+      [
+       151.0801113,
+       -33.9217458
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_011",
+    "label": "Block near Quigg Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 13,
+    "footprint_m2": 361.6,
+    "roof_m2": 361.6,
+    "heat_anomaly_c": 2.8,
+    "renter_share": 0.47,
+    "heat_band": "hottest",
+    "quick_score": 76
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0799956,
+       -33.9157503
+      ],
+      [
+       151.0801401,
+       -33.9156962
+      ],
+      [
+       151.0800242,
+       -33.9154803
+      ],
+      [
+       151.0798798,
+       -33.9155344
+      ],
+      [
+       151.0799956,
+       -33.9157503
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_012",
+    "label": "Block near The Boulevarde (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 14,
+    "footprint_m2": 382.6,
+    "roof_m2": 382.6,
+    "heat_anomaly_c": 1.8,
+    "renter_share": 0.77,
+    "heat_band": "hottest",
+    "quick_score": 81
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0845437,
+       -33.9194175
+      ],
+      [
+       151.0845788,
+       -33.919238
+      ],
+      [
+       151.084272,
+       -33.9191961
+      ],
+      [
+       151.0842369,
+       -33.9193756
+      ],
+      [
+       151.0845437,
+       -33.9194175
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_013",
+    "label": "Block near Railway Parade (example)",
+    "suburb": "Lakemba",
+    "storeys": 2,
+    "storeys_source": "assumed",
+    "flats_est": 14,
+    "footprint_m2": 577.2,
+    "roof_m2": 577.2,
+    "heat_anomaly_c": 1.7,
+    "renter_share": 0.59,
+    "heat_band": "hot",
+    "quick_score": 72
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0697332,
+       -33.9267058
+      ],
+      [
+       151.0698824,
+       -33.9265525
+      ],
+      [
+       151.0696321,
+       -33.9263824
+      ],
+      [
+       151.0694829,
+       -33.9265358
+      ],
+      [
+       151.0697332,
+       -33.9267058
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_014",
+    "label": "Block near Oneata Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 24,
+    "footprint_m2": 650.8,
+    "roof_m2": 650.8,
+    "heat_anomaly_c": -3.8,
+    "renter_share": 0.79,
+    "heat_band": "cooler",
+    "quick_score": 34
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0738572,
+       -33.9134337
+      ],
+      [
+       151.0740145,
+       -33.9133327
+      ],
+      [
+       151.0738202,
+       -33.9131214
+      ],
+      [
+       151.0736629,
+       -33.9132225
+      ],
+      [
+       151.0738572,
+       -33.9134337
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_015",
+    "label": "Block near Gillies Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 20,
+    "footprint_m2": 540.0,
+    "roof_m2": 540.0,
+    "heat_anomaly_c": -1.9,
+    "renter_share": 0.64,
+    "heat_band": "cooler",
+    "quick_score": 35
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0810202,
+       -33.9209275
+      ],
+      [
+       151.0810852,
+       -33.9207856
+      ],
+      [
+       151.0808873,
+       -33.9207223
+      ],
+      [
+       151.0808223,
+       -33.9208642
+      ],
+      [
+       151.0810202,
+       -33.9209275
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_016",
+    "label": "Block near Ernest Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 2,
+    "storeys_source": "assumed",
+    "flats_est": 8,
+    "footprint_m2": 328.9,
+    "roof_m2": 328.9,
+    "heat_anomaly_c": 2.5,
+    "renter_share": 0.51,
+    "heat_band": "hottest",
+    "quick_score": 76
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0666327,
+       -33.9262511
+      ],
+      [
+       151.0668274,
+       -33.9261789
+      ],
+      [
+       151.066744,
+       -33.9260219
+      ],
+      [
+       151.0665493,
+       -33.9260942
+      ],
+      [
+       151.0666327,
+       -33.9262511
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_017",
+    "label": "Block near Lakemba Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 14,
+    "footprint_m2": 373.6,
+    "roof_m2": 373.6,
+    "heat_anomaly_c": 1.2,
+    "renter_share": 0.68,
+    "heat_band": "hot",
+    "quick_score": 68
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0758512,
+       -33.9257453
+      ],
+      [
+       151.0760729,
+       -33.925685
+      ],
+      [
+       151.0759799,
+       -33.9254462
+      ],
+      [
+       151.0757582,
+       -33.9255065
+      ],
+      [
+       151.0758512,
+       -33.9257453
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_018",
+    "label": "Block near The Boulevarde (example)",
+    "suburb": "Lakemba",
+    "storeys": 2,
+    "storeys_source": "assumed",
+    "flats_est": 15,
+    "footprint_m2": 597.7,
+    "roof_m2": 597.7,
+    "heat_anomaly_c": -1.7,
+    "renter_share": 0.72,
+    "heat_band": "cooler",
+    "quick_score": 41
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0797716,
+       -33.9166683
+      ],
+      [
+       151.0799837,
+       -33.9166359
+      ],
+      [
+       151.0799254,
+       -33.9163701
+      ],
+      [
+       151.0797134,
+       -33.9164026
+      ],
+      [
+       151.0797716,
+       -33.9166683
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_019",
+    "label": "Block near Gillies Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 22,
+    "footprint_m2": 594.6,
+    "roof_m2": 594.6,
+    "heat_anomaly_c": -1.4,
+    "renter_share": 0.51,
+    "heat_band": "average",
+    "quick_score": 35
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0744049,
+       -33.924338
+      ],
+      [
+       151.0745118,
+       -33.9242467
+      ],
+      [
+       151.0743686,
+       -33.9241296
+      ],
+      [
+       151.0742616,
+       -33.9242209
+      ],
+      [
+       151.0744049,
+       -33.924338
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_020",
+    "label": "Block near Croydon Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 10,
+    "footprint_m2": 261.4,
+    "roof_m2": 261.4,
+    "heat_anomaly_c": -2.6,
+    "renter_share": 0.48,
+    "heat_band": "cooler",
+    "quick_score": 24
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0798824,
+       -33.9233112
+      ],
+      [
+       151.079996,
+       -33.9231861
+      ],
+      [
+       151.0798084,
+       -33.9230671
+      ],
+      [
+       151.0796947,
+       -33.9231922
+      ],
+      [
+       151.0798824,
+       -33.9233112
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_021",
+    "label": "Block near Gillies Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 14,
+    "footprint_m2": 377.8,
+    "roof_m2": 377.8,
+    "heat_anomaly_c": 0.6,
+    "renter_share": 0.56,
+    "heat_band": "warm",
+    "quick_score": 58
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0734315,
+       -33.9221617
+      ],
+      [
+       151.0735204,
+       -33.922047
+      ],
+      [
+       151.0733667,
+       -33.9219638
+      ],
+      [
+       151.0732778,
+       -33.9220785
+      ],
+      [
+       151.0734315,
+       -33.9221617
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_022",
+    "label": "Block near Quigg Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 9,
+    "footprint_m2": 255.5,
+    "roof_m2": 255.5,
+    "heat_anomaly_c": -1.2,
+    "renter_share": 0.74,
+    "heat_band": "average",
+    "quick_score": 49
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0852353,
+       -33.922578
+      ],
+      [
+       151.0854146,
+       -33.9224699
+      ],
+      [
+       151.0852258,
+       -33.9222513
+      ],
+      [
+       151.0850466,
+       -33.9223594
+      ],
+      [
+       151.0852353,
+       -33.922578
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_023",
+    "label": "Block near Oneata Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 22,
+    "footprint_m2": 608.6,
+    "roof_m2": 608.6,
+    "heat_anomaly_c": 1.5,
+    "renter_share": 0.8,
+    "heat_band": "hot",
+    "quick_score": 75
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0674718,
+       -33.9220699
+      ],
+      [
+       151.0675874,
+       -33.9219691
+      ],
+      [
+       151.0674488,
+       -33.9218581
+      ],
+      [
+       151.0673332,
+       -33.9219589
+      ],
+      [
+       151.0674718,
+       -33.9220699
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_024",
+    "label": "Block near Lakemba Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 10,
+    "footprint_m2": 273.7,
+    "roof_m2": 273.7,
+    "heat_anomaly_c": 3.7,
+    "renter_share": 0.68,
+    "heat_band": "hottest",
+    "quick_score": 87
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       151.0757508,
+       -33.926754
+      ],
+      [
+       151.0758689,
+       -33.9266284
+      ],
+      [
+       151.0757019,
+       -33.9265188
+      ],
+      [
+       151.0755838,
+       -33.9266445
+      ],
+      [
+       151.0757508,
+       -33.926754
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "id": "fx_025",
+    "label": "Block near Croydon Street (example)",
+    "suburb": "Lakemba",
+    "storeys": 3,
+    "storeys_source": "assumed",
+    "flats_est": 13,
+    "footprint_m2": 346.2,
+    "roof_m2": 346.2,
+    "heat_anomaly_c": -1.1,
+    "renter_share": 0.61,
+    "heat_band": "average",
+    "quick_score": 48
+   }
+  }
+ ]
+}
