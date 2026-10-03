@@ -80,7 +80,7 @@ export function DealBalance({ r, sel, onSel }: { r: AssessResponse; sel: GroupSe
   const better = b.keep >= 0.5
   const worse = b.keep < -0.5
   const who = sel === 'top' ? 'top-floor flat' : sel === 'lower' ? 'lower-floor flat' : 'average flat'
-  const summary = `For an ${who}: the old bill is ${mo(b.old)} a month. The new bill is ${mo(b.energy)} plus a ${mo(b.charge)} meter charge. ${
+  const summary = `For an ${who}: the old bill is ${mo(b.old)} a month. The new bill is ${mo(b.energy)} plus a fixed monthly charge of ${mo(b.charge)}. ${
     better ? `The tenant keeps ${mo(b.keep)} a month.` : worse ? `The tenant would pay ${mo(-b.keep)} a month more.` : 'The tenant breaks even.'
   }`
   return (
@@ -135,7 +135,7 @@ export function DealBalance({ r, sel, onSel }: { r: AssessResponse; sel: GroupSe
             <i className="sw energy" /> New energy bill
           </li>
           <li>
-            <i className="sw charge" /> Monthly charge on the meter
+            <i className="sw charge" /> Fixed monthly charge
           </li>
           {better && (
             <li>
@@ -168,12 +168,12 @@ export function StatTiles({ r }: { r: AssessResponse }) {
       <div className="tile" role="listitem">
         <div className="tile-label">Landlord pays upfront</div>
         <div className="tile-num">{money(f.owner_upfront_cost)}</div>
-        <div className="tile-sub">No loan, no bill</div>
+        <div className="tile-sub">{funded ? 'No loan, no bill' : `Only if a grant covers the ${moneyApprox(r.package.funding_gap)} gap`}</div>
       </div>
       <div className="tile" role="listitem">
         <div className="tile-label">Tenant pays upfront</div>
         <div className="tile-num">{money(f.tenant_upfront_cost)}</div>
-        <div className="tile-sub">Pays only the monthly meter charge</div>
+        <div className="tile-sub">Pays only the fixed monthly charge</div>
       </div>
       <div className="tile invest" role="listitem">
         <div className="tile-label">Investor is repaid</div>

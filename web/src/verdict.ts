@@ -56,6 +56,18 @@ export function makeVerdict(r: AssessResponse): Verdict {
   }
   const hints: string[] = []
   if (p.funding_gap > 0) {
+    const gc = p.gap_closers
+    const grant = gc?.grant_needed ?? p.funding_gap
+    hints.push(`A grant of about ${moneyApprox(grant)} would close it.`)
+    if (gc?.cost_of_capital_for_full_funding != null) {
+      hints.push(`It would also work at a cost of capital of ${(gc.cost_of_capital_for_full_funding * 100).toFixed(1)}% a year (now ${(r.finance.cost_of_capital * 100).toFixed(1)}%).`)
+    }
+    if (gc?.term_years_for_full_funding != null) {
+      const life = r.finance.shortest_equipment_life_years
+      hints.push(
+        `Or a repayment term of ${Math.ceil(gc.term_years_for_full_funding)} years (now ${r.finance.term_years})${life && gc.term_years_for_full_funding > life * 0.8 ? ', which is longer than the equipment is meant to last' : ''}.`,
+      )
+    }
     const worst = selected
       .filter((i) => i.net_capex > 0)
       .map((i) => ({ i, ratio: i.saving_per_year / i.net_capex }))
@@ -65,9 +77,8 @@ export function makeVerdict(r: AssessResponse): Verdict {
         `Taking out the ${ITEM_SHORT[worst.i.key]} would cut ${moneyApprox(worst.i.net_capex)} from the cost and lose only about ${moneyApprox(worst.i.saving_per_year)} a year in savings.`,
       )
     }
-    if (r.finance.term_years < 20) hints.push('A longer repayment period spreads the cost over more months. Try it under Advanced.')
+    if (!gc?.term_years_for_full_funding && r.finance.term_years < 20) hints.push('A longer repayment period spreads the cost over more months. Try it under Advanced.')
     if (p.rebates_total === 0 && p.capex_total > 0) hints.push('Check that rebates are switched on under Advanced.')
-    hints.push('A grant or cheaper money for the gap would close it.')
   }
   const ratio = p.net_capex > 0 ? p.funding_gap / p.net_capex : 0
   const detail = allBetterOff
@@ -78,14 +89,14 @@ export function makeVerdict(r: AssessResponse): Verdict {
       tone: 'warn',
       headline: `Close, but ${moneyApprox(p.funding_gap)} short: the bill savings can't repay the whole package`,
       detail,
-      hints: hints.slice(0, 3),
+      hints: hints.slice(0, 4),
     }
   }
   return {
     tone: 'bad',
     headline: `Not yet: the bill savings can repay about ${Math.round((1 - ratio) * 100)}% of the package, ${moneyApprox(p.funding_gap)} short`,
     detail,
-    hints: hints.slice(0, 3),
+    hints: hints.slice(0, 4),
   }
 }
 

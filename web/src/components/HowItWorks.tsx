@@ -11,7 +11,7 @@ export default function HowItWorks({ meta, onClose }: { meta: Meta; onClose: () 
           <p>
             In a rented flat, the landlord pays for upgrades but the tenant gets the cheaper bills, so nobody upgrades. Old gas hot water, plug-in heaters and hot dark roofs stay, and renters swelter and overpay.
           </p>
-          <p>Meterwise shows how an investor can pay for the upgrade instead, and be repaid from the savings through a small fixed charge on each flat's electricity meter. The tenant still ends up better off.</p>
+          <p>Meterwise shows how an investor can pay for the upgrade instead, and be repaid from the savings through a small fixed monthly charge tied to each flat, not to the tenant. The tenant still ends up better off.</p>
         </section>
 
         <section>
@@ -41,8 +41,24 @@ export default function HowItWorks({ meta, onClose }: { meta: Meta; onClose: () 
         <section>
           <h3>What the deal means</h3>
           <p>
-            The monthly charge is capped, so a flat's new bill plus the charge is set to come out lower than its old bill. The charge belongs to the meter, so it stays when tenants change. The landlord and the tenant pay nothing upfront.
+            The monthly charge is capped, so a flat's new bill plus the charge is set to come out lower than its old bill. The charge is tied to the flat, not to the person, so it stays when tenants change. The landlord and the tenant pay nothing upfront.
           </p>
+        </section>
+
+        <section>
+          <h3>How this could really happen</h3>
+          <p className="muted small">A plan to explore, not something that has been agreed.</p>
+          <ul>
+            <li>
+              <strong>Community housing providers:</strong> they own whole blocks and already have upgrade funding, so this is possible now.
+            </li>
+            <li>
+              <strong>Council rates charge for private strata blocks:</strong> needs a NSW law change, because current upgrade agreements only cover strata buildings above 20 lots.
+            </li>
+            <li>
+              <strong>A charge on the meter through the network tariff:</strong> needs national energy rule changes.
+            </li>
+          </ul>
         </section>
 
         <section className="limits">
@@ -52,7 +68,7 @@ export default function HowItWorks({ meta, onClose }: { meta: Meta; onClose: () 
             <li>Heat on the map is satellite land-surface temperature on hot days. It is not the air temperature inside a flat.</li>
             <li>Every dollar and degree figure is a modelled estimate. Real buildings, prices and weather will differ.</li>
             <li>Number of flats and storeys are estimates unless marked as mapped. Change them if you know better.</li>
-            <li>Collecting a charge on the meter needs an agreement with the energy retailer or network. Meterwise does not provide one.</li>
+            <li>Collecting the charge needs a real route (see below). Meterwise does not provide one, and none of these routes is agreed yet.</li>
           </ul>
         </section>
 

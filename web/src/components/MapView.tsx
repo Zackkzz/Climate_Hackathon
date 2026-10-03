@@ -23,6 +23,8 @@ interface Props {
   pin: { lat: number; lon: number } | null
   onPick: (lat: number, lon: number) => void
   bottomPad: number
+  /** Pilot area [west, south, east, north] from /api/meta; the first view fits this. */
+  bbox?: [number, number, number, number]
   onBasemapFailed: () => void
 }
 
@@ -215,7 +217,11 @@ export default function MapView(props: Props) {
       if (!fitted.current && data.features.length > 0) {
         fitted.current = true
         const b = new maplibregl.LngLatBounds()
-        for (const f of data.features) {
+        const bb = cb.current.bbox
+        if (bb && bb.length === 4 && bb.every(Number.isFinite)) {
+          b.extend([bb[0], bb[1]])
+          b.extend([bb[2], bb[3]])
+        } else for (const f of data.features) {
           const rings = f.geometry.type === 'Polygon' ? [f.geometry.coordinates[0]] : f.geometry.coordinates.map((p) => p[0])
           for (const ring of rings) for (const [x, y] of ring) b.extend([x, y])
         }

@@ -45,7 +45,18 @@ interface Props {
 }
 
 function UpgradeCard({ k, on, onToggle, disabledReason, result }: { k: PackageKey; on: boolean; onToggle: () => void; disabledReason: string | null; result: AssessResponse | null }) {
-  const item = result?.package.items.find((i) => i.key === k)
+  const raw = result?.package.items.find((i) => i.key === k)
+  // When an upgrade is off, show what it would cost and save, if the backend says so.
+  const item = raw
+    ? raw.selected
+      ? raw
+      : {
+          ...raw,
+          capex: raw.capex_if_selected ?? raw.capex,
+          rebate: raw.rebate_if_selected ?? raw.rebate,
+          saving_per_year: raw.saving_per_year_if_selected ?? raw.saving_per_year,
+        }
+    : undefined
   const id = useId()
   return (
     <div className={'upgrade' + (on ? ' on' : '') + (disabledReason ? ' disabled' : '')}>
@@ -73,14 +84,14 @@ function UpgradeCard({ k, on, onToggle, disabledReason, result }: { k: PackageKe
             <span className="up-cost">
               {item.rebate > 0 ? (
                 <>
-                  <strong>{money(item.net_capex)}</strong> for the block, after {money(item.rebate)} rebate
+                  <strong>{money(item.capex - item.rebate)}</strong> for the block, after {money(item.rebate)} rebate
                 </>
               ) : (
                 <>
                   <strong>{money(item.capex)}</strong> for the block
                 </>
               )}
-              {item.saving_per_year > 0 && <span className="up-save"> · saves about {money(item.saving_per_year)} a year in bills</span>}
+              {item.saving_per_year > 0 && <span className="up-save"> · {on ? 'saves' : 'would save'} about {money(item.saving_per_year)} a year in bills</span>}
             </span>
           )}
         </span>
@@ -211,7 +222,7 @@ export default function Inputs({ deal, meta, result, base, onChange, onChangeBlo
           />
           <Slider
             label="Repayment period"
-            help="How long the monthly charge stays on the meter. Longer means a smaller charge."
+            help="How long the monthly charge stays tied to the flat. Longer means a smaller charge."
             value={deal.finance.term_years}
             min={5}
             max={25}
@@ -221,7 +232,7 @@ export default function Inputs({ deal, meta, result, base, onChange, onChangeBlo
           />
           <Slider
             label="Share of the saving the tenant keeps, at least"
-            help="The meter charge never takes more than the rest of a flat's saving."
+            help="The monthly charge never takes more than the rest of a flat's saving."
             value={Math.round((1 - deal.finance.savings_share_to_charge) * 100)}
             min={0}
             max={60}

@@ -49,7 +49,7 @@ export function CostBreakdown({ r }: { r: AssessResponse }) {
       <div className="fund">
         <div className="fund-text">
           <span>
-            The monthly meter charges can repay <strong>{money(p.max_fundable_capex)}</strong> of the {money(p.net_capex)} net cost.
+            The fixed monthly charges can repay <strong>{money(p.max_fundable_capex)}</strong> of the {money(p.net_capex)} net cost.
           </span>
           <span className={p.fully_funded ? 'good-text' : 'warn-text'}>{p.fully_funded ? 'Fully funded' : `${money(p.funding_gap)} short`}</span>
         </div>
@@ -88,7 +88,7 @@ export function ImpactCard({ r }: { r: AssessResponse }) {
         </div>
       </div>
       <p className="muted small">
-        Bill savings for the whole block: about {moneyApprox(im.bill_saving_per_year_building)} a year, before the meter charge. All figures are modelled estimates.
+        Bill savings for the whole block: about {moneyApprox(im.bill_saving_per_year_building)} a year, before the monthly charge. All figures are modelled estimates.
       </p>
     </section>
   )

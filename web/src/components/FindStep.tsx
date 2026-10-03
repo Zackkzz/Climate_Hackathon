@@ -185,6 +185,7 @@ function ShortlistView({ ids, buildings, remove, onOpen }: { ids: string[]; buil
   )
 }
 
+const LIST_LIMIT = 40
 const isMobile = () => window.matchMedia('(max-width: 960px)').matches
 
 export default function FindStep({ meta, buildings, shortlist, onBuild, onBuildOwn }: Props) {
@@ -196,6 +197,7 @@ export default function FindStep({ meta, buildings, shortlist, onBuild, onBuildO
   const [pin, setPin] = useState<{ lat: number; lon: number } | null>(null)
   const [sheet, setSheet] = useState<'peek' | 'mid' | 'open'>('peek')
   const [basemapFailed, setBasemapFailed] = useState(false)
+  const [showAll, setShowAll] = useState(false)
 
   const ranked = useMemo(() => [...buildings.features].sort((a, b) => b.properties.quick_score - a.properties.quick_score), [buildings])
   const selected = selectedId ? buildings.features.find((f) => f.properties.id === selectedId) ?? null : null
@@ -226,6 +228,7 @@ export default function FindStep({ meta, buildings, shortlist, onBuild, onBuildO
               setPin({ lat, lon })
               setPickMode(false)
             }}
+            bbox={meta.pilot.bbox}
             bottomPad={!isMobile() ? 0 : sheet === 'peek' ? 170 : sheet === 'mid' ? 350 : 480}
             onBasemapFailed={() => setBasemapFailed(true)}
           />
@@ -282,8 +285,9 @@ export default function FindStep({ meta, buildings, shortlist, onBuild, onBuildO
                 ranked.length === 0 ? (
                   <EmptyBlock title="No blocks found">There are no apartment buildings in this area yet.</EmptyBlock>
                 ) : (
+                  <>
                   <ol className="block-list">
-                    {ranked.map((f, i) => {
+                    {(showAll ? ranked : ranked.slice(0, LIST_LIMIT)).map((f, i) => {
                       const p = f.properties
                       return (
                         <li key={p.id}>
@@ -311,6 +315,12 @@ export default function FindStep({ meta, buildings, shortlist, onBuild, onBuildO
                       )
                     })}
                   </ol>
+                  {!showAll && ranked.length > LIST_LIMIT && (
+                    <button className="btn btn-ghost small-btn show-all" onClick={() => setShowAll(true)}>
+                      Show all {ranked.length} blocks
+                    </button>
+                  )}
+                  </>
                 )
               ) : (
                 <ShortlistView ids={shortlist.ids} buildings={buildings} remove={shortlist.remove} onOpen={(id) => select(id)} />

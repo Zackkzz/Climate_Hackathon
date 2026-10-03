@@ -78,7 +78,7 @@ function Bars({ b }: { b: BalanceView }) {
           <i className="sw energy" /> New energy bill
         </li>
         <li>
-          <i className="sw charge" /> Meter charge
+          <i className="sw charge" /> Monthly charge
         </li>
         <li>
           <i className="sw keep" /> You keep
@@ -128,7 +128,7 @@ function TenantSheet({ r, active }: { r: AssessResponse; active: boolean }) {
         </div>
         <div>
           <div className="s-num">{r.finance.term_years} years</div>
-          <div className="s-lab">the meter charge runs</div>
+          <div className="s-lab">the monthly charge runs</div>
         </div>
       </div>
 
@@ -147,7 +147,7 @@ function TenantSheet({ r, active }: { r: AssessResponse; active: boolean }) {
 
       <h3>What you pay</h3>
       <p>
-        Your electricity and gas bill is estimated to fall from <strong>{money(avg.old)}</strong> to <strong>{money(avg.energy)}</strong> a month. A fixed charge of <strong>{money(avg.charge)}</strong> a month appears on your electricity meter. Together that is{' '}
+        Your electricity and gas bill is estimated to fall from <strong>{money(avg.old)}</strong> to <strong>{money(avg.energy)}</strong> a month. A fixed monthly charge of <strong>{money(avg.charge)}</strong>, tied to the flat and not to you, is added. Together that is{' '}
         <strong>{money(avg.keep)} a month less</strong> than now{avg.keep > 0 ? ', so you come out ahead over the year' : ''}.
       </p>
       <Bars b={avg} />
@@ -158,7 +158,7 @@ function TenantSheet({ r, active }: { r: AssessResponse; active: boolean }) {
               <th scope="col">Your flat</th>
               <th className="r" scope="col">Bill now</th>
               <th className="r" scope="col">New bill</th>
-              <th className="r" scope="col">Meter charge</th>
+              <th className="r" scope="col">Monthly charge</th>
               <th className="r" scope="col">You keep</th>
             </tr>
           </thead>
@@ -185,9 +185,43 @@ function TenantSheet({ r, active }: { r: AssessResponse; active: boolean }) {
         </>
       )}
 
+      {(() => {
+        const c = r.flat_groups.find((g) => g.position === 'top')?.comfort
+        if (!c?.period_label) return null
+        return (
+          <p>
+            Across {c.period_label}, a top-floor flat is estimated to spend {num(c.hours_above_30c_baseline)} hours above 30°C without air conditioning, falling to {num(c.hours_above_30c_upgraded)} with the upgrade.
+          </p>
+        )
+      })()}
+
       <h3>If you move out</h3>
-      <p>The charge belongs to the electricity meter, not to you. When you leave, it stays with the flat and the next tenant gets the same deal. There is nothing to pay off or settle when you go.</p>
+      <p>The charge is tied to the flat, not to you. When you leave, it stays with the flat and the next tenant gets the same deal. There is nothing to pay off or settle when you go.</p>
     </SheetFrame>
+  )
+}
+
+function GapCallout({ r, who }: { r: AssessResponse; who: 'owner' | 'funder' }) {
+  const p = r.package
+  const gc = p.gap_closers
+  return (
+    <div className="sheet-callout">
+      <strong>Funding gap: {money(p.funding_gap)}.</strong> The fixed monthly charges can repay {money(p.max_fundable_capex)} of the {money(p.net_capex)} net cost.
+      {who === 'owner'
+        ? ' The rest needs a grant or other funding before the work goes ahead. Without it, you could be asked to contribute or to choose a smaller package.'
+        : ' The rest needs a grant or another source of funds. Without it, an investor covering the full cost would not get its money back.'}
+      {who === 'funder' && r.finance.total_repaid >= p.net_capex && (
+        <> Repayments add up to {money(r.finance.total_repaid)} over {r.finance.term_years} years, but spread over that time they are worth about {money(p.max_fundable_capex)} of capital.</>
+      )}
+      {who === 'funder' && gc && (
+        <>
+          {' '}
+          Ways to close it, each on its own: a grant of about {moneyApprox(gc.grant_needed ?? p.funding_gap)}
+          {gc.cost_of_capital_for_full_funding != null ? `; a cost of capital of ${(gc.cost_of_capital_for_full_funding * 100).toFixed(1)}%` : ''}
+          {gc.term_years_for_full_funding != null ? `; a term of ${Math.ceil(gc.term_years_for_full_funding)} years` : ''}.
+        </>
+      )}
+    </div>
   )
 }
 
@@ -195,22 +229,31 @@ function OwnerSheet({ r, active }: { r: AssessResponse; active: boolean }) {
   const sel = r.package.items.filter((i) => i.selected)
   const wc = weekComfort(r)
   const diff = wc.peakOld - wc.peakNew
+  const funded = r.package.fully_funded
+  const gap = r.package.funding_gap
   return (
-    <SheetFrame id="owner" active={active} title="Upgrade your building without paying for it" subtitle={`For the owner of ${r.building.label} (${r.building.flats} flats, ${r.building.storeys} ${r.building.storeys === 1 ? 'storey' : 'storeys'})`}>
-      <div className="sheet-stats">
+    <SheetFrame id="owner" active={active} title="Upgrade your building without paying for it up front" subtitle={`For the owner of ${r.building.label} (${r.building.flats} flats, ${r.building.storeys} ${r.building.storeys === 1 ? 'storey' : 'storeys'})`}>
+      <div className={'sheet-stats' + (funded ? '' : ' four')}>
         <div>
-          <div className="s-num good">{money(r.finance.owner_upfront_cost)}</div>
-          <div className="s-lab">you pay upfront</div>
+          <div className={'s-num ' + (funded ? 'good' : 'warn')}>{money(r.finance.owner_upfront_cost)}</div>
+          <div className="s-lab">{funded ? 'you pay upfront' : `you pay upfront, if a grant or other funding covers the ${moneyApprox(gap)} gap`}</div>
         </div>
         <div>
           <div className="s-num">No loan</div>
-          <div className="s-lab">nothing to borrow or repay</div>
+          <div className="s-lab">nothing for you to borrow or repay</div>
         </div>
         <div>
           <div className="s-num">{moneyApprox(r.package.capex_total)}</div>
           <div className="s-lab">of equipment installed (before rebates)</div>
         </div>
+        {!funded && (
+          <div>
+            <div className="s-num warn">{moneyApprox(gap)}</div>
+            <div className="s-lab">funding gap still to find</div>
+          </div>
+        )}
       </div>
+      {!funded && <GapCallout r={r} who="owner" />}
 
       <h3>What gets installed</h3>
       {sel.length === 0 ? (
@@ -227,13 +270,13 @@ function OwnerSheet({ r, active }: { r: AssessResponse; active: boolean }) {
 
       <h3>Who pays</h3>
       <p>
-        An investor, such as a utility, council, community housing provider or green bank, pays for the work ({moneyApprox(r.package.net_capex)} after rebates). They are repaid by a fixed monthly charge of about {money(r.finance.charge_per_month_building / Math.max(1, r.building.flats))} on each flat's electricity meter for {r.finance.term_years} years. Each tenant's new bill plus the charge is lower than their old bill.
+        An investor, such as a community housing provider, a council or a green bank, pays for the work ({moneyApprox(r.package.net_capex)} after rebates). They are repaid by a fixed monthly charge of about {money(r.finance.charge_per_month_building / Math.max(1, r.building.flats))} per flat for {r.finance.term_years} years, tied to the flat and not to the tenant. Each tenant's new bill plus the charge is lower than their old bill.
       </p>
 
       <h3>What you are asked to agree to</h3>
       <ul className="sheet-list">
         <li>Let the installers in on dates agreed with your tenants.</li>
-        <li>Allow the monthly charge to be attached to each flat's electricity meter for {r.finance.term_years} years. It stays with the meter when tenants change.</li>
+        <li>Agree that the monthly charge stays tied to each flat for {r.finance.term_years} years, including when tenants change.</li>
         <li>Keep the new equipment in place and connected for that time.</li>
         <li>Tell new tenants, and any buyer, about the charge.</li>
         <li>If the building has an owners corporation, get its approval for roof and outside work.</li>
@@ -241,7 +284,7 @@ function OwnerSheet({ r, active }: { r: AssessResponse; active: boolean }) {
 
       <h3>What you get</h3>
       <ul className="sheet-list">
-        <li>Modern, efficient equipment in every flat at no cost to you.</li>
+        <li>Modern, efficient equipment in every flat{funded ? ' at no cost to you' : ', with your share depending on how the gap is closed'}.</li>
         <li>Tenants who spend less running their flat: about {money(r.impact.bill_saving_per_year_building / Math.max(1, r.building.flats))} a year each, before the charge.</li>
         {diff >= 0.3 && <li>Top-floor flats that peak about {diff.toFixed(1)} degrees cooler in a heatwave.</li>}
         <li>About {num1(r.impact.co2e_t_per_year_saved)} tonnes less CO₂e a year from the building.</li>
@@ -268,7 +311,7 @@ function RepayChart({ r }: { r: AssessResponse }) {
         const cum = yearly * (i + 1)
         return (
           <g key={i}>
-            <rect x={m.l + i * bw + 2} y={y(cum)} width={Math.max(2, bw - 4)} height={m.t + ih - y(cum)} rx="2" className={cum >= cap ? 'bar-energy' : 'bar-charge-solid'} />
+            <rect x={m.l + i * bw + 2} y={y(cum)} width={Math.max(2, bw - 4)} height={m.t + ih - y(cum)} rx="2" className={cum >= cap && r.package.fully_funded ? 'bar-energy' : 'bar-charge-solid'} />
             {(years <= 15 || i % 2 === 1) && (
               <text x={m.l + i * bw + bw / 2} y={H - 6} textAnchor="middle" className="axis-text">
                 {i + 1}
@@ -289,8 +332,9 @@ function FunderSheet({ r, active }: { r: AssessResponse; active: boolean }) {
   const f = r.finance
   const p = r.package
   const sel = p.items.filter((i) => i.selected)
+  const ret = f.investor_return_pct
   return (
-    <SheetFrame id="funder" active={active} title={`A repayment stream from ${r.building.flats} flats' meters`} subtitle={`For funders: ${r.building.label}`}>
+    <SheetFrame id="funder" active={active} title={`A repayment stream from ${r.building.flats} flats`} subtitle={`For funders: ${r.building.label}`}>
       <div className="sheet-stats four">
         <div>
           <div className="s-num">{moneyApprox(p.net_capex)}</div>
@@ -301,21 +345,29 @@ function FunderSheet({ r, active }: { r: AssessResponse; active: boolean }) {
           <div className="s-lab">repaid over {f.term_years} years</div>
         </div>
         <div>
-          <div className="s-num">{f.investor_return_pct.toFixed(1)}%</div>
-          <div className="s-lab">estimated return a year</div>
+          <div className={'s-num ' + (ret < 0 ? 'warn' : '')}>
+            {ret < 0 ? '-' : ''}
+            {Math.abs(ret).toFixed(1)}%
+          </div>
+          <div className="s-lab">{ret < 0 ? 'estimated loss a year' : 'estimated return a year'}</div>
         </div>
         <div>
-          <div className={'s-num ' + (p.fully_funded ? 'good' : 'warn')}>{p.fully_funded ? 'Covered' : moneyApprox(p.funding_gap)}</div>
-          <div className="s-lab">{p.fully_funded ? 'cost repaid by the charges' : 'not repaid by the charges'}</div>
+          <div className={'s-num ' + (p.fully_funded ? 'good' : 'warn')}>{p.fully_funded ? 'None' : moneyApprox(p.funding_gap)}</div>
+          <div className="s-lab">{p.fully_funded ? 'funding gap' : 'funding gap, not repaid by the charges'}</div>
         </div>
       </div>
+      {!p.fully_funded && <GapCallout r={r} who="funder" />}
 
       <h3>How you are repaid</h3>
       <p>
-        A fixed monthly charge on each flat's electricity meter, about {money(f.charge_per_month_building)} a month across the building ({money(f.charge_per_month_building * 12)} a year). Each charge is capped so the tenant keeps at least {Math.round((1 - f.savings_share_to_charge) * 100)}% of their bill saving. The cost of capital used is {(f.cost_of_capital * 100).toFixed(1)}% with a {Math.round(f.reserve * 100)}% reserve.
+        A fixed monthly charge tied to each flat, about {money(f.charge_per_month_building)} a month across the building ({money(f.charge_per_month_building * 12)} a year). Each charge is capped so the tenant keeps at least {Math.round((1 - f.savings_share_to_charge) * 100)}% of their bill saving. The cost of capital used is {(f.cost_of_capital * 100).toFixed(1)}% with a {Math.round(f.reserve * 100)}% reserve.
       </p>
       <RepayChart r={r} />
-      <p className="chart-note">Cumulative repayments by year, against the capital (line). Bars turn dark once the capital is covered.</p>
+      <p className="chart-note">
+        {r.package.fully_funded
+          ? 'Cumulative repayments by year, against the capital (line). Bars turn dark once the capital is covered.'
+          : "Cumulative repayments by year, not adjusted for the cost of money, against the capital (line). Spread over the term they are worth less than they add up to, so they do not cover the capital."}
+      </p>
 
       <h3>What the money buys</h3>
       <table className="sheet-table">
@@ -351,9 +403,13 @@ function FunderSheet({ r, active }: { r: AssessResponse; active: boolean }) {
       <ul className="sheet-list">
         <li>Savings may come in lower than modelled. The capped charge protects the tenant, so the shortfall falls on the repayments.</li>
         <li>Empty flats and late payments. The {Math.round(f.reserve * 100)}% reserve is meant to cover these.</li>
-        <li>Collecting the charge on the meter needs an agreement with the energy retailer or network. This tool does not provide one.</li>
+        <li>Collecting a charge tied to the flat needs a real route, such as a community housing provider, a council rates charge or a network tariff. Some need law or rule changes, and this tool does not provide one.</li>
         <li>Energy prices and rebates can change, and equipment may not perform as modelled.</li>
-        {!p.fully_funded && <li>As set up, the charges repay {moneyApprox(p.max_fundable_capex)} of {moneyApprox(p.net_capex)}. The rest of {moneyApprox(p.funding_gap)} needs a grant or a different package.</li>}
+        {f.shortest_equipment_life_years != null && f.term_years > f.shortest_equipment_life_years * 0.8 && (
+          <li>
+            The {f.term_years}-year term is longer than 80% of the shortest equipment life ({f.shortest_equipment_life_years} years).
+          </li>
+        )}
       </ul>
 
       <h3>Impact</h3>

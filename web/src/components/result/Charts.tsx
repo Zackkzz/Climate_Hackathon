@@ -192,13 +192,13 @@ export function MonthlyChart({ r }: { r: AssessResponse }) {
   const avgNew = rows.reduce((a, x) => a + x.upgraded_bill + x.charge, 0) / rows.length
   const yearOld = rows.reduce((a, x) => a + x.baseline_bill, 0)
   const yearNew = rows.reduce((a, x) => a + x.upgraded_bill + x.charge, 0)
-  const alt = `Month by month bills for an average flat. Old bills average ${money(avgOld)} a month; new bills including the meter charge average ${money(avgNew)} a month.`
+  const alt = `Month by month bills for an average flat. Old bills average ${money(avgOld)} a month; new bills including the monthly charge average ${money(avgNew)} a month.`
 
   return (
     <section className="card" aria-labelledby="month-h">
       <h3 id="month-h">Month by month</h3>
       <p className="lede">
-        Over the year, the new bills plus the meter charge come to <strong>{money(yearOld - yearNew)} less</strong> than now for an average flat (estimated). In mild months the meter charge can make a bill a little higher, and in summer and winter it is much lower.
+        Over the year, the new bills plus the monthly charge come to <strong>{money(yearOld - yearNew)} less</strong> than now for an average flat (estimated). In mild months the charge can make a bill a little higher, and in summer and winter it is much lower.
       </p>
       <div ref={wrapRef}>
       <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label={alt}>
@@ -223,7 +223,7 @@ export function MonthlyChart({ r }: { r: AssessResponse }) {
           const chargeH = ih - (y(x.charge) - m.t)
           return (
             <g key={x.month}>
-              <title>{`${x.label}: bill now ${money(x.baseline_bill)}; after, ${money(x.upgraded_bill)} plus ${money(x.charge)} meter charge`}</title>
+              <title>{`${x.label}: bill now ${money(x.baseline_bill)}; after, ${money(x.upgraded_bill)} plus ${money(x.charge)} monthly charge`}</title>
               <rect x={cx - bw - gap / 2} y={y(x.baseline_bill)} width={bw} height={ih - (y(x.baseline_bill) - m.t)} rx="3" className="bar-old" />
               <rect x={cx + gap / 2} y={y(x.upgraded_bill)} width={bw} height={energyH} className="bar-energy" />
               <rect x={cx + gap / 2} y={y(x.upgraded_bill) - chargeH} width={bw} height={chargeH} rx="3" fill={`url(#${uid}-stripe)`} className="bar-charge" />
@@ -243,7 +243,7 @@ export function MonthlyChart({ r }: { r: AssessResponse }) {
           <i className="sw energy" /> New energy bill
         </li>
         <li>
-          <i className="sw charge" /> Monthly charge on the meter
+          <i className="sw charge" /> Fixed monthly charge
         </li>
       </ul>
       <div className="sr-only">
@@ -254,7 +254,7 @@ export function MonthlyChart({ r }: { r: AssessResponse }) {
             <th>Month</th>
             <th>Bill now</th>
             <th>New energy bill</th>
-            <th>Meter charge</th>
+            <th>Monthly charge</th>
           </tr>
         </thead>
         <tbody>

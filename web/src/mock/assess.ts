@@ -361,6 +361,9 @@ export function mockAssess(req: AssessRequest): AssessResponse {
       applies_to: c.applies_to,
       saving_per_year: Math.round(saving),
       note: c.note,
+      capex_if_selected: capex,
+      rebate_if_selected: rebate,
+      saving_per_year_if_selected: Math.round(saving),
     }
   })
   const sel = items.filter((i) => i.selected)
@@ -477,6 +480,7 @@ export function mockAssess(req: AssessRequest): AssessResponse {
       max_fundable_capex: Math.round(maxFundable),
       fully_funded: fullyFunded,
       funding_gap: Math.round(fundGap),
+      gap_closers: { grant_needed: Math.round(fundGap), cost_of_capital_for_full_funding: null, term_years_for_full_funding: null },
     },
     finance: {
       term_years: fin.term_years,

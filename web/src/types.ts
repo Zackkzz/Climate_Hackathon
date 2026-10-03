@@ -59,6 +59,8 @@ export interface Meta {
     building_count: number
     /** True when the backend is serving example (not real) data. */
     is_fixture?: boolean
+    /** Optional heat image; the app ignores it. */
+    heat_overlay?: { file: string; bounds: [number, number, number, number] }
   }
   defaults: {
     existing: Existing
@@ -151,6 +153,9 @@ export interface Comfort {
   hours_above_30c_upgraded: number
   peak_indoor_c_baseline: number
   peak_indoor_c_upgraded: number
+  /** Optional: describes the period the whole-period hours cover. */
+  period_label?: string
+  basis?: string
 }
 
 export interface FlatGroup {
@@ -177,6 +182,10 @@ export interface PackageItem {
   applies_to: 'building' | 'flat' | string
   saving_per_year: number
   note: string
+  /** Optional extras: cost and saving if this upgrade were switched on. */
+  capex_if_selected?: number
+  rebate_if_selected?: number
+  saving_per_year_if_selected?: number
 }
 
 export interface PackageSummary {
@@ -187,6 +196,15 @@ export interface PackageSummary {
   max_fundable_capex: number
   fully_funded: boolean
   funding_gap: number
+  /** Optional: separate ways to close the gap, each with everything else unchanged. */
+  gap_closers?: GapClosers
+}
+
+export interface GapClosers {
+  grant_needed?: number | null
+  cost_of_capital_for_full_funding?: number | null
+  term_years_for_full_funding?: number | null
+  note?: string
 }
 
 export interface FinanceResult {
@@ -199,6 +217,7 @@ export interface FinanceResult {
   investor_return_pct: number
   owner_upfront_cost: number
   tenant_upfront_cost: number
+  shortest_equipment_life_years?: number
 }
 
 export interface Impact {
