@@ -35,7 +35,9 @@ The team directed the work, chose the idea and is responsible for the submission
 |---|---|---|
 | OpenStreetMap, via the Overpass API | Apartment building footprints and addresses | ODbL; "© OpenStreetMap contributors" |
 | Landsat 8/9 Collection 2 Level-2 (USGS/NASA), via Microsoft Planetary Computer | Summer land surface temperature | Public domain; Planetary Computer terms |
-| Australian Bureau of Statistics, 2021 Census | Share of homes rented | CC BY 4.0 |
+| Australian Bureau of Statistics, 2021 Census (table G37 at SA1 level) and suburb boundaries | Share of homes rented; suburb names | CC BY 4.0 |
+| NSW Spatial Services geocoded addresses | Street address labels and counts of flats | Licence not stated on its Data.NSW listing; used with attribution. **Team: check the terms before sharing labels further.** |
+| NSW Government Greater Sydney land surface temperature, summer 2022-23 | Cross-check of the heat layer only | CC BY 4.0 |
 | Open-Meteo historical weather API (ERA5, Copernicus/ECMWF) | Hourly weather for the thermal model | CC BY 4.0 |
 | Australian Energy Regulator: Default Market Offer and energy use benchmarks | Electricity prices; validation | Public |
 | EnergyAustralia and Jemena published gas tariffs | Gas prices | Public |
@@ -46,12 +48,12 @@ The team directed the work, chose the idea and is responsible for the submission
 | Pay As You Save programme rules and field reviews (EEI, Clean Energy Works, Berkeley Lab) | Finance rules | Public |
 | OpenFreeMap | Basemap tiles | Open; attribution shown on the map |
 
-The exact pilot data sources are confirmed in `data/pilot/README.md` once the dataset is built.
+The Landsat scene IDs and the full method are in `data/pilot/README.md`.
 
 ## Software
 
 - **Backend:** Python, FastAPI, Uvicorn, Pydantic, NumPy, SciPy, Requests, pytest, and for the data pipeline
-  Shapely, pyproj, rasterio, pystac-client and planetary-computer.
+  Shapely, pyproj, rasterio, pystac-client, planetary-computer and matplotlib.
 - **Frontend:** React, Vite, TypeScript, MapLibre GL JS. Colour ramp from ColorBrewer. Icons and logo drawn for
   this project. No web fonts.
 - **Development tools:** Git, Node.js, Playwright (browser checks).

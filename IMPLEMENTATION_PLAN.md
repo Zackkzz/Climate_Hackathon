@@ -21,7 +21,8 @@ savings repay, so neither the landlord nor the tenant pays upfront.
   3. Works out a monthly charge on each flat's meter that repays the upgrade while the tenant's total bill still
      falls.
   4. Produces a one-page offer for the tenant, the owner and the funder.
-- **Pilot area:** Western Sydney, where summer heat is worst and older walk-up flats are common.
+- **Pilot area:** Penrith and Kingswood in Western Sydney: 358 mapped apartment blocks, strong summer heat and a
+  median of 70% of nearby homes rented.
 
 ## 2. Why this problem
 
