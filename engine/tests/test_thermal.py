@@ -69,3 +69,11 @@ def test_local_heat_adds_cooling_demand(weather):
     base = simulate(FlatSpec(top_floor=False, heat_anomaly_air_c=0.0), weather)
     hot = simulate(FlatSpec(top_floor=False, heat_anomaly_air_c=1.5), weather)
     assert hot.cooling_kwh > base.cooling_kwh
+
+
+@pytest.mark.parametrize("share", [0.0, 0.5, 1.0])
+def test_energy_balance_closes_for_any_roof_coupling(weather, share):
+    with P.overridden(roof_heat_to_air_share=share):
+        r = simulate(FlatSpec(top_floor=True), weather)
+    throughput = sum(abs(v) for v in r.flows.values())
+    assert abs(sum(r.flows.values())) < 1e-6 * throughput

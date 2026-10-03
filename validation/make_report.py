@@ -40,7 +40,8 @@ SELC = ("https://www.energystar.gov/sites/default/files/2024-09/SELC%20Review%20
         "Interests%20of%20Low-Income%20Customers%20Under%20PAYS.pdf")
 DMO8 = P.SRC_DMO8
 
-TYPICAL = {"storeys": 3, "flats": 12, "roof_m2": 320.0, "lat": -33.92, "lon": 151.07, "heat_anomaly_c": 2.0}
+PILOT_LAT, PILOT_LON = -33.75, 150.70  # Penrith and Kingswood pilot centre
+TYPICAL = {"storeys": 3, "flats": 12, "roof_m2": 320.0, "lat": PILOT_LAT, "lon": PILOT_LON, "heat_anomaly_c": 2.0}
 FULL_ELEC = {"cool_roof": False, "induction_cooktop": True, "disconnect_gas": True}
 
 
@@ -78,7 +79,7 @@ def fmt(x: float, nd: int = 0) -> str:
 
 
 def main() -> None:
-    weather, _ = get_weather(-33.92, 151.07, allow_network=False)
+    weather, _ = get_weather(PILOT_LAT, PILOT_LON, allow_network=False)
     rows: list[tuple[str, str, str, str, str, str]] = []  # (check, benchmark, source, pass range, model, result)
     notes: list[str] = []
 
@@ -87,14 +88,15 @@ def main() -> None:
     e_avg = avg_flat(base, "baseline", "electricity_kwh")
     g_avg = avg_flat(base, "baseline", "gas_mj")
     top, low = base["flat_groups"][0], base["flat_groups"][1]
+    # Penrith is in climate zone 6 (UNSW Vol 2 lists "Penrith- Climate zone 6"); AER benchmarks use the same zones.
+    z6 = "NSW zone 6 (mild temperate; Penrith): 1 person 3,541; 2 people 6,060; 3 people 6,570 kWh/yr (all dwelling types)"
     rows.append(("Electricity per flat, baseline (gas hot water, plug-in heaters, no air conditioning), average flat",
-                 "NSW zone 5 (Sydney): 1 person 3,109; 2 people 5,237; 3 people 6,361 kWh/yr (all dwelling types)",
-                 f"[AER 2020, Table 16]({AER_2020})", "3,109 to 6,361 (1 to 3 people)", fmt(e_avg),
-                 verdict(e_avg, 3109, 6361)))
-    rows.append(("Electricity, top-floor flat only", "same", f"[AER 2020]({AER_2020})", "3,109 to 6,361",
-                 fmt(top["baseline"]["electricity_kwh"]), verdict(top["baseline"]["electricity_kwh"], 3109, 6361)))
-    rows.append(("Electricity, lower-floor flat only", "same", f"[AER 2020]({AER_2020})", "3,109 to 6,361",
-                 fmt(low["baseline"]["electricity_kwh"]), verdict(low["baseline"]["electricity_kwh"], 3109, 6361)))
+                 z6, f"[AER 2020, Table 17]({AER_2020}) (seasonal values summed)", "3,541 to 6,570 (1 to 3 people)",
+                 fmt(e_avg), verdict(e_avg, 3541, 6570)))
+    rows.append(("Electricity, top-floor flat only", "same", f"[AER 2020, Table 17]({AER_2020})", "3,541 to 6,570",
+                 fmt(top["baseline"]["electricity_kwh"]), verdict(top["baseline"]["electricity_kwh"], 3541, 6570)))
+    rows.append(("Electricity, lower-floor flat only", "same", f"[AER 2020, Table 17]({AER_2020})", "3,541 to 6,570",
+                 fmt(low["baseline"]["electricity_kwh"]), verdict(low["baseline"]["electricity_kwh"], 3541, 6570)))
     rows.append(("Gas per flat, baseline (gas storage hot water + gas cooktop, no gas heater)",
                  "NSW without gas heater: 1 person 9,176; 2 people 18,542 MJ/yr",
                  f"[ACIL Allen 2017 for AER, Table 6.3]({ACIL_2017})", "9,176 to 18,542", fmt(g_avg),
@@ -122,51 +124,71 @@ def main() -> None:
                  verdict(hw_pct, 15, 35)))
 
     # ------------------------------------------------------------------ 2. cool roof vs UNSW CBA (Sydney)
+    # Like-for-like settings from UNSW Vol 2, Appendix Table 43: reference roof reflectance 0.15, cool roof 0.80 (new,
+    # not aged); roof insulation R2 for the existing house (Building 11) and R3.7 for the new low-rise apartment block
+    # (Building 08, climate zone 5). UNSW's "maximum indoor temperature reduction" is the largest hourly difference
+    # between the two cases over a typical summer week, free-running (Vol 3 Figures 6-7), so the same metric is used.
     T.simulate_cached.cache_clear()
+    from meterwise.assess import _hottest_week_start
 
-    def cooling_heating(top_floor: bool, alpha: float, insulated: bool):
-        r = T.simulate(T.FlatSpec(top_floor=top_floor, roof_absorptance=alpha, ceiling_insulated=insulated), weather)
-        f = T.simulate(T.FlatSpec(top_floor=top_floor, roof_absorptance=alpha, ceiling_insulated=insulated), weather,
-                       False, False)
-        return r.cooling_kwh, r.heating_kwh, float(f.indoor_c.max())
+    UNSW_ALPHA_REF, UNSW_ALPHA_COOL = 1 - 0.15, 1 - 0.80
 
-    dark, cool = P.v("roof_absorptance_dark"), P.v("roof_absorptance_cool_aged")
+    def roof_case(top_floor: bool, alpha: float, r_added: float | None):
+        over = {} if r_added is None else {"r_ceiling_insulation_added": r_added}
+        with P.overridden(**over):
+            spec = T.FlatSpec(top_floor=top_floor, roof_absorptance=alpha, ceiling_insulated=r_added is not None)
+            r = T.simulate(spec, weather)
+            f = T.simulate(spec, weather, False, False)
+        return r.cooling_kwh, r.heating_kwh, f.indoor_c
+
+    def max_hourly_drop(ref_in, cool_in) -> float:
+        i0 = _hottest_week_start(weather.temp_c)
+        return float((ref_in[i0:i0 + 168] - cool_in[i0:i0 + 168]).max())
+
     area = P.v("flat_area_m2")
-    lowc, lowh, _ = cooling_heating(False, dark, False)
-    # (a) insulated 3-storey block (4 top flats + 8 lower) vs UNSW Building 08, new insulated low-rise apartment
-    tc_d, th_d, tp_d = cooling_heating(True, dark, True)
-    tc_c, th_c, tp_c = cooling_heating(True, cool, True)
-    bld_cool_d = 4 * tc_d + 8 * lowc
-    red_pct = 100 * 4 * (tc_d - tc_c) / bld_cool_d
+    dark = P.v("roof_absorptance_dark")
+    cool = P.v("roof_absorptance_cool_aged")
+    # (a) Building 08: whole 3-storey block (4 top flats + 8 lower), top ceiling R3.7
+    lowc, lowh, _ = roof_case(False, UNSW_ALPHA_REF, None)
+    tc_d, th_d, ti_d = roof_case(True, UNSW_ALPHA_REF, 3.7)
+    tc_c, th_c, ti_c = roof_case(True, UNSW_ALPHA_COOL, 3.7)
+    red_pct = 100 * 4 * (tc_d - tc_c) / (4 * tc_d + 8 * lowc)
     red_m2 = 4 * (tc_d - tc_c) / (12 * area)
     pen_m2 = 4 * (th_c - th_d) / (12 * area)
-    rows.append(("Cool roof: annual cooling load cut, whole 3-storey block with insulated ceiling",
-                 "UNSW Building 08 (new insulated low-rise apartment, 3 storeys): 7.8-12.6% annual cooling saving",
-                 f"[UNSW Cool Roofs CBA Vol 3 Sydney]({UNSW_V3})", "4.8% to 15.6% (published range +/-3 points)",
-                 f"{red_pct:.1f}%", verdict(red_pct, 4.8, 15.6)))
-    rows.append(("Cool roof: heating penalty vs cooling cut, same block (kWh per m2 of floor)",
-                 "Building 08: heating penalty 0.0-1.0 vs cooling cut 1.7-3.3 kWh/m2",
-                 f"[UNSW Vol 3]({UNSW_V3})", "penalty 0 to 1.5 and smaller than the cooling cut",
-                 f"penalty {pen_m2:.2f}, cut {red_m2:.2f}",
+    drop08 = max_hourly_drop(ti_d, ti_c)
+    b08 = "UNSW Building 08 (new low-rise apartment block, roof R3.7, reflectance 0.15 -> 0.80)"
+    rows.append(("Cool roof, like-for-like with Building 08: annual cooling cut, whole 3-storey block",
+                 f"{b08}: 7.8-12.6% annual cooling saving",
+                 f"[UNSW Vol 3]({UNSW_V3}); settings [Vol 2 Table 43]({P.SRC_UNSW_V2})",
+                 "4.8% to 15.6% (published range +/-3 points)", f"{red_pct:.1f}%", verdict(red_pct, 4.8, 15.6)))
+    rows.append(("Cool roof, like-for-like with Building 08: heating penalty vs cooling cut (kWh per m2 of floor)",
+                 "Building 08: heating penalty 0.0-1.0 vs cooling cut 1.7-3.3 kWh/m2", f"[UNSW Vol 3]({UNSW_V3})",
+                 "penalty 0 to 1.5 and smaller than the cooling cut", f"penalty {pen_m2:.2f}, cut {red_m2:.2f}",
                  "PASS" if 0 <= pen_m2 <= 1.5 and pen_m2 < red_m2 else "OUTSIDE"))
-    rows.append(("Cool roof: drop in peak indoor temperature, insulated top-floor flat, no air conditioning",
-                 "Building 08: maximum indoor temperature 0.8-1.0 C lower", f"[UNSW Vol 3]({UNSW_V3})",
-                 "0.3 to 1.5 C (stated before running)", f"{tp_d - tp_c:.1f} C", verdict(tp_d - tp_c, 0.3, 1.5)))
-    # (b) uninsulated top-floor flat vs UNSW Building 11, existing uninsulated standalone house (single storey)
-    uc_d, uh_d, up_d = cooling_heating(True, dark, False)
-    uc_c, uh_c, up_c = cooling_heating(True, cool, False)
+    rows.append(("Cool roof, like-for-like with Building 08: largest hourly indoor drop, hottest week, top floor, no AC",
+                 "Building 08: maximum indoor temperature reduction 0.8-1.0 C", f"[UNSW Vol 3]({UNSW_V3})",
+                 "0.3 to 1.5 C", f"{drop08:.1f} C", verdict(drop08, 0.3, 1.5)))
+    # (b) Building 11: single-storey house, roof R2 -> our top-floor flat with R2 added
+    uc_d, uh_d, ui_d = roof_case(True, UNSW_ALPHA_REF, 2.0)
+    uc_c, uh_c, ui_c = roof_case(True, UNSW_ALPHA_COOL, 2.0)
     ured = 100 * (uc_d - uc_c) / uc_d
     upen = (uh_c - uh_d) / area
-    rows.append(("Cool roof: annual cooling load cut, uninsulated top-floor flat",
-                 "UNSW Building 11 (existing single-storey house): 42.4-55.8% annual cooling saving",
-                 f"[UNSW Vol 3]({UNSW_V3})", "37.4% to 60.8% (published range +/-5 points)", f"{ured:.0f}%",
-                 verdict(ured, 37.4, 60.8)))
-    rows.append(("Cool roof: heating penalty, uninsulated top-floor flat (kWh per m2)",
+    drop11 = max_hourly_drop(ui_d, ui_c)
+    b11 = "UNSW Building 11 (existing single-storey house, roof R2, reflectance 0.15 -> 0.80)"
+    rows.append(("Cool roof, like-for-like with Building 11: annual cooling cut, top-floor flat with R2 ceiling",
+                 f"{b11}: 42.4-55.8% annual cooling saving", f"[UNSW Vol 3]({UNSW_V3})",
+                 "37.4% to 60.8% (published range +/-5 points)", f"{ured:.0f}%", verdict(ured, 37.4, 60.8)))
+    rows.append(("Cool roof, like-for-like with Building 11: heating penalty (kWh per m2)",
                  "Building 11: heating penalty 2.8-4.9 kWh/m2", f"[UNSW Vol 3]({UNSW_V3})", "1.8 to 5.9 (+/-1)",
                  f"{upen:.1f}", verdict(upen, 1.8, 5.9)))
-    rows.append(("Cool roof: drop in peak indoor temperature, uninsulated top-floor flat",
-                 "Building 11: maximum indoor temperature 4.8-5.2 C lower", f"[UNSW Vol 3]({UNSW_V3})",
-                 "3.8 to 6.2 C (+/-1 C)", f"{up_d - up_c:.1f} C", verdict(up_d - up_c, 3.8, 6.2)))
+    rows.append(("Cool roof, like-for-like with Building 11: largest hourly indoor drop, hottest week, no AC",
+                 "Building 11: maximum indoor temperature reduction 4.8-5.2 C", f"[UNSW Vol 3]({UNSW_V3})",
+                 "3.8 to 6.2 C (+/-1 C)", f"{drop11:.1f} C", verdict(drop11, 3.8, 6.2)))
+    # Information only: Meterwise's own default case (uninsulated ceiling, aged coating)
+    dc_d, dh_d, di_d = roof_case(True, dark, None)
+    dc_c, dh_c, di_c = roof_case(True, cool, None)
+    default_roof = {"cool_cut_pct": 100 * (dc_d - dc_c) / dc_d, "heat_pen_m2": (dh_c - dh_d) / area,
+                    "drop": max_hourly_drop(di_d, di_c), "peak_drop": float(di_d.max() - di_c.max())}
 
     # ------------------------------------------------------------------ 3. indoor heat plausibility
     f_top = T.simulate(T.FlatSpec(top_floor=True, roof_absorptance=dark, heat_anomaly_air_c=0.6), weather, False, False)
@@ -188,16 +210,24 @@ def main() -> None:
 
     # ------------------------------------------------------------------ 4. bill engine vs AER DMO
     n = weather.hours
-    use = EnergyUse({k: np.full(n, 3900 / n) if k == "appliances" else np.zeros(n) for k in USAGE_END_USES},
-                    {k: np.zeros(n) for k in USAGE_END_USES}, gas_connected=False)
-    dmo_bill = compute_bill(use, Tariff.default(), weather.month).bill_per_year
+
+    def flat_rate_bill(kwh: float, tariff: Tariff) -> float:
+        use = EnergyUse({k: np.full(n, kwh / n) if k == "appliances" else np.zeros(n) for k in USAGE_END_USES},
+                        {k: np.zeros(n) for k in USAGE_END_USES}, gas_connected=False)
+        return compute_bill(use, tariff, weather.month).bill_per_year
+
+    endeavour = flat_rate_bill(4900, Tariff.default())
+    rows.append(("Bill engine: 4,900 kWh/yr on the Endeavour Energy flat-rate default offer (pilot default)",
+                 "AER DMO 8 annual price $2,328 at 4,900 kWh", f"[AER DMO 2026-27]({DMO8})", "$2,323 to $2,333",
+                 f"${endeavour:,.2f}", verdict(endeavour, 2323, 2333)))
+    ausgrid = flat_rate_bill(3900, Tariff(P.v("ausgrid_c_per_kwh"), P.v("ausgrid_supply_c_per_day"), 1.0, 0.0))
     rows.append(("Bill engine: 3,900 kWh/yr on the Ausgrid flat-rate default offer",
                  "AER DMO 8 annual price $1,899 at 3,900 kWh", f"[AER DMO 2026-27]({DMO8})", "$1,894 to $1,904",
-                 f"${dmo_bill:,.2f}", verdict(dmo_bill, 1894, 1904)))
+                 f"${ausgrid:,.2f}", verdict(ausgrid, 1894, 1904)))
 
     # ------------------------------------------------------------------ 5. PAYS programme rules
     share = P.v("savings_share_to_charge")
-    rows.append(("Meter charge cap as share of modelled saving", "Charge no more than 80% of estimated annual savings",
+    rows.append(("Monthly charge cap as share of modelled saving", "Charge no more than 80% of estimated annual savings",
                  f"[EEI PAYS minimum requirements]({PAYS_EEI})", "<= 80%", f"{share:.0%}", "PASS" if share <= 0.8 else "OUTSIDE"))
     life = min(P.v("life_heat_pump_hot_water"), P.v("life_reverse_cycle"), P.v("life_cool_roof"))
     term = P.v("term_years")
@@ -260,6 +290,9 @@ def main() -> None:
         ("Heat anomaly ignored (fraction 0)", {"anomaly_air_fraction": 0.0}, {}),
         ("Heat anomaly doubled (fraction 0.6, cap 3 C)", {"anomaly_air_fraction": 0.6, "anomaly_air_cap_c": 3.0}, {}),
         ("Heating used half as much (conditioned share 0.3)", {"conditioned_share": 0.3}, {}),
+        ("Storage tank losses 20% instead of 30%", {"storage_loss_share": 0.2}, {}),
+        ("Roof heat through a concrete ceiling slab (via the mass)", {"roof_heat_to_air_share": 0.0}, {}),
+        ("12-year term (breaks the PAYS term rule)", {}, {"finance": {"term_years": 12}}),
         ("Installed costs +20%", {"cost_heat_pump_hot_water": 4800.0, "cost_reverse_cycle": 2640.0,
                                   "cost_induction": 2400.0, "cost_cool_roof_per_m2": 45.3}, {}),
     ]
@@ -282,7 +315,7 @@ def main() -> None:
              "outputs. Nothing in this file is typed in by hand except the benchmark values and pass ranges, which are "
              "fixed in the script before the model runs.\n")
     L.append(f"Weather: ERA5 reanalysis via Open-Meteo, calendar year {weather.year}, grid point {weather.lat:.2f}, "
-             f"{weather.lon:.2f} (Western Sydney). Typical block used throughout: 3 storeys, 12 flats of 65 m2, roof 320 m2, "
+             f"{weather.lon:.2f} (Penrith, Western Sydney). Typical block used throughout: 3 storeys, 12 flats of 65 m2, roof 320 m2, "
              "satellite heat anomaly +2.0 C (converted to +0.6 C air on hot afternoons, an assumption).\n")
     L.append("Defaults for the existing flat: gas storage hot water, plug-in electric heaters, no air conditioning, gas "
              "cooktop, dark roof.\n")
@@ -300,25 +333,53 @@ def main() -> None:
         if r[5] != "PASS":
             L.append(f"- **{r[0]}**: model {r[4]}, pass range {r[3]}.")
     L.append("")
-    L.append("- The UNSW house (Building 11) is an existing single-storey standalone house (242 m2); Meterwise models "
-             "a heavy brick top-floor flat whose floor and shared walls touch other flats. Some difference in the "
-             "peak-temperature drop and heating penalty is expected, but the size of the gap shows the roof physics here is "
-             "simplified (two thermal nodes, a fixed split between downward and upward heat flow through the roof space). "
-             "In this model the cool roof's winter heating penalty on an uninsulated top floor is larger than UNSW "
-             "found, so the cool roof's bill saving is, if anything, understated.")
+    L.append("- **Cool roof vs the UNSW house (Building 11).** The first version of this report compared the wrong "
+             "things: our peak-to-peak drop with UNSW's *largest hourly* drop, and an uninsulated flat with an aged "
+             "coating against UNSW's R2-insulated house with a new 0.80-reflectance coating. The checks above now use "
+             "UNSW's own settings and metric. On that basis the model matches the insulated apartment block (Building 08) "
+             "but still shows a much smaller hourly temperature drop and cooling cut than the house. The house is a "
+             "lightweight single-storey building that UNSW simulated with no window opening (its reference case reaches "
+             "40-44 C); our top-floor flat sits on heavy brick and concrete, and its occupants open windows. A diagnostic "
+             "run of our model with lightweight mass and no window opening still gave only about 2 C, so part of the gap "
+             "is the simplified roof physics (a fixed outside surface resistance of 0.04 m2K/W from ISO 6946 and no "
+             "separate roof-space air node), not just building type. The cool roof's comfort benefit may therefore be "
+             "understated rather than overstated.")
+    L.append(f"- **Meterwise's own default roof case** (uninsulated ceiling, coating aged to absorptance {cool}): "
+             f"cooling cut {default_roof['cool_cut_pct']:.0f}%, heating penalty {default_roof['heat_pen_m2']:.1f} kWh/m2, "
+             f"largest hourly indoor drop {default_roof['drop']:.1f} C, peak-to-peak drop {default_roof['peak_drop']:.1f} C. "
+             "No published benchmark matches this exact case.")
+    L.append("- **Roof heat path (changed in this version).** The roof R-values come from the NCC entry for a tiled roof "
+             "over a flat plasterboard ceiling. Plasterboard stores little heat, so heat through the top-floor ceiling now "
+             "goes straight to the room air instead of first passing through the brick-and-concrete mass. This is an "
+             "assumption (some walk-ups have a concrete ceiling slab); the sensitivity table includes the concrete-slab case.")
     L.append("- The AER and ACIL Allen benchmarks cover all dwelling types, including houses, so a 65 m2 flat sitting "
-             "near or just below the low end of the range is expected. Hot water is a larger share of energy in a small "
-             "flat with little heating than in the average home YourHome describes; the model's share is still high, "
-             "which points to the hot water assumptions (2.4 people x 50 L at 60 C, older gas tank at 65% efficiency) "
-             "being on the generous side. The sensitivity table shows the effect of lower hot water use. The top-floor flat uses more than the lower flats because "
-             "an uninsulated ceiling loses a lot of heat in winter.")
+             "near or just below the low end of the range is expected. The electricity benchmark switched from zone 5 "
+             "(urban Sydney) to zone 6 because the pilot moved from the Lakemba example data to Penrith; the ranges were "
+             "changed for the location, not the result. The top-floor flat runs above the range because an uninsulated "
+             "ceiling loses a lot of heat in Penrith's colder winters and the plug-in heaters are resistive. The ACIL Allen "
+             "gas benchmarks are NSW-wide (mostly coastal Sydney), so a Penrith flat with a gas heater sitting above the "
+             "range is expected.")
+    L.append(f"- **Hot water share ({hw_pct:.0f}% vs about 25%).** The hot water inputs were re-examined and now come "
+             "from YourHome: 50 L per person per day delivered at 50 C (the legal tap limit), about 30% of a storage "
+             "tank's energy lost from the tank and pipes, and a gas burner efficiency of 0.75 (bottom of YourHome's range). "
+             "In absolute terms the result is not generous: hot water plus cooking gas for 2.4 people is "
+             f"{fmt(g_avg)} MJ/yr, below ACIL Allen's measured NSW figure of 18,542 MJ/yr for 2-person gas homes without a "
+             "gas heater. The share is high because a small flat with plug-in heaters and no air conditioning uses little "
+             "other energy; YourHome's 25% is an average over all homes, most of them houses with more heating. "
+             "So this check is not like-for-like and is kept only for transparency. No flats-only household size "
+             "and no AS/NZS 4234 load table could be opened, so 2.4 people per flat stays an assumption (tested at 1.8 and 3.1).")
     from meterwise.finance import annuity_factor
 
-    cut = 100 * (1 - annuity_factor(P.v("cost_of_capital"), 10) / annuity_factor(P.v("cost_of_capital"), term))
-    L.append(f"- The PAYS term check {'fails' if term > 0.8 * life else 'passes'} with the default {term}-year term; "
-             f"the heat pump's assumed life is {life} years (80% = {0.8 * life:.1f} years). The API warns on every "
-             f"assessment that breaches it. A 10-year term would comply but lowers the capital the charges can repay "
-             f"by {cut:.0f}%.\n")
+    if term > 0.8 * life:
+        cut = 100 * (1 - annuity_factor(P.v("cost_of_capital"), int(0.8 * life)) / annuity_factor(P.v("cost_of_capital"), term))
+        L.append(f"- The PAYS term check fails with the default {term}-year term; the heat pump's assumed life is {life} "
+                 f"years (80% = {0.8 * life:.1f} years). A compliant term would cut the capital the charges can repay "
+                 f"by {cut:.0f}%.\n")
+    else:
+        cut = 100 * (1 - annuity_factor(P.v("cost_of_capital"), term) / annuity_factor(P.v("cost_of_capital"), 12))
+        L.append(f"- The default term is now {term} years, inside the PAYS limit of 80% of the heat pump's assumed "
+                 f"{life}-year life ({0.8 * life:.1f} years). Compared with the 12-year term used before, this lowers the "
+                 f"capital the capped charges can repay by {cut:.0f}%. The API warns whenever a user picks a longer term.\n")
 
     L.append("## 2. Headline results for the typical block\n")
     L.append("| Package | Capex | Rebates | Net capex | Max fundable | Fully funded | Funding gap | Avg charge/month | "
@@ -344,7 +405,7 @@ def main() -> None:
     L.append("")
 
     L.append("## 3. Sensitivity: does the headline survive?\n")
-    L.append("Headline tested: *the package is fully funded by capped meter charges and every tenant is better off*. "
+    L.append("Headline tested: *the package is fully funded by capped monthly charges and every tenant is better off*. "
              "Tenants are better off by construction (the charge is capped at 80% of each flat's modelled saving); the "
              "open question is whether the capped charges repay the whole cost. Each row changes one input.\n")
     L.append("| Case | Default package: fully funded? | gap | tenant net/month | Full electrification + disconnection: "
@@ -362,6 +423,11 @@ def main() -> None:
     L.append("## 4. Limits\n")
     L.append("- **Not validated against metered data.** No flat-level smart meter or gas meter data for the pilot area "
              "was available, so energy use is compared only with published averages for all dwelling types.")
+    L.append("- **Hot water** inputs come from YourHome averages, not from metered flats. People per flat (2.4) is an "
+             "assumption: no flats-only household size for Lakemba was found, and the AS/NZS 4234 load tables and the "
+             "Residential Baseline Study could not be opened.")
+    L.append("- **Cool roof** effects agree with UNSW for an insulated apartment block but are much smaller than UNSW's "
+             "result for a single-storey house, partly because of simplified roof physics (see above).")
     L.append("- **Thermal model** is a two-node simplification (after ISO 13790), with one representative top-floor flat "
              "and one representative lower flat. Orientation, shading by neighbours, ground-floor slab contact, and "
              "differences between individual flats are not modelled. Sun on walls and windows uses an average-facade "
@@ -377,7 +443,9 @@ def main() -> None:
              "flats were obtained. The small reverse-cycle air conditioner rebate ($250) and the heat pump life "
              "(13 years) are assumptions. STC counts were taken from an installer guide, not the Clean Energy "
              "Regulator register.")
-    L.append("- **Prices** are 2026-27 default offers; many tenants are on market offers. Bills do not include "
+    L.append("- **Prices** are 2026-27 default offers for the Endeavour Energy area (electricity) and the Jemena gas "
+             "zone; the network was chosen for the pilot suburbs as a whole, not checked address by address. Many tenants "
+             "are on market offers. Bills do not include "
              "concessions or solar.")
     L.append("- **Emissions** use today's NSW grid factor; the grid is getting cleaner, so savings from electrification "
              "will grow. That trend is not modelled.")

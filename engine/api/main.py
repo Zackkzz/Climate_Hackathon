@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from meterwise import buildings as B
+from meterwise.credits import all_credits
 from meterwise import params as P
 from meterwise.assess import DISCLAIMER, AssessError, assess
 from meterwise.models import OPTIONS, AssessRequest, AssessResponse, PortfolioRequest
@@ -59,7 +60,7 @@ def meta() -> dict[str, Any]:
         "The model turns them into a small, capped air temperature adjustment, which is an assumption.",
         f"Weather is one real year ({WEATHER_YEAR}) of hourly ERA5 reanalysis data from Open-Meteo for the area.",
         "Energy use is modelled for a typical flat, not measured from meters. Real bills vary with how people live.",
-        "Prices are 2026-27 NSW default offers (Ausgrid electricity, Jemena gas) including GST.",
+        f"Prices are 2026-27 NSW default offers ({P.v('electricity_network')} electricity, Jemena gas) including GST.",
     ]
     notes += ds.warnings
     return {
@@ -81,6 +82,7 @@ def meta() -> dict[str, Any]:
         },
         "options": OPTIONS,
         "data_notes": notes,
+        "credits": all_credits(),
         "assumptions": P.as_assumptions(),
     }
 

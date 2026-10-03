@@ -68,7 +68,7 @@ def cold_water_temp(weather: Weather) -> np.ndarray:
 
 
 def hot_water_heat_mj(weather: Weather, litres_per_day: float) -> np.ndarray:
-    """Useful heat put into hot water each hour (MJ), spread evenly over the day."""
+    """Useful heat in the hot water delivered at the tap each hour (MJ), spread evenly over the day."""
     dt = np.clip(P.v("hot_water_temp_c") - cold_water_temp(weather), 0, None)
     return litres_per_day * 4.186e-3 * dt / 24.0  # MJ per hour (4.186 kJ/kgK, 1 L = 1 kg)
 
@@ -82,16 +82,17 @@ def energy_use(eq: Equipment, weather: Weather, heating_w: np.ndarray, cooling_w
     elec: dict[str, np.ndarray] = {}
     gas: dict[str, np.ndarray] = {}
 
-    # Hot water
+    # Hot water: storage tanks also lose a share of their energy from the tank and pipes.
     hw = hot_water_heat_mj(weather, litres_per_day)
+    tank = hw / (1.0 - P.v("storage_loss_share"))
     if eq.hot_water == "gas_storage":
-        gas["hot_water"], elec["hot_water"] = hw / P.v("eff_gas_storage"), zero
+        gas["hot_water"], elec["hot_water"] = tank / P.v("eff_gas_storage"), zero
     elif eq.hot_water == "gas_instant":
         gas["hot_water"], elec["hot_water"] = hw / P.v("eff_gas_instant"), zero
     elif eq.hot_water == "electric_storage":
-        gas["hot_water"], elec["hot_water"] = zero, hw / P.v("eff_electric_storage") / MJ_PER_KWH
+        gas["hot_water"], elec["hot_water"] = zero, tank / P.v("eff_electric_storage") / MJ_PER_KWH
     elif eq.hot_water == "heat_pump":
-        gas["hot_water"], elec["hot_water"] = zero, hw / P.v("cop_heat_pump_hot_water") / MJ_PER_KWH
+        gas["hot_water"], elec["hot_water"] = zero, tank / P.v("cop_heat_pump_hot_water") / MJ_PER_KWH
     else:
         raise ValueError(f"unknown hot water system {eq.hot_water}")
 

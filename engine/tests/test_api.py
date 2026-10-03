@@ -185,3 +185,50 @@ def test_portfolio_limits():
 def test_cors_for_local_dev():
     r = client.options("/api/assess", headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": "POST"})
     assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+def test_meta_credits():
+    m = client.get("/api/meta").json()
+    assert m["credits"]
+    for c in m["credits"]:
+        assert {"name", "url", "licence", "used_for"} <= set(c)
+    urls = [c["url"] for c in m["credits"]]
+    assert any("open-meteo" in u for u in urls) and any("aer.gov.au" in u for u in urls)
+    assert m["defaults"]["finance"]["term_years"] == 10
+
+
+def test_credits_merge_pilot_sources(tmp_path, monkeypatch):
+    import json
+
+    from meterwise import credits
+
+    (tmp_path / "meta.json").write_text(json.dumps({"sources": [
+        {"name": "OpenStreetMap", "url": "https://www.openstreetmap.org/copyright", "license": "ODbL", "use": "footprints"},
+        "https://example.org/plain-string-source",
+        {"name": "Open-Meteo duplicate", "url": "https://open-meteo.com/en/docs/historical-weather-api"},
+    ]}))
+    monkeypatch.setattr(credits, "PILOT_DIR", tmp_path)
+    allc = credits.all_credits()
+    osm = next(c for c in allc if c["name"] == "OpenStreetMap")
+    assert osm["licence"] == "ODbL" and osm["used_for"] == "footprints"
+    assert any(c["url"] == "https://example.org/plain-string-source" for c in allc)
+    assert sum("open-meteo.com" in c["url"] for c in allc) == 1
+    monkeypatch.setattr(credits, "PILOT_DIR", tmp_path / "missing")
+    assert credits.all_credits() == credits.ENGINE_CREDITS
+
+
+def test_index_html_not_cached_by_run_py():
+    import importlib.util
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    if not (root / "web" / "dist" / "index.html").exists():
+        pytest.skip("web/dist not built")
+    spec = importlib.util.spec_from_file_location("mw_run", root / "run.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    c = TestClient(mod.app)
+    r = c.get("/")
+    assert r.status_code == 200 and r.headers.get("cache-control") == "no-cache"
+    assert c.get("/some/client/route").headers.get("cache-control") == "no-cache"
+    assert c.get("/api/health").json() == {"status": "ok"}

@@ -29,9 +29,10 @@ def _mount_web() -> None:
         if path.startswith("api/") or path == "api":
             raise HTTPException(status_code=404, detail="Not found.")
         target = (DIST / path).resolve()
-        if path and target.is_file() and DIST.resolve() in target.parents:
-            return FileResponse(target)
-        return FileResponse(DIST / "index.html")
+        if path and target.is_file() and DIST.resolve() in target.parents and target.name != "index.html":
+            return FileResponse(target)  # hashed build assets: normal caching
+        # index.html must always be revalidated so a rebuilt web app shows up without a hard reload.
+        return FileResponse(DIST / "index.html", headers={"Cache-Control": "no-cache"})
 
 
 _mount_web()

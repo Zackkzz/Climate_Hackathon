@@ -61,15 +61,28 @@ SRC_ABS_LAKEMBA = "https://abs.gov.au/census/find-census-data/quickstats/2021/SA
 
 PARAMS: dict[str, Param] = {
     # ------------------------------------------------------------------ tariffs (2026-27, incl. GST)
+    "electricity_network": Param(
+        "Endeavour Energy", "network", "Electricity network area used for default prices (the pilot is in Penrith)",
+        "https://www.endeavourenergy.com.au/about-us",
+        "Endeavour Energy: 'we power the lives of 2.8 million people throughout Sydney's Greater West...'. Penrith and "
+        "Kingswood are in Sydney's Greater West. The Lakemba example data is in the Ausgrid area (prices below).", "tariff"),
     "electricity_c_per_kwh": Param(
-        33.1372, "c/kWh", "Electricity price per kWh (Ausgrid area default market offer, flat rate, 2026-27)",
-        SRC_DMO8, "AER DMO 8 final determination, Figure 2.1, residential flat-rate tariff caps, Ausgrid. Incl. GST.", "tariff"),
+        33.7273, "c/kWh", "Electricity price per kWh (Endeavour Energy area default market offer, flat rate, 2026-27)",
+        SRC_DMO8, "AER DMO 8 final determination, Figure 2.1, residential flat-rate tariff caps, Endeavour Energy. Incl. GST.",
+        "tariff"),
     "electricity_supply_c_per_day": Param(
-        166.2289, "c/day", "Electricity daily supply charge (Ausgrid area default market offer, 2026-27)",
-        SRC_DMO8, "AER DMO 8 final determination, Figure 2.1, Ausgrid. Incl. GST.", "tariff"),
+        185.1350, "c/day", "Electricity daily supply charge (Endeavour Energy area default market offer, 2026-27)",
+        SRC_DMO8, "AER DMO 8 final determination, Figure 2.1, Endeavour Energy. Incl. GST.", "tariff"),
+    "ausgrid_c_per_kwh": Param(
+        33.1372, "c/kWh", "For reference: Ausgrid area default market offer price per kWh, 2026-27", SRC_DMO8,
+        "AER DMO 8, Figure 2.1, Ausgrid. Not used unless you enter it as the tariff.", "tariff"),
+    "ausgrid_supply_c_per_day": Param(
+        166.2289, "c/day", "For reference: Ausgrid area daily supply charge, 2026-27", SRC_DMO8,
+        "AER DMO 8, Figure 2.1, Ausgrid.", "tariff"),
     "gas_c_per_mj": Param(
         6.38, "c/MJ", "Gas price per MJ (first 20.7 MJ each day, Jemena NSW network standing offer from 1 July 2026)",
-        SRC_EA_GAS, "EnergyAustralia NSW residential gas standing offer, Jemena zone. Blocks: first 20.712 MJ/day 6.38 c, "
+        SRC_EA_GAS, "EnergyAustralia NSW residential gas standing offer, Jemena zone (Jemena's network covers Sydney; "
+        "the retailer notes the zone must be confirmed at each address). Blocks: first 20.712 MJ/day 6.38 c, "
         "next 20.384 MJ/day 4.51 c, then 4.18 c. The engine applies the blocks day by day and scales them if you change this price.",
         "tariff"),
     "gas_block_2_c_per_mj": Param(4.51, "c/MJ", "Gas price, next 20.384 MJ each day", SRC_EA_GAS, "", "tariff"),
@@ -112,6 +125,11 @@ PARAMS: dict[str, Param] = {
                                  "flow, total R-value 0.74. Top floor only.", "building"),
     "r_roof_ceiling_up": Param(0.23, "m2K/W", "Heat resistance of the same roof, heat flowing up (winter)", SRC_NCC2019,
                                "Same NCC table, upward heat flow, total R-value 0.23. Top floor only.", "building"),
+    "roof_heat_to_air_share": Param(1.0, "share", "Share of top-floor roof heat that reaches room air directly through a "
+                                    "lightweight plasterboard ceiling", ASSUMPTION,
+                                    "The roof R-values above are for a tiled roof over a flat plasterboard ceiling, which "
+                                    "stores little heat, so roof heat goes straight to the room air. Set 0 for a flat with a "
+                                    "concrete ceiling slab (heat then passes through the heavy mass).", "building"),
     "r_ceiling_insulation_added": Param(3.5, "m2K/W", "Insulation added by the ceiling insulation upgrade (R3.5 batts)",
                                         ASSUMPTION, "Product R-value as installed; real installs can lose some of this to gaps.",
                                         "building"),
@@ -171,13 +189,19 @@ PARAMS: dict[str, Param] = {
     "internal_gains_base_w": Param(250.0, "W", "Heat from people and appliances (daytime and night)", ASSUMPTION, "", "use"),
     "internal_gains_evening_w": Param(600.0, "W", "Heat from people, cooking and appliances (5-10 pm)", ASSUMPTION, "", "use"),
     "occupants_per_flat": Param(2.4, "people", "People living in each flat", ASSUMPTION,
-                                "Lakemba's average household is 3.1 people (ABS 2021, all dwelling types); flats usually hold "
-                                "smaller households, so we assume 2.4. Tested at 3.1 in the validation report.", "use"),
+                                "No flats-only household size was found. Lakemba's average is 3.1 people per household "
+                                "across all dwellings (ABS 2021, 70% of them flats); flats usually hold smaller households "
+                                "than houses, so we assume 2.4. The validation report tests 1.8 and 3.1.", "use"),
     "hot_water_l_per_person_day": Param(50.0, "L/person/day", "Hot water used per person each day", SRC_YOURHOME_HW,
-                                        "YourHome: 'one person uses about 50 litres of hot water per day'. Heated from cold "
-                                        "mains to 60 C in the model.", "use"),
-    "hot_water_temp_c": Param(60.0, "C", "Hot water storage temperature", ASSUMPTION,
-                              "Storage tanks must be kept at 60 C or more to control Legionella.", "use"),
+                                        "YourHome: 'one person uses about 50 litres of hot water per day'. Taken as water "
+                                        "delivered at the tap temperature below.", "use"),
+    "hot_water_temp_c": Param(50.0, "C", "Hot water temperature at the tap", SRC_YOURHOME_HW,
+                              "YourHome: new systems need a tempering valve so water at the tap does not exceed 50 C. "
+                              "Tanks are stored at 60 C; that extra heat shows up as tank loss below.", "use"),
+    "storage_loss_share": Param(0.30, "share of energy", "Share of a storage tank's energy lost as heat from the tank and pipes",
+                                SRC_YOURHOME_HW, "YourHome: 'About 30 percent of the energy used by a storage system is "
+                                "wasted in heat loss from the tank and associated pipework'. Applied to gas, electric and "
+                                "heat pump tanks; not to instantaneous systems.", "use"),
     "cold_water_offset_c": Param(2.0, "C", "Cold mains water is assumed this much warmer than the last month's average air temperature",
                                  ASSUMPTION, "", "use"),
     "cooking_gas_mj_per_year": Param(2000.0, "MJ/year", "Gas used for cooking per flat", ASSUMPTION, "", "use"),
@@ -185,16 +209,18 @@ PARAMS: dict[str, Param] = {
                                             ASSUMPTION, "Same before and after the upgrade.", "use"),
 
     # ------------------------------------------------------------------ equipment efficiency
-    "eff_gas_storage": Param(0.65, "ratio", "Older gas storage hot water: share of gas energy that ends up in the hot water used",
-                             ASSUMPTION, "YourHome gives 0.75-0.96 for new gas systems; older storage tanks lose more through "
-                             "the pilot flame, flue and tank, so we use 0.65.", "equipment"),
+    "eff_gas_storage": Param(0.75, "ratio", "Gas storage hot water: share of burnt gas that heats the water (before tank losses)",
+                             SRC_YOURHOME_HW, "Bottom of YourHome's 0.75-0.96 range for gas hot water, for an older tank. "
+                             "Tank losses are added separately, so overall 0.75 x 0.70 = 0.53 reaches the tap.", "equipment"),
     "eff_gas_instant": Param(0.75, "ratio", "Gas instantaneous hot water efficiency", SRC_YOURHOME_HW,
-                             "Bottom of YourHome's 0.75-0.96 range for gas hot water.", "equipment"),
-    "eff_electric_storage": Param(0.85, "ratio", "Electric storage hot water efficiency (includes tank heat losses)", ASSUMPTION,
-                                  "YourHome gives about 0.95 for a new electric tank; tank heat losses lower it.", "equipment"),
+                             "Bottom of YourHome's 0.75-0.96 range for gas hot water. No tank, so no tank losses.", "equipment"),
+    "eff_electric_storage": Param(0.95, "ratio", "Electric storage hot water: heating element efficiency (before tank losses)",
+                                  SRC_YOURHOME_HW, "YourHome: new electric storage about 0.95. Tank losses are added separately.",
+                                  "equipment"),
     "cop_heat_pump_hot_water": Param(3.0, "COP", "Heat pump hot water: units of heat per unit of electricity, over a year in "
-                                     "Sydney", SRC_YOURHOME_HW, "YourHome: heat pumps have a COP of around 3-5. We use the "
-                                     "bottom of the range to cover tank losses and cooler winter air.", "equipment"),
+                                     "Sydney (before tank losses)", SRC_YOURHOME_HW,
+                                     "YourHome: heat pumps have a COP of around 3-5. We use the bottom of the range for cooler "
+                                     "winter air. Tank losses are added separately.", "equipment"),
     "eff_gas_heater": Param(0.65, "ratio", "Older gas space heater efficiency", SRC_ENERGYRATING_HEATERS,
                             "Energy Rating space heater profile: gas space heaters typically 60-90% efficient; older units "
                             "sit toward the low end.", "equipment"),
@@ -260,10 +286,10 @@ PARAMS: dict[str, Param] = {
     # ------------------------------------------------------------------ finance defaults
     "cost_of_capital": Param(0.055, "per year", "Investor's cost of capital (nominal, compounded monthly)", ASSUMPTION,
                              "Set to resemble a utility or green-bank lending rate.", "finance"),
-    "term_years": Param(12, "years", "Repayment term of the meter charge", ASSUMPTION,
-                        "PAYS rules keep the term within 80% of the shortest equipment life; the engine checks this and "
-                        "warns.", "finance"),
-    "savings_share_to_charge": Param(0.8, "share", "Largest share of a flat's modelled saving the meter charge may take",
+    "term_years": Param(10, "years", "Repayment term of the monthly charge", SRC_PAYS,
+                        "PAYS rules: term no more than 80% of the shortest-lived measure's life (13-year heat pump -> "
+                        "10.4 years), so the default is 10 years. Longer user-chosen terms get a warning.", "finance"),
+    "savings_share_to_charge": Param(0.8, "share", "Largest share of a flat's modelled saving the monthly charge may take",
                                      SRC_PAYS, "PAYS minimum requirements: the charge is 'not more than 80 percent of the "
                                      "upgrades' estimated annual savings'.", "finance"),
     "reserve": Param(0.05, "share", "Share of charges set aside against unpaid bills and lower-than-modelled savings",
@@ -272,6 +298,14 @@ PARAMS: dict[str, Param] = {
         "saving-weighted", "method", "How shared building costs (cool roof, ceiling insulation) are split between flats",
         ASSUMPTION, "Shared costs are split in proportion to each flat's modelled yearly saving from the whole package, so every "
         "flat's charge stays within its own saving cap. Flats with no saving carry none of the shared cost.", "finance"),
+    "finance_definitions": Param(
+        "see note", "definitions", "What the finance figures mean", ASSUMPTION,
+        "total_repaid = all monthly charges paid by tenants over the term (before the reserve). The reserve share of each "
+        "charge is set aside against unpaid bills and lower-than-modelled savings, so only total_repaid_after_reserve "
+        "repays the investor. investor_return_pct = the yearly rate of return (monthly compounding) that the charges after "
+        "the reserve earn on the full net cost; it equals the cost of capital when the package is fully funded and is "
+        "lower when the charge cap leaves a funding gap. Total repaid can exceed the net cost while the return is "
+        "negative, because the reserve is not paid to the investor.", "finance"),
     "attribution_order": Param(
         "hot water, reverse cycle, induction, gas disconnection, ceiling insulation, cool roof", "order",
         "Order used to split the package saving between items", ASSUMPTION,

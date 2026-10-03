@@ -1,4 +1,4 @@
-"""The bill-neutral meter-charge deal (Pay As You Save / tariffed on-bill finance).
+"""The bill-neutral monthly-charge deal (Pay As You Save / tariffed on-bill finance).
 
 Rules (from the API contract):
 - Each flat's monthly charge is the lower of (a) the charge that repays that flat's share of net capex over the

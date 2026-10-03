@@ -229,7 +229,8 @@ def assess(req: AssessRequest, allow_network: bool = True) -> dict[str, Any]:
     base_eq, up_eq, disconnect, eqwarn = equipment_pair(ex, pkg)
     warnings += eqwarn
     alpha_base = P.v("roof_absorptance_dark") if ex.roof == "dark" else P.v("roof_absorptance_light")
-    alpha_up = min(alpha_base, P.v("roof_absorptance_cool_aged")) if pkg.cool_roof else alpha_base
+    alpha_up_if_cool = min(alpha_base, P.v("roof_absorptance_cool_aged"))
+    alpha_up = alpha_up_if_cool if pkg.cool_roof else alpha_base
     if pkg.cool_roof and ex.roof == "light":
         warnings.append("The roof is already light-coloured, so a cool roof coating adds only a small benefit.")
 
@@ -268,6 +269,35 @@ def assess(req: AssessRequest, allow_network: bool = True) -> dict[str, Any]:
     for i in range(1, len(steps)):
         item_saving[steps[i][0]] = step_bills[i - 1] - step_bills[i]
 
+    # --- what each unselected item would add on top of the current package (marginal, one at a time)
+    up_total = step_bills[-1]
+    if_selected: dict[str, float | None] = {}
+    for key in ATTRIBUTION_ORDER:
+        if selected[key]:
+            if_selected[key] = item_saving[key]
+            continue
+        eq = up_cfg.equipment
+        cfg_x: Config | None
+        if key == "heat_pump_hot_water":
+            cfg_x = Config(up_cfg.roof_absorptance, up_cfg.ceiling_insulated, replace(eq, hot_water="heat_pump"))
+        elif key == "reverse_cycle":
+            cfg_x = Config(up_cfg.roof_absorptance, up_cfg.ceiling_insulated,
+                           replace(eq, heating="reverse_cycle", cooling="reverse_cycle"))
+        elif key == "induction_cooktop":
+            cfg_x = Config(up_cfg.roof_absorptance, up_cfg.ceiling_insulated, replace(eq, cooktop="induction"))
+        elif key == "disconnect_gas":
+            # Only possible when nothing in the upgraded flat still uses gas.
+            ok = base_eq.uses_gas and eq.gas_connected and not eq.uses_gas
+            cfg_x = Config(up_cfg.roof_absorptance, up_cfg.ceiling_insulated, replace(eq, gas_connected=False)) if ok else None
+        elif key == "ceiling_insulation":
+            cfg_x = Config(up_cfg.roof_absorptance, True, eq)
+        else:  # cool_roof
+            cfg_x = Config(alpha_up_if_cool, up_cfg.ceiling_insulated, eq)
+        if cfg_x is None:
+            if_selected[key] = None
+        else:
+            if_selected[key] = up_total - sum(counts[p] * A.bill(p, cfg_x)[0].bill_per_year for p in positions)
+
     # --- package items and costs
     items = []
     for key in ["cool_roof", "heat_pump_hot_water", "reverse_cycle", "induction_cooktop", "ceiling_insulation",
@@ -279,9 +309,13 @@ def assess(req: AssessRequest, allow_network: bool = True) -> dict[str, Any]:
                       "capex": round(capex if sel else 0.0, 2), "rebate": round(rebate if sel else 0.0, 2),
                       "net_capex": round(capex - rebate if sel else 0.0, 2), "applies_to": applies_to,
                       "saving_per_year": round(item_saving[key], 2), "note": note,
-                      "capex_if_selected": round(capex, 2), "rebate_if_selected": round(rebate, 2)})
+                      "capex_if_selected": round(capex, 2), "rebate_if_selected": round(rebate, 2),
+                      "saving_per_year_if_selected": None if if_selected[key] is None else round(if_selected[key], 2)})
     if pkg.disconnect_gas and not disconnect:
         next(i for i in items if i["key"] == "disconnect_gas")["note"] = "Not applied: some appliances would still use gas"
+    elif not disconnect and if_selected["disconnect_gas"] is None and base_eq.uses_gas:
+        next(i for i in items if i["key"] == "disconnect_gas")["note"] = (
+            "Only possible once no appliance uses gas (add the matching upgrades first)")
     capex_total = sum(i["capex"] for i in items)
     rebates_total = sum(i["rebate"] for i in items)
     net_capex = capex_total - rebates_total
@@ -307,7 +341,7 @@ def assess(req: AssessRequest, allow_network: bool = True) -> dict[str, Any]:
         neutral = ub.bill_per_year + 12 * charge <= bb.bill_per_year + 0.01
         if s < 0:
             warnings.append(f"{GROUP_LABELS[p]}: the modelled bill rises by ${-s:,.0f} a year, mostly because these flats "
-                            "gain air conditioning they did not have before. They pay no meter charge; their share of the "
+                            "gain air conditioning they did not have before. They pay no monthly charge; their share of the "
                             "cost counts as a funding gap.")
         free_b = A.thermal(p, base_cfg, heating=False, cooling=False)
         free_u = A.thermal(p, up_cfg, heating=False, cooling=False)
@@ -319,6 +353,9 @@ def assess(req: AssessRequest, allow_network: bool = True) -> dict[str, Any]:
             "peak_indoor_c_baseline": round(float(free_b.indoor_c.max()), 1),
             "peak_indoor_c_upgraded": round(float(free_u.indoor_c.max()), 1),
             "basis": "Without air conditioning running (shows the passive effect of the roof).",
+            "period_label": f"Hours over the whole year ({weather.year} weather), with no air conditioning running",
+            "as_used_period_label": f"Hours over the whole year ({weather.year} weather), with heating and cooling "
+                                    "used as assumed",
             "hours_above_30c_baseline_as_used": int((used_b.indoor_c > 30).sum()),
             "hours_above_30c_upgraded_as_used": int((used_u.indoor_c > 30).sum()),
             "as_used_basis": "With the flat's heating and cooling used as assumed (air conditioning 2-11 pm when hot).",
@@ -356,7 +393,7 @@ def assess(req: AssessRequest, allow_network: bool = True) -> dict[str, Any]:
         "note": "Each is a separate way to close the funding gap with everything else unchanged.",
     }
     if not fully_funded:
-        warnings.append(f"The capped meter charges repay ${max(net_capex - gap, 0):,.0f} of the ${net_capex:,.0f} net cost. "
+        warnings.append(f"The capped monthly charges repay ${max(net_capex - gap, 0):,.0f} of the ${net_capex:,.0f} net cost. "
                         f"The remaining ${gap:,.0f} would need a grant, an owner contribution or a smaller package.")
 
     # PAYS rule: term no longer than 80% of the shortest-lived measure.
@@ -447,6 +484,8 @@ def assess(req: AssessRequest, allow_network: bool = True) -> dict[str, Any]:
                     "savings_share_to_charge": fin.savings_share_to_charge, "reserve": fin.reserve,
                     "charge_per_month_building": round(charge_bldg, 2),
                     "total_repaid": round(charge_bldg * 12 * fin.term_years, 2),
+                    "total_repaid_after_reserve": round(charge_bldg * 12 * fin.term_years * (1 - fin.reserve), 2),
+                    "reserve_held": round(charge_bldg * 12 * fin.term_years * fin.reserve, 2),
                     "investor_return_pct": None if irr is None else round(irr * 100, 2),
                     "owner_upfront_cost": 0, "tenant_upfront_cost": 0,
                     "apply_rebates": fin.apply_rebates,

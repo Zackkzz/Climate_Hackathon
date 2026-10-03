@@ -2,13 +2,16 @@
 
 Plain-language picture: a flat is a box of air (small heat store) inside heavy brick and concrete (big heat
 store). Heat leaks between outdoors and the air through windows and draughts, and between outdoors and the
-brick/concrete through the walls and, for top-floor flats only, through the ceiling and roof. The sun heats
+brick/concrete through the walls. For top-floor flats only, heat also flows through the roof space and the
+lightweight plasterboard ceiling straight to the room air (a share can be sent to the heavy mass instead, for
+flats with a concrete ceiling slab). The sun heats
 the roof (how much depends on the roof's colour, its "solar absorptance"), the walls, and comes in through
 windows. People and appliances add heat. A heater or air conditioner adds or removes heat to hold a set
 temperature while people are home.
 
 The structure follows the ISO 13790 simple hourly method (mass node, mass-to-air coupling 9.1 W/m2K x
-effective mass area, opaque elements coupled to the mass node, windows and air change coupled to the air node,
+effective mass area, heavy opaque elements coupled to the mass node, windows, air change and the lightweight
+top-floor ceiling coupled to the air node,
 sol-air treatment of sunlit opaque surfaces via alpha x R_se x U x A x I), reduced to two nodes so it is easy to
 explain. It is solved with an implicit (backward Euler) one-hour step.
 
@@ -86,6 +89,8 @@ def geometry(spec: FlatSpec) -> dict[str, float]:
     h_inf = RHO_C_AIR * vol * P.v("infiltration_ach") / 3600.0
     h_ms = H_MS_PER_M2 * P.v("mass_area_factor") * a
 
+    share_air = P.v("roof_heat_to_air_share")
+
     def h_em(h_op: float) -> float:
         # ISO 13790 split of opaque conductance between surface-to-mass and mass-to-outside.
         return 1.0 / (1.0 / h_op - 1.0 / h_ms) if h_op > 0 else 0.0
@@ -94,7 +99,10 @@ def geometry(spec: FlatSpec) -> dict[str, float]:
         "wall_m2": wall, "window_m2": win, "roof_m2": roof, "volume_m3": vol,
         "h_wall": h_wall, "h_win": h_win, "h_inf": h_inf, "h_ms": h_ms,
         "h_roof_down": u_down * roof, "h_roof_up": u_up * roof,
-        "h_em_down": h_em(h_wall + u_down * roof), "h_em_up": h_em(h_wall + u_up * roof),
+        # Roof conductance split: lightweight-ceiling share straight to the air node, the rest via the mass node.
+        "h_ra_down": share_air * u_down * roof, "h_ra_up": share_air * u_up * roof,
+        "h_em_down": h_em(h_wall + (1 - share_air) * u_down * roof),
+        "h_em_up": h_em(h_wall + (1 - share_air) * u_up * roof),
         "c_air": RHO_C_AIR * vol * P.v("air_furniture_capacity_multiplier"),
         "c_mass": P.v("mass_capacity_j_per_m2k") * a,
     }
@@ -141,14 +149,13 @@ def simulate(spec: FlatSpec, weather: Weather, heating: bool = True, cooling: bo
     vert = P.v("vertical_to_horizontal_irradiance") * ghi
     roof_excess = R_SE * (spec.roof_absorptance * ghi - H_R_EXT * SKY_DELTA_K)  # sol-air minus air temp, K
     tsa_roof = t_out + roof_excess
-    phi_roof_dn = g["h_roof_down"] * roof_excess
-    phi_roof_up = g["h_roof_up"] * roof_excess
+    share_air = P.v("roof_heat_to_air_share")
     phi_wall = (P.v("wall_absorptance") * R_SE * g["h_wall"] * vert
                 - R_SE * g["h_wall"] * H_R_EXT * SKY_DELTA_K * 0.5)  # a wall sees half the sky
     phi_win = P.v("window_shgc") * P.v("window_shading_factor") * g["window_m2"] * vert
     phi_int = sch["gains_w"]
 
-    # Window solar and internal gains: half to the air, half to the mass. Roof and wall solar: to the mass.
+    # Window solar and internal gains: half to the air, half to the mass. Wall solar: to the mass.
     phi_air = 0.5 * (phi_win + phi_int)
     phi_mass0 = 0.5 * (phi_win + phi_int) + phi_wall
 
@@ -156,33 +163,37 @@ def simulate(spec: FlatSpec, weather: Weather, heating: bool = True, cooling: bo
     ci, cm = g["c_air"], g["c_mass"]
     h_ms = g["h_ms"]
     h_em_dn, h_em_up = g["h_em_down"], g["h_em_up"]
+    h_ra_dn, h_ra_up = g["h_ra_down"], g["h_ra_up"]
+    h_rm_dn, h_rm_up = (1 - share_air) * g["h_roof_down"], (1 - share_air) * g["h_roof_up"]
     h_closed = g["h_win"] + g["h_inf"]
     h_open = h_closed + RHO_C_AIR * g["volume_m3"] * P.v("window_open_ach") / 3600.0
     open_above = P.v("window_open_above_c")
     t_heat, t_cool = P.v("heating_setpoint_c"), P.v("cooling_setpoint_c")
     hon, con = sch["heat_on"].tolist(), sch["cool_on"].tolist()
     to_l, pa_l, pm_l = t_out.tolist(), phi_air.tolist(), phi_mass0.tolist()
-    tsa_l, prd_l, pru_l = tsa_roof.tolist(), phi_roof_dn.tolist(), phi_roof_up.tolist()
+    tsa_l, ex_l = tsa_roof.tolist(), roof_excess.tolist()
 
-    def step(k: int, ti: float, tm: float) -> tuple[float, float, float, float, float, float]:
+    def step(k: int, ti: float, tm: float) -> tuple:
         """One implicit hour.
 
-        Returns new air temp, new mass temp, conditioning heat (W, positive heats), air-node conductance,
-        mass-to-outside conductance and roof solar heat used this hour.
+        Returns new air temp, new mass temp, conditioning heat (W, positive heats), air-exchange conductance,
+        mass-to-outside conductance, roof-to-air conductance and roof solar heat used this hour (W).
         """
         to = to_l[k]
-        if tsa_l[k] > ti:  # roof hotter than the room: heat flows down
-            h_em, phi_roof = h_em_dn, prd_l[k]
+        if tsa_l[k] > ti:  # roof hotter than the room: heat flows down (higher resistance)
+            h_em, h_ra, h_rm = h_em_dn, h_ra_dn, h_rm_dn
         else:
-            h_em, phi_roof = h_em_up, pru_l[k]
+            h_em, h_ra, h_rm = h_em_up, h_ra_up, h_rm_up
+        phi_roof_air = h_ra * ex_l[k]
+        phi_roof_mass = h_rm * ex_l[k]
         a22 = cm / dt + h_em + h_ms
         h_ia = h_open if (ti > open_above and to < ti) else h_closed
         q = 0.0
         for _ in range(2):
-            a11 = ci / dt + h_ia + h_ms
+            a11 = ci / dt + h_ia + h_ra + h_ms
             det = a11 * a22 - h_ms * h_ms
-            b1 = ci / dt * ti + h_ia * to + pa_l[k]
-            b2 = cm / dt * tm + h_em * to + pm_l[k] + phi_roof
+            b1 = ci / dt * ti + (h_ia + h_ra) * to + pa_l[k] + phi_roof_air
+            b2 = cm / dt * tm + h_em * to + pm_l[k] + phi_roof_mass
             ti_free = (b1 * a22 + h_ms * b2) / det
             dti_dq = a22 / det
             if heating and hon[k] and ti_free < t_heat:
@@ -195,7 +206,7 @@ def simulate(spec: FlatSpec, weather: Weather, heating: bool = True, cooling: bo
             break
         ti_new = ti_free + q * dti_dq
         tm_new = (b2 + h_ms * ti_new) / a22
-        return ti_new, tm_new, q, h_ia, h_em, phi_roof
+        return ti_new, tm_new, q, h_ia, h_em, h_ra, phi_roof_air + phi_roof_mass
 
     ti = tm = float(np.mean(t_out[: 24 * 14]))
     for k in range(24 * 14):
@@ -205,9 +216,9 @@ def simulate(spec: FlatSpec, weather: Weather, heating: bool = True, cooling: bo
     cool_w = np.zeros(n)
     t_in = np.zeros(n)
     ti0, tm0 = ti, tm
-    q_air_ex = q_env = roof_solar = 0.0
+    q_air_ex = q_env = q_roof_air = roof_solar = 0.0
     for k in range(n):
-        ti, tm, q, h_ia, h_em, phi_roof = step(k, ti, tm)
+        ti, tm, q, h_ia, h_em, h_ra, phi_roof = step(k, ti, tm)
         t_in[k] = ti
         if q > 0:
             heat_w[k] = q
@@ -215,6 +226,7 @@ def simulate(spec: FlatSpec, weather: Weather, heating: bool = True, cooling: bo
             cool_w[k] = -q
         q_air_ex += h_ia * (to_l[k] - ti)
         q_env += h_em * (to_l[k] - tm)
+        q_roof_air += h_ra * (to_l[k] - ti)
         roof_solar += phi_roof
 
     flows = {
@@ -225,7 +237,8 @@ def simulate(spec: FlatSpec, weather: Weather, heating: bool = True, cooling: bo
         "heating": float(heat_w.sum() / 1000),
         "cooling": float(-cool_w.sum() / 1000),
         "windows_and_air_exchange": q_air_ex / 1000,
-        "opaque_fabric": q_env / 1000,
+        "opaque_fabric_via_mass": q_env / 1000,
+        "ceiling_to_air": q_roof_air / 1000,
         "minus_stored": -(ci * (ti - ti0) + cm * (tm - tm0)) / 3.6e6,
     }
     return ThermalResult(heating_w=heat_w, cooling_w=cool_w, indoor_c=t_in, outdoor_c=t_out, flows=flows)

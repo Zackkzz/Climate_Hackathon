@@ -158,18 +158,68 @@ def test_usage_end_uses_present():
 
 
 def test_gap_closers_are_consistent():
-    r = assess(make_request(package={"cool_roof": False, "induction_cooktop": True, "disconnect_gas": True}))
+    pkg = {"cool_roof": False, "induction_cooktop": True, "disconnect_gas": True}
+    fin = {"term_years": 15}  # long enough that some cost of capital closes the gap
+    r = assess(make_request(package=pkg, finance=fin))
     gc = r["package"]["gap_closers"]
     assert gc["grant_needed"] == r["package"]["funding_gap"]
     rate = gc["cost_of_capital_for_full_funding"]
     assert rate is not None
-    at = assess(make_request(package={"cool_roof": False, "induction_cooktop": True, "disconnect_gas": True},
-                             finance={"cost_of_capital": max(rate - 0.0005, 0)}))
-    above = assess(make_request(package={"cool_roof": False, "induction_cooktop": True, "disconnect_gas": True},
-                                finance={"cost_of_capital": rate + 0.002}))
+    at = assess(make_request(package=pkg, finance={**fin, "cost_of_capital": max(rate - 0.0005, 0)}))
+    above = assess(make_request(package=pkg, finance={**fin, "cost_of_capital": rate + 0.002}))
     assert at["package"]["fully_funded"] and not above["package"]["fully_funded"]
-    term = gc["term_years_for_full_funding"]
+    term = assess(make_request(package=pkg))["package"]["gap_closers"]["term_years_for_full_funding"]
     if term is not None:
-        ok = assess(make_request(package={"cool_roof": False, "induction_cooktop": True, "disconnect_gas": True},
-                                 finance={"term_years": term}))
+        ok = assess(make_request(package=pkg, finance={"term_years": term}))
         assert ok["package"]["fully_funded"]
+
+
+def test_default_term_meets_pays_rule_and_long_term_warns():
+    from meterwise import params as P
+
+    r = assess(make_request())
+    assert r["finance"]["term_years"] == 10
+    assert r["finance"]["term_years"] <= 0.8 * r["finance"]["shortest_equipment_life_years"]
+    assert not any("80% of the shortest equipment life" in w for w in r["warnings"])
+    assert P.v("term_years") == 10
+    long = assess(make_request(finance={"term_years": 15}))
+    assert any("80% of the shortest equipment life" in w for w in long["warnings"])
+
+
+def test_saving_if_selected_matches_adding_the_item():
+    base = assess(make_request(package={"induction_cooktop": False, "ceiling_insulation": False}))
+    items = {i["key"]: i for i in base["package"]["items"]}
+    for key in ("induction_cooktop", "ceiling_insulation"):
+        added = assess(make_request(package={key: True}))
+        extra = added["impact"]["bill_saving_per_year_building"] - base["impact"]["bill_saving_per_year_building"]
+        assert items[key]["saving_per_year_if_selected"] == pytest.approx(extra, abs=0.5)
+    # Gas disconnection is not possible while the gas cooktop stays.
+    assert items["disconnect_gas"]["saving_per_year_if_selected"] is None
+    # Selected items report their attributed saving.
+    assert items["heat_pump_hot_water"]["saving_per_year_if_selected"] == pytest.approx(
+        items["heat_pump_hot_water"]["saving_per_year"], abs=0.01)
+
+
+def test_comfort_period_label_present():
+    r = assess(make_request())
+    for g in r["flat_groups"]:
+        assert "whole year" in g["comfort"]["period_label"]
+
+
+def test_reserve_explains_total_repaid_vs_return():
+    for pkg in ({}, {"cool_roof": False, "induction_cooktop": True, "disconnect_gas": True}):
+        f = assess(make_request(package=pkg))
+        fin, net = f["finance"], f["package"]["net_capex"]
+        assert fin["total_repaid_after_reserve"] == pytest.approx(fin["total_repaid"] * (1 - fin["reserve"]), abs=0.05)
+        assert fin["total_repaid_after_reserve"] + fin["reserve_held"] == pytest.approx(fin["total_repaid"], abs=0.05)
+        # The return is negative exactly when charges net of the reserve do not repay the net cost.
+        assert (fin["investor_return_pct"] < 0) == (fin["total_repaid_after_reserve"] < net)
+    defs = next(a for a in f["assumptions"] if a["key"] == "finance_definitions")
+    assert "total_repaid" in defs["note"] and "investor_return_pct" in defs["note"]
+
+
+def test_no_meter_charge_wording_in_user_text():
+    r = assess(make_request(existing={"heating": "none", "cooling": "none"},
+                            package={"heat_pump_hot_water": False, "cool_roof": False}, tariff={"gas_c_per_mj": 1.0}))
+    text = " ".join(r["warnings"]) + " ".join(a["label"] + a.get("note", "") for a in r["assumptions"])
+    assert "meter charge" not in text.lower()
