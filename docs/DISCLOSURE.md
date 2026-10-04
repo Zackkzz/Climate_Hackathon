@@ -15,14 +15,18 @@ to:
 - No code, design or asset from before the event is included.
 - Before and during the event the team explored other ideas, which are not part of this submission.
 - The idea started from a research-style proposal generated with an AI research tool during the event
-  ("COP31 Hackathon Proposal Strategy", now in [docs/research](research/README.md)). **Team: name the tool here.** Its example results (a 240-flat testbed)
+  ("COP31 Hackathon Proposal Strategy", now in [docs/research](research/README.md)). Its example results (a 240-flat testbed)
   were never simulated and are not used anywhere in this project. Every result here comes from code in this
   repository.
 
 ## AI tools
 
+We used Codex and Claude Code to aid with the development of the application itself; however, research and ideating
+was done, for the most part, without AI assistance.
+
 | Tool | Used for |
 |---|---|
+| Codex (OpenAI) | Aiding development of the application |
 | Claude Code (Anthropic), models Claude Fable 5.1, Claude Opus 5.5 and Claude Sonnet 5.5 | Research, planning, writing the code, tests and documents, and reviewing the app in a browser |
 | AI research tool used for the starting proposal (**team to name**) | The initial idea |
 | ChatGPT deep research (**team to confirm**) | An earlier idea that was not pursued |
