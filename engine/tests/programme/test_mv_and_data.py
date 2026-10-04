@@ -39,7 +39,9 @@ def test_mv_true_up_reduces_charge_and_refunds_from_reserve(client, H):
     run2 = ok(client.post(f"/api/programme/projects/{pid}/mv/run", headers=H("manager"), json={}))
     assert all(t["refund"] == 0 for t in run2["true_ups"])
     html = client.get(f"/api/programme/documents/{pid}/mv_report.html", headers=H("funder")).text
-    assert "SIMULATED" in html
+    assert "Modelled estimate" in html and "SIMULATED" not in html
+    rd = ok(client.get(f"/api/programme/flats/{fl[0]['id']}/readings", headers=H("manager")))
+    assert rd[0]["source"] == "simulated" and rd[0]["source_label"] == "Modelled estimate"
 
 
 def test_mv_skips_flats_with_missing_readings(client, H):
@@ -92,8 +94,8 @@ def test_utility_readings_rejected_without_consent(client, H):
     meters = ok(client.get("/api/utility/meters", headers=H("distributor")))
     with_c = next(m for m in meters if m["data_consent"] and m["charge_status"] == "active")
     without = next(m for m in meters if not m["data_consent"])
-    csv = ("meter_id,month,electricity_kwh,gas_mj\n"
-           f"{with_c['meter_id']},2026-09,180,0\n{without['meter_id']},2026-09,180,0\nNMI-EX-UNKNOWN,2026-09,1,0\n")
+    csv = ("meter_reference,month,electricity_kwh,gas_mj\n"
+           f"{with_c['meter_id']},2026-09,180,0\n{without['meter_id']},2026-09,180,0\nMW-999999,2026-09,1,0\n")
     res = ok(client.post("/api/utility/readings", headers={**H("distributor"), "Content-Type": "text/csv"}, content=csv))
     assert res["accepted"] == 1
     reasons = {r["row"]: r["reason"] for r in res["rejected"]}

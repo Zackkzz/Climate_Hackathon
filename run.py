@@ -26,10 +26,14 @@ def _mount_web() -> None:
 
     @app.get("/{path:path}", include_in_schema=False)
     def spa(path: str) -> FileResponse:
-        if path.startswith("api/") or path == "api":
+        if path.startswith("api/") or path in ("api", "openapi.json", "docs", "redoc") or path.startswith("docs/"):
             raise HTTPException(status_code=404, detail="Not found.")
-        target = (DIST / path).resolve()
-        if path and target.is_file() and DIST.resolve() in target.parents and target.name != "index.html":
+        try:
+            target = (DIST / path).resolve()
+            is_file = bool(path) and target.is_file()
+        except (OSError, ValueError):  # null bytes or invalid names: treat as an unknown client route
+            is_file = False
+        if is_file and DIST.resolve() in target.parents and target.name != "index.html":
             return FileResponse(target)  # hashed build assets: normal caching
         # index.html must always be revalidated so a rebuilt web app shows up without a hard reload.
         return FileResponse(DIST / "index.html", headers={"Cache-Control": "no-cache"})

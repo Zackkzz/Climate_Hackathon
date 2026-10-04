@@ -79,8 +79,7 @@ def test_mfa_flow(client):
     tok = ok(client.post("/api/auth/mfa/login", json={"ticket": r["ticket"], "code": auth.totp(s["secret"], step)}))
     assert ok(client.get("/api/auth/me", headers={"Authorization": f"Bearer {tok['token']}"}))["mfa_enabled"]
     ctl = ok(client.get("/api/government/controls", headers=login(client, EMAILS["council"])))
-    assert ctl["mfa_demo_exemption"]["active"] and any(c["key"] == "mfa" and "Demo exemption" in c["description"]
-                                                      for c in ctl["controls"])
+    assert ctl["mfa_enforced"] is False and ctl["accounts_without_mfa"] > 0
 
 
 def test_mfa_required_outside_demo(client, monkeypatch):
@@ -90,7 +89,7 @@ def test_mfa_required_outside_demo(client, monkeypatch):
     s = ok(client.post("/api/auth/mfa/setup", json={"ticket": r["ticket"]}))
     out = ok(client.post("/api/auth/mfa/verify", json={"ticket": r["ticket"], "code": auth.totp(s["secret"])}))
     assert out["token"]
-    assert client.get("/api/auth/demo-users").status_code == 403
+    assert client.get("/api/auth/demo-users").status_code == 404
     assert client.post("/api/sim/advance", headers={"Authorization": f"Bearer {out['token']}"},
                        json={"months": 1}).status_code == 403
 
@@ -174,10 +173,75 @@ def test_personal_data_export_and_erase(client, H):
     assert {"personal_data.export", "personal_data.erase"} <= {e["action"] for e in log}
 
 
-def test_demo_users_route(client):
+def test_demo_users_route(client, monkeypatch):
+    assert client.get("/api/auth/demo-users").status_code == 404  # off by default
+    monkeypatch.setenv("METERWISE_LIST_ACCOUNTS", "1")
     users = ok(client.get("/api/auth/demo-users"))
     roles = {u["role"] for u in users}
     assert {"manager", "government", "utility", "owner", "installer", "funder", "tenant"} <= roles
     assert all(u["example"] for u in users)
     code = next(u["code"] for u in users if u["role"] == "tenant")
     ok(client.post("/api/auth/tenant", json={"code": code}))
+
+
+def test_docs_switch(monkeypatch):
+    from api.main import _docs_enabled
+    monkeypatch.delenv("METERWISE_DOCS", raising=False)
+    monkeypatch.setenv("METERWISE_DEMO", "0")
+    assert _docs_enabled() is False
+    monkeypatch.setenv("METERWISE_DOCS", "1")
+    assert _docs_enabled() is True
+    monkeypatch.setenv("METERWISE_DEMO", "1")
+    monkeypatch.setenv("METERWISE_DOCS", "0")
+    assert _docs_enabled() is False
+
+
+def test_no_demo_wording_in_user_facing_responses(client, H):
+    import json as _j
+    from programme import db as _db
+    banned = ("(example)", "demo", "prototype", "fictional", "simulated report", "(simulated)", "demonstration")
+    paths = ["/api/programme", "/api/programme/overview", "/api/programme/projects", "/api/programme/faults",
+             "/api/programme/reserve", "/api/government/outcomes", "/api/government/controls", "/api/government/grants",
+             "/api/utility/summary", "/api/utility/meters", "/api/programme/orgs", "/api/auth/me", "/api/sim/clock"]
+    with _db.tx():
+        pids = [r["id"] for r in _db.q("SELECT id FROM projects")]
+    paths += [f"/api/programme/projects/{i}" for i in pids]
+    for path in paths:
+        who = "distributor" if path.startswith("/api/utility") else "manager"
+        text = client.get(path, headers=H(who)).text.lower()
+        hit = [b for b in banned if b in text]
+        assert not hit, (path, hit)
+    with _db.tx():
+        names = [r["name"] for r in _db.q("SELECT name FROM orgs")] + [r["name"] for r in _db.q("SELECT name FROM users")]
+    assert all("xample" not in n for n in names)
+
+
+def test_docs_switch(monkeypatch):
+    from api.main import _docs_enabled
+    monkeypatch.delenv("METERWISE_DOCS", raising=False)
+    monkeypatch.setenv("METERWISE_DEMO", "0")
+    assert _docs_enabled() is False
+    monkeypatch.setenv("METERWISE_DOCS", "1")
+    assert _docs_enabled() is True
+    monkeypatch.setenv("METERWISE_DEMO", "1")
+    monkeypatch.setenv("METERWISE_DOCS", "0")
+    assert _docs_enabled() is False
+
+
+def test_no_demo_wording_in_user_facing_responses(client, H):
+    from programme import db as _db
+    banned = ("(example)", "demo", "prototype", "fictional", "simulated report", "(simulated)", "demonstration")
+    paths = ["/api/programme", "/api/programme/overview", "/api/programme/projects", "/api/programme/faults",
+             "/api/programme/reserve", "/api/government/outcomes", "/api/government/controls", "/api/government/grants",
+             "/api/utility/summary", "/api/utility/meters", "/api/programme/orgs", "/api/auth/me", "/api/sim/clock"]
+    with _db.tx():
+        pids = [r["id"] for r in _db.q("SELECT id FROM projects")]
+    paths += [f"/api/programme/projects/{i}" for i in pids]
+    for path in paths:
+        who = "distributor" if path.startswith("/api/utility") else "manager"
+        text = client.get(path, headers=H(who)).text.lower()
+        hit = [b for b in banned if b in text]
+        assert not hit, (path, hit)
+    with _db.tx():
+        names = [r["name"] for r in _db.q("SELECT name FROM orgs")] + [r["name"] for r in _db.q("SELECT name FROM users")]
+    assert all("xample" not in n for n in names)

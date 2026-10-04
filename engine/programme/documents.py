@@ -1,7 +1,7 @@
 """Printable documents: self-contained HTML (inline CSS, A4 print styles, no external assets).
 
 Wording follows docs/policy-australia.md, Route A: a service charge collected by a community housing provider, not a
-loan to the tenant. Each document carries the example notice. Documents are rendered from the live records when
+loan to the tenant. Documents are rendered from the live records when
 asked for; the ``documents`` table records when each was issued (and supersedes a tenant disclosure after a tenancy
 change).
 """
@@ -16,7 +16,8 @@ from . import service as S
 from .auth import NO_PERSONAL, Principal
 from .errors import bad, forbidden, not_found
 
-NOTICE = "Example document produced by a prototype. Not legal or financial advice."
+NOTICE = ("This document summarises the arrangement. It does not replace your lease, your tenancy agreement or the "
+          "signed programme agreement.")
 KINDS = {
     "tenant_disclosure": ("Your flat's energy upgrade: what it costs and what you save", True),
     "owner_agreement": ("Owner agreement: upgrade and service charge", False),
@@ -136,9 +137,9 @@ footer { margin-top: 20px; border-top: 1px solid #c9d1d9; padding-top: 6px; font
 def page(title: str, subtitle: str, body: str, ref: str) -> str:
     return (f"<!doctype html><html lang=\"en-AU\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" "
             f"content=\"width=device-width, initial-scale=1\"><title>{e(title)}</title><style>{CSS}</style></head>"
-            f"<body><main><div class=\"notice\" role=\"note\">{NOTICE}</div><h1>{e(title)}</h1>"
-            f"<p class=\"sub\">{subtitle}</p>{body}<footer>{NOTICE} Organisations, people and meter numbers in this "
-            f"demonstration are fictional examples. Reference {e(ref)}. Printed {e(clock.today())}.</footer>"
+            f"<body><main><h1>{e(title)}</h1>"
+            f"<p class=\"sub\">{subtitle}</p>{body}<footer>{NOTICE} Reference {e(ref)}. Printed "
+            f"{e(clock.today())}.</footer>"
             f"</main></body></html>")
 
 
@@ -172,6 +173,11 @@ def _installed(pr: dict) -> list[dict]:
     return [{"key": k, "label": S.ITEM_LABELS[k]} for k in S.ITEM_LABELS if pkg.get(k)]
 
 
+def _src(source: str) -> str:
+    from .ledger import SOURCE_LABELS
+    return SOURCE_LABELS.get(source, source)
+
+
 def _verified_for_flat(pid: int, fid: int) -> dict | None:
     for r in reversed(db.q("SELECT * FROM mv_runs WHERE project_id = ? ORDER BY id", (pid,))):
         for b in r["data"]["by_flat"]:
@@ -203,7 +209,7 @@ def tenant_disclosure(pr: dict, f: dict, p: Principal) -> str:
                                                                   money(saving_m)),
                  ("Expected to be better off each month", money(net))])
     body += f"""
-<p>This sheet is for <b>{who}</b>, unit {e(f['unit'])}, {e(pr['label'])}. Meter {e(f['meter_id'])}.
+<p>This sheet is for <b>{who}</b>, unit {e(f['unit'])}, {e(pr['label'])}. Meter reference {e(f['meter_id'])}.
 Please read it before you agree. It takes about two minutes.</p>
 <h2>1. What is installed</h2><ul>{''.join(f'<li>{e(i)}{" " + roof if "roof" in i.lower() and roof else ""}</li>' for i in x['installed'])}</ul>
 <p>{e(x['provider']['name'])} owns the equipment. You do not pay anything upfront.</p>
@@ -216,7 +222,7 @@ do not owe the rest of the cost if you leave.</li>
 <p>The model expects your energy bills to fall by about <b>{money(saving_m)} a month</b>. After the charge you are
 expected to be about <b>{money(net)} a month</b> better off. This is an estimate: real savings depend on how you use
 your home and on energy prices.</p>
-{f'<p>Checked against real meter readings for {e(v["period"]["from"])} to {e(v["period"]["to"])}: your verified saving was <b>{money(v.get("verified_saving_per_month"))} a month</b> (readings: {e(v["source"])}).</p>' if v else ''}
+{f'<p>Savings check for {e(v["period"]["from"])} to {e(v["period"]["to"])}: your verified saving was <b>{money(v.get("verified_saving_per_month"))} a month</b> (readings: {e(_src(v["source"]))}).</p>' if v else ''}
 <h2>4. What is guaranteed</h2>
 <ul><li>The charge is never more than {share:.0%} of the expected saving, so you keep at least {1 - share:.0%}.</li>
 <li>Your charge can never go above the {money(f['offered_charge'] if f['offered_charge'] is not None else charge)} in your offer.</li>
@@ -237,7 +243,7 @@ programme use your <b>monthly electricity and gas totals</b> to check your savin
 in the tenant page or by asking {e(x['provider']['name'])}. Without it, savings are checked using estimates only.
 Status for this flat: <b>{'consent given' + (' until ' + e(dc['expires_on']) if dc and dc['expires_on'] else '') if dc else 'no consent given'}</b>.</p>
 <h2>8. How to complain</h2>
-<ol><li>Contact {e(x['provider']['name'])}: {e(contact.get('email', 'see your lease'))}, {e(contact.get('phone', ''))}.</li>
+<ol><li>Contact {e(x['provider']['name'])}{(' on ' + e(contact['phone'])) if contact.get('phone') else ''}{(' or ' + e(contact['email'])) if contact.get('email') else ''}, or use the tenant page.</li>
 <li>If you are not happy with the answer, for tenancy matters contact NSW Fair Trading or apply to the NSW Civil and
 Administrative Tribunal (NCAT).</li>
 <li>For problems with your energy retailer's bill, contact the Energy and Water Ombudsman NSW (EWON).</li></ol>
@@ -274,7 +280,7 @@ def charge_schedule_doc(pr: dict, f: dict, p: Principal) -> str:
                                                  if led else "<p>No entries yet.</p>")
     body += "<h2>Full schedule</h2>" + (table(["#", "Month", "Charge", "To reserve", "Interest", "Principal", "Balance"],
                                               rows, {2, 3, 4, 5, 6}) if rows else "<p>No schedule yet.</p>")
-    return page(KINDS["charge_schedule"][0], f"Unit {e(f['unit'])}, {e(pr['label'])}. Meter {e(f['meter_id'])}", body,
+    return page(KINDS["charge_schedule"][0], f"Unit {e(f['unit'])}, {e(pr['label'])}. Meter reference {e(f['meter_id'])}", body,
                 f"P{pr['id']}-F{f['id']}")
 
 
@@ -360,7 +366,7 @@ def funder_term_sheet(pr: dict, p: Principal) -> str:
         ['Billed (after pauses)', money(billed)], ['Collected', money(paid)],
         ['Arrears', money(sum(arrears_of(f['id']) for f in flats))],
         ['Latest savings check', f"{last['period']['from']} to {last['period']['to']}: realisation {last['realisation_rate']:.0%}, "
-                                 f"{len(last['true_ups'])} true-ups ({last['source']} readings)" if last else 'None yet']])}
+                                 f"{len(last['true_ups'])} true-ups (readings: {last.get('source_label', last['source'])})" if last else 'None yet']])}
 <h2>Risks</h2><ul><li>Savings may be lower than modelled (US evidence: about half of Kansas participants saved enough to cover the charge).</li>
 <li>Legal status of the charge under tenancy and credit law is to confirm.</li><li>Equipment life: term is kept within 80% of the shortest equipment life where possible.</li></ul>"""
     return page(KINDS["funder_term_sheet"][0], e(pr["label"]), body, f"P{pr['id']}-FTS")
@@ -388,7 +394,8 @@ def mv_report(pr: dict, p: Principal) -> str:
     if not runs:
         raise not_found("A measured-savings run for this project")
     d = runs[-1]["data"]
-    sim = d["source"] in ("simulated", "mixed")
+    from .ledger import SOURCE_LABELS
+    modelled = d["source"] in ("simulated", "mixed")
     rows = []
     hide = p.role in NO_PERSONAL
     for i, b in enumerate(d["by_flat"]):
@@ -409,7 +416,9 @@ def mv_report(pr: dict, p: Principal) -> str:
     body += (f"<p>Block <b>{e(pr['label'])}</b>. Period {e(d['period']['from'])} to {e(d['period']['to'])}, checked "
              f"{e(d['run_on'])}. Flats checked: {d['flats_verified']}; skipped for missing readings: {d.get('flats_skipped', 0)}."
              f" Bill-neutral on verified savings: {d['bill_neutral_flats']}.</p>"
-             + (f"<p class=\"warn\">Readings in this report are SIMULATED for the demonstration ({e(d['source'])}). They are not measured data.</p>" if sim else "")
+             + f"<p>Readings used: <b>{e(SOURCE_LABELS.get(d['source'], d['source']))}</b>."
+             + (" Where meter data was not available, monthly use was estimated from the building model."
+                if modelled else "") + "</p>"
              + f"<h2>Method</h2><p>{e(method)}</p><h2>By flat</h2>"
              + table(["Unit", "Modelled saving", "Verified saving", "Achieved", "Confidence", "True-up"], rows, {1, 2, 3})
              + "<h2>True-ups applied</h2>"

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS orgs (id INTEGER PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL, example INTEGER DEFAULT 1,
   contact_json TEXT DEFAULT '{}', area_json TEXT DEFAULT '[]');
 CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, role TEXT NOT NULL,
-  org_id INTEGER REFERENCES orgs(id), pw_hash TEXT NOT NULL, demo_password TEXT, example INTEGER DEFAULT 1);
+  org_id INTEGER REFERENCES orgs(id), pw_hash TEXT NOT NULL, demo_password TEXT, example INTEGER DEFAULT 1, title TEXT);
 CREATE TABLE IF NOT EXISTS programmes (id INTEGER PRIMARY KEY, name TEXT, example INTEGER DEFAULT 1, route TEXT,
   route_status TEXT, finance_json TEXT, capital_committed REAL DEFAULT 0, grant_pool REAL DEFAULT 0,
   provider_org_id INTEGER, funder_org_id INTEGER, office_org_id INTEGER, reserve_shortfall REAL DEFAULT 0);

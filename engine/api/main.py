@@ -19,7 +19,17 @@ from meterwise.weather import WEATHER_YEAR
 from api import programme as programme_api
 from api.analysis import router as analysis_router
 
-app = FastAPI(title="Meterwise API", version="0.2.0",
+def _docs_enabled() -> bool:
+    """Interactive docs and /openapi.json: METERWISE_DOCS=1/0; default on only when METERWISE_DEMO is not 0."""
+    v = os.environ.get("METERWISE_DOCS")
+    if v is not None:
+        return v != "0"
+    return os.environ.get("METERWISE_DEMO", "1") != "0"
+
+
+_docs = _docs_enabled()
+app = FastAPI(title="Meterwise API", version="0.2.0", docs_url="/docs" if _docs else None,
+              redoc_url="/redoc" if _docs else None, openapi_url="/openapi.json" if _docs else None,
               description="Bill-neutral electrification and cool-roof deals for rented flats: screening tool and "
                           "programme system.")
 # CORS: explicit origins from METERWISE_CORS_ORIGINS (comma separated); otherwise local development hosts only.
