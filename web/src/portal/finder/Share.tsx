@@ -8,8 +8,6 @@ import { toast } from '@/portal/components/ui/sonner'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
 import { Button } from '@/portal/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/portal/components/ui/tabs'
-import { ExampleBadge } from '@/portal/components/Status'
-import { USE_MOCK } from '@/api'
 
 interface Props {
   assess: Async<AssessResponse>
@@ -80,7 +78,6 @@ function SheetFrame({ title, subtitle, active, children, id }: { title: string; 
       <header className="sheet-head">
         <div className="sheet-brand">
           <strong>Meterwise</strong>
-          {USE_MOCK && <ExampleBadge>Demo data</ExampleBadge>}
         </div>
         <div className="sheet-date">{date}</div>
       </header>

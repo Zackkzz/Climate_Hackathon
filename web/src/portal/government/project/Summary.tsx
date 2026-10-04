@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
+import { cleanName } from '@/portal/lib/labels'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { api } from '@/console/api'
@@ -106,7 +107,7 @@ export default function Summary({ p, role, onChange }: TabProps) {
           {!next && <p className="mw-mt-3 mw-text-muted">This project is at the last stage.</p>}
         </Panel>
 
-        <Panel title="Where the project is">
+        <Panel title="Where the project is" className="mw-lg-col-span-2">
           <ol className="mw-space-y-1" aria-label="Stages">
             {STAGES.map((st, i) => {
               const h = history.filter((x) => x.stage === st).pop()
@@ -129,8 +130,8 @@ export default function Summary({ p, role, onChange }: TabProps) {
             items={[
               { label: 'Address', value: p.label },
               { label: 'Flats', value: p.flats },
-              { label: 'Owner', value: p.owner_org?.name },
-              { label: 'Installer', value: p.installer_org?.name ?? 'Not chosen yet' },
+              { label: 'Owner', value: cleanName(p.owner_org?.name) },
+              { label: 'Installer', value: (p.installer_org ? cleanName(p.installer_org.name) : null) ?? 'Not chosen yet' },
               { label: 'In this stage since', value: dateLabelAu(p.stage_since) },
               { label: 'Heat', value: p.heat_band },
             ]}

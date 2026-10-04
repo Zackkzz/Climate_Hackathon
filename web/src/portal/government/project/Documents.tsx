@@ -61,7 +61,7 @@ export default function Documents({ p }: TabProps) {
   const labels: Record<number, string> = {}
   for (const f of p.flats_list) labels[f.id] = `Flat ${f.unit}`
   return (
-    <Panel title="Documents" description="Printable pages. Each one says it is an example made by a prototype and is not legal or financial advice.">
+    <Panel title="Documents" description="Printable pages. They summarise the agreement and are not legal or financial advice. Please have your own adviser review them.">
       <DocumentList projectId={p.id} flatLabels={labels} />
     </Panel>
   )

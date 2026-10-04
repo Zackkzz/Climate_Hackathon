@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { cleanName } from '@/portal/lib/labels'
 import { z } from 'zod'
 import { api } from '@/console/api'
 import { EmptyState, ErrorAlert } from '@/portal/components/States'
@@ -38,7 +39,7 @@ export default function Installation({ p, role, onChange }: TabProps) {
                 if (r) onChange(await api.project(p.id))
               })}
             >
-              <p>Installer: {accepted.installer_org.name}</p>
+              <p>Installer: {cleanName(accepted.installer_org.name)}</p>
               <DateField control={form.control} name="scheduled_start" label="Scheduled start" />
               <ErrorAlert error={create.error} title="We could not create the work order" />
               <Button type="submit" disabled={create.busy}>
@@ -64,7 +65,7 @@ export default function Installation({ p, role, onChange }: TabProps) {
       <Panel title="Work order">
         <Facts
           items={[
-            { label: 'Installer', value: wo.installer_org.name },
+            { label: 'Installer', value: cleanName(wo.installer_org.name) },
             { label: 'Scheduled start', value: dateLabelAu(wo.scheduled_start) },
             { label: 'Completed', value: wo.completed_on ? dateLabelAu(wo.completed_on) : 'Not yet' },
             { label: 'Warranty', value: `${wo.warranty_years} years` },

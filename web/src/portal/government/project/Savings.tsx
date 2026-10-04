@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRef, useState } from 'react'
+import { sourceLabel } from '@/portal/lib/labels'
 import { useForm } from 'react-hook-form'
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts'
 import { z } from 'zod'
@@ -12,7 +13,7 @@ import { Confirm } from '@/portal/components/Confirm'
 import { DataTable } from '@/portal/components/DataTable'
 import { EmptyState, ErrorAlert, Gate } from '@/portal/components/States'
 import { Facts, Figures, Panel } from '@/portal/components/PageHeader'
-import { SimulatedBadge, StatusBadge } from '@/portal/components/Status'
+import { StatusBadge } from '@/portal/components/Status'
 import { TextField } from '@/portal/components/fields'
 import { Button } from '@/portal/components/ui/button'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/portal/components/ui/chart'
@@ -28,9 +29,8 @@ const runSchema = z
   .object({ from: z.string().regex(monthRe, 'Enter the first month as YYYY-MM, for example 2027-01.'), to: z.string().regex(monthRe, 'Enter the last month as YYYY-MM, for example 2027-12.') })
   .refine((v) => v.from <= v.to, { path: ['to'], message: 'The last month must not be before the first month.' })
 
-function SourceBadge({ source }: { source: string }) {
-  if (source === 'simulated') return <SimulatedBadge />
-  return <StatusBadge tone="info">{source === 'uploaded' ? 'Uploaded' : source === 'utility' ? 'From the utility' : source}</StatusBadge>
+function SourceBadge({ source, label }: { source: string; label?: string | null }) {
+  return <StatusBadge tone="info">{sourceLabel(source, label)}</StatusBadge>
 }
 
 function Readings({ p, role }: TabProps) {
@@ -54,7 +54,7 @@ function Readings({ p, role }: TabProps) {
   }
 
   return (
-    <Panel title="Readings" description="Monthly meter readings for one flat. Readings from the simulator are labelled as simulated.">
+    <Panel title="Readings" description="Monthly meter readings for one flat. Each reading shows where it came from.">
       <div className="mw-mb-3 nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-3">
         <div>
           <label htmlFor="rd-flat" className="mw-mb-1 nsw-display-block nsw-small nsw-text-medium">
@@ -107,7 +107,7 @@ function Readings({ p, role }: TabProps) {
               { accessorKey: 'gas_mj', header: 'Gas (MJ)', cell: ({ row }) => num(row.original.gas_mj), meta: { numeric: true } },
               { accessorKey: 'indoor_hours_above_30c', header: 'Hours over 30 C', cell: ({ row }) => (row.original.indoor_hours_above_30c ?? '-'), meta: { numeric: true } },
               { accessorKey: 'mean_outdoor_c', header: 'Outdoor mean (C)', cell: ({ row }) => (row.original.mean_outdoor_c === null || row.original.mean_outdoor_c === undefined ? '-' : num1(row.original.mean_outdoor_c)), meta: { numeric: true } },
-              { id: 'source', header: 'Source', accessorFn: (r) => r.source, cell: ({ row }) => <SourceBadge source={row.original.source} /> },
+              { id: 'source', header: 'Source', accessorFn: (r) => r.source, cell: ({ row }) => <SourceBadge source={row.original.source} label={(row.original as { source_label?: string }).source_label} /> },
             ]}
           />
         )}
@@ -132,7 +132,7 @@ function Result({ run, unit }: { run: MvRun; unit: (id: number) => string }) {
         ]}
       />
       <p className="nsw-small mw-text-muted">
-        Period {monthLabelAu(run.period.from)} to {monthLabelAu(run.period.to)}, run on {dateLabelAu(run.run_on)}. Data source: {run.source}.
+        Period {monthLabelAu(run.period.from)} to {monthLabelAu(run.period.to)}, run on {dateLabelAu(run.run_on)}. Data source: {sourceLabel(run.source, (run as { source_label?: string }).source_label)}.
       </p>
 
       <ChartBox

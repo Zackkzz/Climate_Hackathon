@@ -1,6 +1,5 @@
 // NSW Design System footer (.nsw-footer): a link list in the upper part, the notice and disclaimer in the lower part.
 import { Link } from 'react-router'
-import { MOCK } from '@/console/api'
 import { DemoNotice } from './DemoNotice'
 
 export function Footer() {
@@ -28,10 +27,7 @@ export function Footer() {
       </div>
       <div className="nsw-footer__lower">
         <div className="nsw-container">
-          <p className="nsw-footer__copyright mw-footer-note">
-            Meterwise is a prototype. Documents are not legal or financial advice.
-            {MOCK ? ' This copy runs on built-in demo data with no server.' : ''}
-          </p>
+          <p className="nsw-footer__copyright mw-footer-note">Meterwise {new Date().getFullYear()}</p>
           <DemoNotice where="footer" />
         </div>
       </div>

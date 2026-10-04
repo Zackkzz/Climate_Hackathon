@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from '@/portal/components/icons'
+import { cleanName } from '@/portal/lib/labels'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { api } from '@/console/api'
@@ -28,7 +29,7 @@ export default function Projects() {
       { accessorKey: 'stage', header: 'Stage', cell: ({ row }) => <StageBadge stage={row.original.stage} />, meta: { csv: (p) => STAGE_LABEL[p.stage] } },
       { accessorKey: 'flats', header: 'Flats', meta: { numeric: true } },
       { accessorKey: 'heat_band', header: 'Heat', cell: ({ row }) => HEAT[row.original.heat_band] ?? row.original.heat_band },
-      { id: 'owner', header: 'Owner', accessorFn: (p) => p.owner_org?.name ?? '' },
+      { id: 'owner', header: 'Owner', accessorFn: (p) => cleanName(p.owner_org?.name) },
       { id: 'capex', header: 'Net cost', accessorFn: (p) => p.summary.net_capex, cell: ({ getValue }) => money(getValue<number>()), meta: { numeric: true, csv: (p) => p.summary.net_capex } },
       { id: 'gap', header: 'Funding gap', accessorFn: (p) => p.summary.funding_gap, cell: ({ getValue }) => money(getValue<number>()), meta: { numeric: true, csv: (p) => p.summary.funding_gap } },
       { id: 'next', header: 'Next step', accessorFn: (p) => p.next_step, cell: ({ row }) => <span className="nsw-display-block mw-min-w-48 mw-ws-normal">{row.original.next_step}</span> },

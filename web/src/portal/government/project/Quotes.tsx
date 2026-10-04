@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { cleanName } from '@/portal/lib/labels'
 import { z } from 'zod'
 import { api } from '@/console/api'
 import type { Quote } from '@/console/types'
@@ -37,13 +38,13 @@ function QuoteItems({ q }: { q: Quote }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" aria-label={`See line items for the quote from ${q.installer_org.name}`}>
+        <Button variant="outline" size="sm" aria-label={`See line items for the quote from ${cleanName(q.installer_org.name)}`}>
           Line items
         </Button>
       </DialogTrigger>
       <DialogContent className="mw-max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{q.installer_org.name}</DialogTitle>
+          <DialogTitle>{cleanName(q.installer_org.name)}</DialogTitle>
           <DialogDescription>
             Quote {dateLabelAu(q.submitted_on)}, valid until {dateLabelAu(q.valid_until)}. {q.note}
           </DialogDescription>
@@ -124,7 +125,7 @@ export default function Quotes(props: TabProps) {
                                     />
                                   </FormControl>
                                   <FormLabel htmlFor={`inst-${o.id}`} className="nsw-text-normal">
-                                    {o.name} {o.example ? '(example)' : ''}
+                                    {cleanName(o.name)}
                                   </FormLabel>
                                 </div>
                               ))}
@@ -158,7 +159,7 @@ export default function Quotes(props: TabProps) {
           csvName={`project-${p.id}-quotes`}
           searchPlaceholder="Search quotes"
           columns={[
-            { id: 'installer', header: 'Installer', accessorFn: (q) => q.installer_org.name },
+            { id: 'installer', header: 'Installer', accessorFn: (q) => cleanName(q.installer_org.name) },
             { accessorKey: 'total', header: 'Quoted', cell: ({ row }) => money(row.original.total), meta: { numeric: true } },
             { accessorKey: 'modelled_total', header: 'Modelled', cell: ({ row }) => money(row.original.modelled_total), meta: { numeric: true } },
             {
@@ -192,7 +193,7 @@ export default function Quotes(props: TabProps) {
                     <QuoteItems q={q} />
                     {manager && q.status === 'submitted' && !hasAccepted && (
                       <Confirm
-                        title={`Accept the quote from ${q.installer_org.name}?`}
+                        title={`Accept the quote from ${cleanName(q.installer_org.name)}?`}
                         description={`This accepts a quote of ${money(q.total)}, declines the other quotes and reassesses the deal with the quoted prices.`}
                         confirmLabel="Accept quote"
                         onConfirm={async () => {

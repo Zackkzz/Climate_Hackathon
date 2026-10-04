@@ -267,3 +267,5 @@ main p:last-child { margin-bottom: 0; }
 .mw-accordion__heading { margin: 0; font-size: inherit; } .mw-accordion { margin: 0.5rem 0; } .mw-accordion .nsw-accordion__content-wrap { padding: 1rem; border: 1px solid var(--nsw-grey-04); border-top: 0; }
 .mw-bg-white { background: var(--nsw-white); } .mw-bg-wash { background: var(--nsw-off-white); }
 .mw-card { height: 100%; } .mw-callout { margin: 0; }
+.mw-control-row { display: grid; gap: 0.25rem; padding: 0.75rem 1rem; }
+@media (min-width: 36rem) { .mw-control-row { grid-template-columns: 12rem 1fr 8rem; gap: 1rem; } }

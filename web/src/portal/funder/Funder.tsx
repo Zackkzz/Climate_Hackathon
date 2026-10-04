@@ -9,7 +9,7 @@ import { ChartBox, LegendKey } from '@/portal/components/ChartBox'
 import { DataTable } from '@/portal/components/DataTable'
 import { Figures, PageHeader, Panel } from '@/portal/components/PageHeader'
 import { Gate } from '@/portal/components/States'
-import { SimulatedBadge, StageBadge, STAGE_LABEL } from '@/portal/components/Status'
+import { StageBadge, STAGE_LABEL } from '@/portal/components/Status'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/portal/components/ui/chart'
 import type { ChartConfig } from '@/portal/components/ui/chart'
 import { monthLabel } from '@/portal/lib/dates-p2'
@@ -169,7 +169,7 @@ function Body({ d }: { d: Loaded }) {
       </div>
 
       <div className="mw-mt-4">
-        <Panel title="Projects" description="No tenant names are shown. Measured figures come from simulated meters." actions={<SimulatedBadge label="Simulated readings" />}>
+        <Panel title="Projects" description="No tenant names are shown.">
           <DataTable columns={cols} data={rows} caption="Project figures" csvName="funder-projects" searchPlaceholder="Search projects" getRowId={(r) => String(r.p.id)} initialHidden={{ gap: false, charge: false, neutral: false }} emptyTitle="No projects" />
         </Panel>
       </div>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { getBuildings, getMeta, USE_MOCK } from '@/api'
+import { getBuildings, getMeta } from '@/api'
 import { useAssess, useLoad, useShortlist } from '@/hooks'
 import { decodeDeal, encodeDeal, newDeal, parseHash } from '@/state'
 import type { Route, Sheet, Step } from '@/state'
@@ -9,7 +9,6 @@ import { DemoNotice } from '@/portal/components/DemoNotice'
 import { Footer } from '@/portal/components/Footer'
 import { SiteHeader, SkipLink } from '@/portal/components/Shell'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
-import { ExampleBadge } from '@/portal/components/Status'
 import { Button } from '@/portal/components/ui/button'
 import './finder.css'
 import Build from './Build'
@@ -134,7 +133,6 @@ export default function Finder() {
           </ol>
         </nav>
         <nav aria-label="Finder links" className="mw-ml-auto nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-x-3 nsw-small">
-          {USE_MOCK ? <ExampleBadge>Demo data</ExampleBadge> : m?.pilot.is_fixture ? <ExampleBadge>Example data</ExampleBadge> : null}
           <Button variant="link" className="mw-h-auto mw-p-0" onClick={() => setHow(true)}>
             How it works
           </Button>

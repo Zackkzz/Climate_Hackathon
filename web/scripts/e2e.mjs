@@ -1,6 +1,6 @@
 // End-to-end walk of the Meterwise programme against a running server, on a fresh database.
 // Usage: node scripts/e2e.mjs [baseUrl]      (default http://localhost:8000)
-// Resets the demo database first (POST /api/sim/reset), then runs each step and prints PASS or FAIL with a reason.
+// Resets the database first (POST /api/sim/reset), then runs each step and prints PASS or FAIL with a reason.
 // Steps drive the real screens in Chromium where practical and use API calls to set up or read back state.
 // Exit code 1 if any step failed. Set HEADED=1 to watch it, ONLY=<text> to run steps whose name contains the text.
 import { chromium } from 'playwright-core'
@@ -8,8 +8,9 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const BASE = (process.argv[2] ?? 'http://localhost:8000').replace(/\/$/, '')
-const PW = 'Penrith-demo-2026!'
-const EMAIL = (n) => `${n}@meterwise.example`
+// Sign-in details come from the environment: E2E_PASSWORD (or DEMO_PASSWORD) and E2E_<ROLE> for each email.
+const PW = process.env.E2E_PASSWORD ?? process.env.DEMO_PASSWORD ?? 'Penrith-demo-2026!'
+const EMAIL = (n) => process.env['E2E_' + n.toUpperCase()] ?? `${n}@meterwise.example`
 
 function findChrome() {
   const root = join(process.env.LOCALAPPDATA ?? '', 'ms-playwright')
@@ -93,8 +94,16 @@ console.log(`Reset: ${reset.status === 200 ? 'database wiped and reseeded' : 're
 const T = {}
 for (const n of ['manager', 'council', 'provider', 'strata', 'installer', 'distributor', 'funder']) T[n] = await login(n)
 mgr = T.manager
-const demo = await call(null, 'GET', '/api/auth/demo-users')
-const tenantCode = demo.find((u) => u.code)?.code
+// A tenant access code, found through the manager's own view of an active project's flats.
+let tenantCode
+{
+  const projects = await call(mgr, 'GET', '/api/programme/projects?stage=active')
+  for (const pr of projects) {
+    const flats = await call(mgr, 'GET', `/api/programme/projects/${pr.id}/flats`)
+    tenantCode = flats.find((f) => f.access_code)?.access_code
+    if (tenantCode) break
+  }
+}
 
 const browser = await chromium.launch({ executablePath: findChrome(), headless: !process.env.HEADED })
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true })
@@ -195,7 +204,7 @@ await step('Save a site audit (screen)', async () => {
   await page.getByRole('form', { name: 'Site audit form' }).waitFor({ timeout: 15000 })
   const f = page.getByRole('form', { name: 'Site audit form' })
   await f.getByLabel('Date of visit', { exact: true }).fill('2026-10-06')
-  await f.getByLabel('Visited by').fill('E2E Inspector (example)')
+  await f.getByLabel('Visited by').fill('E2E Inspector')
   const flats = await f.getByLabel('Flats', { exact: true }).inputValue()
   await f.getByLabel('Flats', { exact: true }).fill(String(Number(flats) + 1))
   for (const [label, option] of [['Roof condition', 'Sound'], ['Roof colour now', 'Dark'], ['Hot water layout', 'A unit in each flat']]) {
@@ -222,7 +231,7 @@ await step('Advance to Offer, then Consent (screen)', async () => {
 await step('Owner signs and tenants agree (owner by screen, flats by API)', async () => {
   await page.goto(`${BASE}/government/projects/${pid}/consent`)
   await settle()
-  await page.getByLabel('Full name of the person signing').fill('E2E Asset Officer (example)')
+  await page.getByLabel('Full name of the person signing').fill('E2E Asset Officer')
   await page.getByRole('button', { name: 'Record signature' }).click()
   await confirmDialog()
   await page.waitForTimeout(1500)
@@ -265,7 +274,7 @@ await step('Installer submits a quote (API as installer)', async () => {
   const q = await call(T.installer, 'POST', `/api/programme/projects/${pid}/quotes`, {
     items: t.items.map((i) => ({ key: i.key, label: i.label, qty: i.qty, unit_price: Math.round(i.modelled_unit_price * 0.97) })),
     valid_until: valid.toISOString().slice(0, 10),
-    note: 'E2E quote (example)',
+    note: 'E2E quote',
   })
   quoteId = q.id
   must(q.total > 0, 'empty quote')
@@ -381,7 +390,7 @@ await step('Tenant reports a fault, manager resolves it (report by API as tenant
   const row = page.getByRole('row').filter({ hasText: 'E2E: no hot water' }).first()
   await row.getByRole('button', { name: /Resolve fault/ }).click()
   const dlg = page.getByRole('dialog').first()
-  await dlg.getByLabel('What was done').fill('Replaced the controller (example)')
+  await dlg.getByLabel('What was done').fill('Replaced the controller')
   await dlg.getByRole('button', { name: 'Mark as fixed' }).click()
   await page.waitForTimeout(1500)
   const faults = await call(mgr, 'GET', `/api/programme/faults?project_id=${pid}`)
@@ -393,7 +402,7 @@ await step('Tenancy change on a flat (screen)', async () => {
   await settle()
   await flatMenu(flat.unit, 'Change tenant')
   const dlg = page.getByRole('dialog').first()
-  await dlg.getByLabel("New tenant's name").fill('E2E New Tenant (example)')
+  await dlg.getByLabel("New tenant's name").fill('E2E New Tenant')
   const clock = await call(mgr, 'GET', '/api/sim/clock')
   await dlg.getByLabel('Move-in date', { exact: true }).fill(`${clock.month}-20`)
   await dlg.getByRole('button', { name: 'Change tenant' }).click()
@@ -436,7 +445,7 @@ await step('Manager records meter-data consent on a flat sheet with a note (scre
   await settle()
   await flatMenu(other.unit, 'Ledger and details')
   const sheet = page.getByRole('dialog').first()
-  await sheet.getByLabel(/How did the tenant give consent/).fill('Signed form on 3 March (example)')
+  await sheet.getByLabel(/How did the tenant give consent/).fill('Signed form on 3 March')
   await sheet.getByRole('button', { name: 'Record consent' }).click()
   // status labels carry an icon ligature as text (hidden from assistive technology), so match the end of the text
   await sheet.getByText(/Given$/).first().waitFor({ timeout: 8000 })
@@ -470,15 +479,15 @@ await step('Billing run for the month and CSV export (screen)', async () => {
   return `${text.split('\n').length - 1} CSV lines`
 })
 
-await step('Demo clock: advance 3 months (screen)', async () => {
-  await page.goto(`${BASE}/government/overview`)
+await step('System date: advance 3 months (screen)', async () => {
+  await page.goto(`${BASE}/government/admin`)
   await settle()
   const before = (await call(mgr, 'GET', '/api/sim/clock')).month
-  await page.getByRole('button', { name: /advance 3 months/i }).click()
+  await page.getByRole('button', { name: /move forward 3 months/i }).click()
   if (await page.getByRole('alertdialog').count()) await confirmDialog()
   await page.getByText(/Moved to/).waitFor({ timeout: 90000 })
   const after = (await call(mgr, 'GET', '/api/sim/clock')).month
-  must(after !== before, 'clock did not move')
+  must(after !== before, 'the system date did not move')
   return `${before} to ${after}`
 })
 
@@ -575,10 +584,10 @@ await step('Landlord enquiry submitted on the public form (screen)', async () =>
   const ctx3 = await browser.newContext()
   const ep = await ctx3.newPage()
   await ep.goto(BASE + '/enquiry')
-  await ep.getByLabel('Your name').fill('E2E Landlord (example)')
-  await ep.getByLabel('Email address').fill('e2e@example.org')
+  await ep.getByLabel('Your name').fill('E2E Landlord')
+  await ep.getByLabel('Email address').fill('e2e@organisation.com.au')
   await ep.getByRole('combobox', { name: /You are a/ }).selectOption({ label: 'Landlord' })
-  await ep.getByLabel('Address of the block').fill('12 Example Street, Penrith')
+  await ep.getByLabel('Address of the block').fill('12 Station Street, Penrith')
   await ep.getByLabel('Number of flats').fill('8')
   await ep.getByRole('button', { name: 'Send enquiry' }).click()
   await ep.getByText('Enquiry received').waitFor({ timeout: 10000 })
@@ -620,7 +629,7 @@ await step('Strata resolution recorded on the strata user block (screen)', async
   await settle()
   await page.getByRole('button', { name: 'Record resolution and sign' }).click()
   const dlg = page.getByRole('dialog').first()
-  await dlg.getByLabel('Name of the person signing for the committee').fill('E2E Chair (example)')
+  await dlg.getByLabel('Name of the person signing for the committee').fill('E2E Chair')
   await dlg.getByLabel('Meeting date', { exact: true }).fill('2026-09-30')
   await dlg.getByLabel('Votes for', { exact: true }).fill('12')
   await dlg.getByLabel('Votes against', { exact: true }).fill('2')

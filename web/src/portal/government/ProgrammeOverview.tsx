@@ -1,21 +1,17 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts'
 import { api } from '@/console/api'
-import type { Overview, Scenario } from '@/console/types'
+import type { Overview } from '@/console/types'
 import { STAGES } from '@/console/types'
 import { useRes } from '@/console/useRes'
 import { money, num } from '@/format'
 import { ChartBox } from '@/portal/components/ChartBox'
-import { Confirm } from '@/portal/components/Confirm'
 import { DataTable } from '@/portal/components/DataTable'
 import { Facts, Figures, PageHeader, Panel } from '@/portal/components/PageHeader'
-import { ErrorAlert, Gate } from '@/portal/components/States'
-import { STAGE_LABEL, SimulatedBadge, StatusBadge } from '@/portal/components/Status'
-import { Button } from '@/portal/components/ui/button'
+import { Gate } from '@/portal/components/States'
+import { STAGE_LABEL, StatusBadge } from '@/portal/components/Status'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/portal/components/ui/chart'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/portal/components/ui/select'
-import { useAction } from '@/portal/lib/actions'
 import { usePageTitle } from './shared'
 
 const ROUTE: Record<string, string> = {
@@ -27,82 +23,6 @@ const ROUTE: Record<string, string> = {
 function monthName(m: string) {
   const [y, mo] = m.split('-').map(Number)
   return new Date(y, mo - 1, 1).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })
-}
-
-function ClockControl({ onChange }: { onChange: () => void }) {
-  const clock = useRes(() => api.clock(), [])
-  const [scenario, setScenario] = useState<Scenario>('mixed')
-  const act = useAction()
-  const [last, setLast] = useState('')
-  if (clock.error && !clock.data) return null // switched off outside the demo
-  const adv = async (n: number) => {
-    const r = await act.run(() => api.advanceClock(n, scenario))
-    if (r) {
-      setLast(`Moved to ${monthName(r.month)}. ${r.billing_runs} billing runs, ${r.payments} payments, ${r.faults_opened} faults opened, ${r.faults_resolved} resolved, ${r.mv_runs} savings checks.`)
-      clock.reload()
-      onChange()
-    }
-  }
-  return (
-    <Panel title="Demo clock" description="A demo control. It moves time forward with simulated data so you can see years of billing in seconds." actions={<SimulatedBadge label="Demo control" />}>
-      <p className="mw-mb-3">
-        The programme month is <strong>{clock.data ? monthName(clock.data.month) : '...'}</strong>.
-      </p>
-      <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-3">
-        <div className="nsw-display-flex nsw-flex-column mw-gap-1_5">
-          <label htmlFor="scn" className="nsw-small nsw-text-medium">
-            How the equipment performs
-          </label>
-          <Select value={scenario} onValueChange={(v) => setScenario(v as Scenario)}>
-            <SelectTrigger id="scn" className="mw-w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="as_modelled">As modelled</SelectItem>
-              <SelectItem value="mixed">Mixed</SelectItem>
-              <SelectItem value="underperforming">Underperforming</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        {[1, 3, 12].map((n) => (
-          <Button key={n} variant="outline" disabled={act.busy} onClick={() => void adv(n)}>
-            Advance {n} {n === 1 ? 'month' : 'months'}
-          </Button>
-        ))}
-        <Confirm
-          title="Reset the demo?"
-          description={<p>This wipes every change and goes back to the starting example. It cannot be undone.</p>}
-          confirmLabel="Reset demo"
-          destructive
-          onConfirm={async () => {
-            const r = await act.run(() => api.resetClock(), 'Demo reset')
-            if (r !== undefined) {
-              setLast('')
-              clock.reload()
-              onChange()
-            }
-          }}
-        >
-          <Button variant="outline" disabled={act.busy}>
-            Reset demo
-          </Button>
-        </Confirm>
-      </div>
-      {act.busy && (
-        <p role="status" className="mw-mt-2 mw-text-muted">
-          Working through the months
-        </p>
-      )}
-      <div className="mw-mt-2">
-        <ErrorAlert error={act.error} title="The clock did not move" />
-      </div>
-      {last && (
-        <p role="status" className="mw-mt-2">
-          {last}
-        </p>
-      )}
-    </Panel>
-  )
 }
 
 export default function ProgrammeOverview() {
@@ -120,7 +40,7 @@ export default function ProgrammeOverview() {
           const monthly = o.monthly.slice(-24)
           return (
             <div className="mw-space-y-4">
-              <Panel title={p.name} actions={p.example ? <StatusBadge tone="neutral">Example programme</StatusBadge> : undefined}>
+              <Panel title={p.name}>
                 <Facts
                   items={[
                     { label: 'Delivery route', value: ROUTE[p.route] ?? p.route },
@@ -140,7 +60,6 @@ export default function ProgrammeOverview() {
                   { label: 'Flats with a charge', value: num(o.flats.active_charges), note: `${num(o.flats.total)} flats, ${num(o.flats.paused)} paused` },
                 ]}
               />
-              <ClockControl onChange={res.reload} />
 
               <div className="nsw-display-grid mw-grid-cols-1 mw-gap-4 mw-lg-grid-cols-2 mw-children-min-0">
                 <ChartBox
@@ -165,7 +84,7 @@ export default function ProgrammeOverview() {
                 </Panel>
               </div>
 
-              <Panel title="Modelled and measured savings" actions={<SimulatedBadge label="Measured on simulated meters" />}>
+              <Panel title="Modelled and measured savings">
                 <Facts
                   items={[
                     { label: 'Modelled', value: `${money(o.modelled.tenant_saving_per_year)} a year saved by tenants. ${o.modelled.co2e_t_per_year.toFixed(1)} tonnes of CO2e a year avoided.` },
@@ -182,7 +101,7 @@ export default function ProgrammeOverview() {
                 description="Billed is the outlined bar. Collected is the solid bar."
                 chart={
                   monthly.length === 0 ? (
-                    <p className="mw-text-muted">No charges have been billed yet. Advance the demo clock to see billing.</p>
+                    <p className="mw-text-muted">No charges have been billed yet. Billing starts once a project is active.</p>
                   ) : (
                     <ChartContainer config={{ billed: { label: 'Billed', color: 'var(--chart-1)' }, collected: { label: 'Collected', color: 'var(--chart-1)' } }} className="mw-h-72 nsw-width-100" role="img" aria-label={`Billed and collected each month. Latest ${monthName(monthly[monthly.length - 1].month)}: billed ${money(monthly[monthly.length - 1].billed)}, collected ${money(monthly[monthly.length - 1].collected)}.`}>
                       <BarChart data={monthly} margin={{ left: 8, right: 8 }}>

@@ -13,7 +13,6 @@ import { Icon } from './icons'
 import type { IconType } from './icons'
 import { BrandLogo } from './BrandLogo'
 import { DemoNotice } from './DemoNotice'
-import { ExampleBadge } from './Status'
 import { Footer } from './Footer'
 import { SessionGuard } from './Session'
 
@@ -80,13 +79,8 @@ function UserMenu() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
           <div className="nsw-text-semibold">{user.name}</div>
-          <div className="nsw-small mw-text-muted">
-            {ROLE_LABEL[user.role]}
-            {user.org?.name ? `, ${user.org.name}` : ''}
-          </div>
-          <div className="mw-mt-1">
-            <ExampleBadge>Example account</ExampleBadge>
-          </div>
+          <div className="nsw-small mw-text-muted">{user.title ?? ROLE_LABEL[user.role]}</div>
+          {user.org?.name && <div className="nsw-small mw-text-muted">{user.org.name}</div>}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem

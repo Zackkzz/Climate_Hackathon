@@ -34,20 +34,3 @@ const STAGE_TONE: Record<Stage, Tone> = { screened: 'neutral', audit: 'info', of
 export function StageBadge({ stage }: { stage: Stage }) {
   return <StatusBadge tone={STAGE_TONE[stage] ?? 'neutral'}>{STAGE_LABEL[stage] ?? stage}</StatusBadge>
 }
-
-/** Marks organisations and people that are made up for the demo. */
-export function ExampleBadge({ children = 'Example' }: { children?: ReactNode }) {
-  return (
-    <Badge tone="outline" title="Made up for the demo">
-      {children}
-    </Badge>
-  )
-}
-/** Marks data that comes from a simulator, not a real meter. */
-export function SimulatedBadge({ label = 'Simulated' }: { label?: string }) {
-  return (
-    <Badge tone="outline" title="From a simulator, not a real meter">
-      {label}
-    </Badge>
-  )
-}

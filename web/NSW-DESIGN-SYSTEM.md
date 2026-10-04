@@ -157,10 +157,12 @@ METERWISE_DB=<worktree>/engine/var/nswds.db <repo>/.venv/Scripts/python run.py -
 ```
 
 (Port 8001, the port first suggested, was already taken by another server on this machine, so 8011 was used; the Vite
-proxy points at 8011.) Scripts: `scripts/axe.mjs` (WCAG 2.2 AA sweep, desktop and `--mobile` at 320px, reflow check),
-`scripts/e2e.mjs` (30 steps; selectors for selects changed to `selectOption`, and one status text match tolerates the
-icon ligature text), `scripts/shot.mjs` (screenshots), `scripts/finder-urls.mjs` and `scripts/print-check.mjs` (finder URLs
-for the sweep; print emulation check of the notice).
+proxy points at 8011.) The server no longer lists demo accounts, so the sign-in page has only the staff form, the MFA
+step and the tenant access code. Scripts: `scripts/axe.mjs` (WCAG 2.2 AA sweep, desktop and `--mobile` at 320px, reflow
+check; tenant access codes come from `GET /api/programme/projects/{id}/flats` as manager) and `scripts/e2e.mjs` (30 steps;
+credentials from `E2E_PASSWORD` and `E2E_<ROLE>` with the seed emails as defaults). Selectors differ from the main branch
+only where the markup does: selects are native, so `selectOption` replaces click-and-choose, and one status text match
+tolerates the icon ligature text. The screenshot and print-emulation helpers used during the build were removed.
 
 ## Known gaps
 

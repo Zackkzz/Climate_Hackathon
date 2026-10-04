@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { useEffect } from 'react'
+import { cleanName } from '@/portal/lib/labels'
 import { useNavigate, useParams } from 'react-router'
 import { api } from '@/console/api'
 import { useUser } from '@/console/auth'
@@ -42,7 +43,7 @@ function SummaryTab({ p }: { p: PropertyProject }) {
             { label: 'Since', value: fmtDate(p.stage_since) },
             { label: 'Next step', value: p.next_step },
             { label: 'Blocked by', value: p.blocked_by.length ? <ul className="mw-list-disc mw-pl-4">{p.blocked_by.map((b, i) => <li key={i}>{b}</li>)}</ul> : 'Nothing' },
-            { label: 'Installer', value: p.installer_org?.name ?? 'Not chosen yet' },
+            { label: 'Installer', value: (p.installer_org ? cleanName(p.installer_org.name) : null) ?? 'Not chosen yet' },
             { label: 'Flats', value: p.flats },
           ]}
         />
@@ -106,7 +107,7 @@ function DocumentsTab({ p }: { p: PropertyProject }) {
   ]
   return (
     <div className="mw-space-y-3">
-      <p className="mw-text-muted">Printable pages. Each says it is an example made by a prototype and is not legal or financial advice.</p>
+      <p className="mw-text-muted">Printable pages. They summarise your agreement and are not legal or financial advice. Please have your own adviser review them.</p>
       <ErrorAlert error={act.error} title="We could not open the document" />
       <Gate res={res}>{(d) => <DataTable columns={cols} data={d} caption="Documents" searchPlaceholder="Search documents" emptyTitle="No documents yet" emptyText="Documents are made when the offer is issued." />}</Gate>
     </div>

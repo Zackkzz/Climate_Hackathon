@@ -6,7 +6,6 @@ import type {
   AuditLogEntry,
   BillingRun,
   ClockInfo,
-  DemoUser,
   Doc,
   Fault,
   Flat,
@@ -206,7 +205,6 @@ export const api = {
   logout: () => post<unknown>('/api/auth/logout'),
   tenantLogin: (code: string) => json<TenantLoginResponse>('POST', '/api/auth/tenant', { code }, false),
   me: () => get<User>('/api/auth/me'),
-  demoUsers: () => json<DemoUser[] | { users: DemoUser[]; tenant_codes?: DemoUser[] }>('GET', '/api/auth/demo-users', undefined, false),
 
   // programme and portfolio
   programme: () => get<Programme>(P),

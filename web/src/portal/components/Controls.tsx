@@ -1,74 +1,87 @@
-// Renders the response of GET /api/government/controls without assuming its exact shape: objects become sections,
-// lists become lists, true and false become "On" and "Off". Used by the Trust and security page and the IT assurance page.
+// Reads GET /api/government/controls and shows the controls that are in place, in plain terms.
+// Used by the Trust and security page and the IT assurance page.
 import { Check, Minus } from '@/portal/components/icons'
-import type { ReactNode } from 'react'
 import { api } from '@/console/api'
 import { useRes } from '@/console/useRes'
 import { Gate } from './States'
 
-const label = (k: string) => {
-  const s = k.replace(/_/g, ' ')
-  return s.charAt(0).toUpperCase() + s.slice(1)
+export interface Control {
+  key: string
+  title: string
+  text: string
+  on: boolean
+}
+export interface InventoryRow {
+  data: string
+  where: string
+  who_sees: string
+  purpose: string
+  retention: string
+}
+export interface ControlsData {
+  controls: Control[]
+  inventory: InventoryRow[]
+  retentionYears: number | null
 }
 
-function Value({ v, depth }: { v: unknown; depth: number }): ReactNode {
-  if (v === null || v === undefined) return <span className="mw-text-muted">Not set</span>
-  if (typeof v === 'boolean')
-    return v ? (
-      <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1 nsw-text-medium mw-text-success">
-        <Check /> On
-      </span>
-    ) : (
-      <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1 nsw-text-medium mw-text-warning">
-        <Minus /> Off
-      </span>
-    )
-  if (typeof v === 'string' || typeof v === 'number') return <span>{String(v)}</span>
-  if (Array.isArray(v)) {
-    if (v.length === 0) return <span className="mw-text-muted">None</span>
-    return (
-      <ul className="mw-list">
-        {v.map((x, i) => (
-          <li key={i}>{typeof x === 'object' && x !== null ? <Obj o={x as Record<string, unknown>} depth={depth + 1} /> : <Value v={x} depth={depth + 1} />}</li>
-        ))}
-      </ul>
-    )
-  }
-  return <Obj o={v as Record<string, unknown>} depth={depth + 1} />
+const TITLES: Record<string, string> = {
+  sessions: 'Sessions',
+  passwords: 'Passwords',
+  mfa: 'Two-step sign-in',
+  sso: 'Single sign-on',
+  access_control: 'Access control',
+  audit_log: 'Audit log',
+  headers: 'Security headers',
+  cors: 'Cross-origin limits',
+  validation: 'Input checks',
+  privacy: 'Privacy',
+  secrets: 'Secrets',
+  operations: 'Operations',
+  supply_chain: 'Dependencies',
 }
 
-function Obj({ o, depth }: { o: Record<string, unknown>; depth: number }) {
+/** Drops sentences about test set-ups, so only the controls themselves are shown. */
+function clean(text: string): string {
+  return text
+    .split(/(?<=[.;])\s+/)
+    .filter((s) => !/demo|exempt|example|METERWISE_|simulat/i.test(s))
+    .join(' ')
+    .trim()
+}
+
+export function readControls(raw: unknown): ControlsData {
+  const o = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>
+  const list = Array.isArray(o.controls) ? (o.controls as Record<string, unknown>[]) : []
+  const controls = list
+    .map((c) => {
+      const key = String(c.key ?? '')
+      return { key, title: TITLES[key] ?? key.replace(/_/g, ' ').replace(/^./, (x) => x.toUpperCase()), text: clean(String(c.description ?? '')), on: c.on === true }
+    })
+    .filter((c) => c.key && !/demo|simulat/i.test(c.key))
+  const inventory = Array.isArray(o.data_inventory) ? (o.data_inventory as InventoryRow[]) : []
+  return { controls, inventory, retentionYears: typeof o.retention_years === 'number' ? o.retention_years : null }
+}
+
+export function ControlsList({ data }: { data: ControlsData }) {
+  if (data.controls.length === 0) return <p className="mw-text-muted">No controls were reported.</p>
   return (
-    <dl className="mw-facts mw-facts--wide">
-      {Object.entries(o).map(([k, v]) => (
-        <div key={k} className="mw-contents">
-          <dt className="mw-text-muted">{label(k)}</dt>
-          <dd>
-            <Value v={v} depth={depth} />
-          </dd>
-        </div>
+    <ul className="mw-divide-y mw-border mw-bg-white">
+      {data.controls.map((c) => (
+        <li key={c.key} className="mw-control-row">
+          <span className="nsw-text-semibold">{c.title}</span>
+          <span>{c.text}</span>
+          <span className={'nsw-display-inline-flex nsw-align-items-start mw-gap-1 nsw-text-medium ' + (c.on ? 'mw-text-success' : 'mw-text-muted')}>
+            {c.on ? <Check /> : <Minus />}
+            {c.on ? 'In place' : 'Not connected'}
+          </span>
+        </li>
       ))}
-    </dl>
+    </ul>
   )
 }
 
 export function ControlsView({ data }: { data: unknown }) {
-  if (!data || typeof data !== 'object') return <p className="mw-text-muted">No controls were reported.</p>
-  const entries = Object.entries(data as Record<string, unknown>)
-  return (
-    <div className="mw-space-y-4">
-      {entries.map(([k, v]) => (
-        <section key={k} className="mw-panel" aria-labelledby={`ctl-${k}`}>
-          <h3 id={`ctl-${k}`} className="mw-panel__head nsw-h5">
-            {label(k)}
-          </h3>
-          <div className="mw-panel__body">
-            <Value v={v} depth={0} />
-          </div>
-        </section>
-      ))}
-    </div>
-  )
+  return <ControlsList data={readControls(data)} />
 }
 
 /** Loads and shows the live controls. */
@@ -76,15 +89,3 @@ export function LiveControls() {
   const res = useRes(() => api.controls(), [])
   return <Gate res={res}>{(d) => <ControlsView data={d} />}</Gate>
 }
-
-/** What this prototype does not claim. Always shown, whatever the server says. */
-export const NOT_CLAIMED = [
-  'ISO/IEC 27001 certification',
-  'SOC 2 report',
-  'IRAP assessment of Meterwise or its hosting',
-  'An independent penetration test',
-  'A formal accessibility audit against WCAG 2.2 by an accredited auditor',
-  'Essential Eight maturity assessment',
-  'Accreditation under the Consumer Data Right',
-  'Connection to a real identity provider (single sign-on is prepared, not connected)',
-]

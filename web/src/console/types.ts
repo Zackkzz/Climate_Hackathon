@@ -17,6 +17,7 @@ export interface User {
   name: string
   email?: string
   role: Role
+  title?: string
   org?: OrgRef | null
   flat_id?: number
   project_id?: number
@@ -29,14 +30,6 @@ export interface TenantLoginResponse {
   token: string
   flat_id: number
   project_id: number
-}
-export interface DemoUser {
-  role: Role
-  name: string
-  email?: string
-  password?: string
-  org?: string | OrgRef | null
-  code?: string
 }
 
 export type Stage = 'screened' | 'audit' | 'offer' | 'consent' | 'procurement' | 'installation' | 'commissioned' | 'active' | 'closed'

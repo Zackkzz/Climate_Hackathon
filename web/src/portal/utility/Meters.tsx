@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
+import { sourceLabel } from '@/portal/lib/labels'
 import { utilityApi } from '@/console/api-utility'
 import type { MeterRow } from '@/console/types-utility'
 import type { Stage } from '@/console/types'
@@ -22,7 +23,7 @@ function charge(s: string) {
 }
 
 const columns: ColumnDef<MeterRow>[] = [
-  { accessorKey: 'meter_id', header: 'Meter id', cell: (c) => <span className="mw-mono nsw-small">{c.getValue<string>()}</span> },
+  { accessorKey: 'meter_id', header: 'Meter reference', cell: (c) => <span className="mw-mono nsw-small">{c.getValue<string>()}</span> },
   { accessorKey: 'address', header: 'Address' },
   { accessorKey: 'position', header: 'Floor', cell: (c) => (c.getValue<string>() === 'top' ? 'Top' : 'Lower') },
   { accessorKey: 'stage', header: 'Project stage', cell: (c) => <StageBadge stage={c.getValue<string>() as Stage} />, meta: { csv: (r) => STAGE_NAME[r.stage] ?? r.stage } },
@@ -32,7 +33,7 @@ const columns: ColumnDef<MeterRow>[] = [
   { accessorKey: 'has_gas', header: 'Gas connected', cell: (c) => (c.getValue<boolean>() ? 'Yes' : 'No'), meta: { csv: (r) => (r.has_gas ? 'yes' : 'no') } },
   { accessorKey: 'retailer_customer', header: 'Our customer', cell: (c) => (c.getValue<boolean>() ? 'Yes' : 'No'), meta: { csv: (r) => (r.retailer_customer ? 'yes' : 'no') } },
   { accessorKey: 'last_reading_month', header: 'Last reading', cell: (c) => c.getValue<string | null>() ?? 'None' },
-  { accessorKey: 'reading_source', header: 'Reading source', cell: (c) => c.getValue<string | null>() ?? '-' },
+  { accessorKey: 'reading_source', header: 'Reading source', cell: (c) => sourceLabel(c.getValue<string | null>()) },
 ]
 
 export default function Meters() {
