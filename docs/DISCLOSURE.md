@@ -29,8 +29,7 @@ and research that shaped it into Meterwise.
 |---|---|
 | Codex (OpenAI) | Aiding development of the application |
 | Claude Code (Anthropic), models Claude Fable 5.1, Claude Opus 5.5 and Claude Sonnet 5.5 | Research, planning, writing the code, tests and documents, and reviewing the app in a browser |
-| AI research tool used for the starting proposal (**team to name**) | The initial idea |
-| ChatGPT deep research (**team to confirm**) | An earlier idea that was not pursued |
+| Gemini (Google), for the starting proposal | The initial idea |
 
 The team directed the work, chose the idea and is responsible for the submission.
 
