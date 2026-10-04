@@ -429,11 +429,11 @@ export default function Share({ assess, sheet, onSheet, onBack }: Props) {
           </div>
         </div>
         <Tabs value={sheet} onValueChange={(v) => onSheet(v as Sheet)}>
-          <TabsList aria-label="Choose a sheet" className="mw-h-auto nsw-flex-wrap mw-p-1">
+          <TabsList aria-label="Choose a sheet" className="mw-sheet-tabs">
             {TABS.map((t) => (
-              <TabsTrigger key={t.key} value={t.key} id={`tab-${t.key}`} aria-controls={`sheet-${t.key}`} className="mw-h-auto nsw-flex-column nsw-align-items-start mw-py-1_5">
-                <span className="nsw-text-semibold">{t.label}</span>
-                <span className="nsw-small nsw-text-normal mw-text-muted">{t.sub}</span>
+              <TabsTrigger key={t.key} value={t.key} id={`tab-${t.key}`} aria-controls={`sheet-${t.key}`} >
+                <span className="mw-sheet-tab__label">{t.label}</span>
+                <span className="mw-sheet-tab__sub">{t.sub}</span>
               </TabsTrigger>
             ))}
           </TabsList>

@@ -1,28 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { importLibrary, setOptions } from '@googlemaps/js-api-loader'
+import { MAPS_KEY as API_KEY, MAP_STYLE, loadMaps, mapsAuthFailures as authFailures } from '@/portal/lib/maps'
 import { HEAT_COLORS } from '../../heat'
 import { heatWord } from '../../format'
 import type { BuildingCollection, BuildingFeature, HeatBand } from '../../types'
 
-declare global {
-  interface Window {
-    gm_authFailure?: () => void
-  }
-}
-
-// Browser key for the Maps JavaScript API. It is public by design: Google accepts it only from the site's own addresses,
-// for this one API, up to a daily number of map loads. It is read from web/.env.local, which git ignores.
-const API_KEY: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? ''
-
-// Muted base map so the heat colours stand out; businesses and transit icons are hidden.
-const MAP_STYLE: google.maps.MapTypeStyle[] = [
-  { stylers: [{ saturation: -60 }] },
-  { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
-  { featureType: 'poi', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-]
 const PIN_SVG =
-  '<svg width="30" height="38" viewBox="0 0 30 38" aria-hidden="true"><path d="M15 36S3 24.500 3 14.500a12 12 0 0 1 24 0C27 24.500 15 36 15 36z" fill="#0b4f7c" stroke="#fff" stroke-width="2.500"/><circle cx="15" cy="14.500" r="4.500" fill="#fff"/></svg>'
+  '<svg width="30" height="38" viewBox="0 0 30 38" aria-hidden="true"><path d="M15 36S3 24.500 3 14.500a12 12 0 0 1 24 0C27 24.500 15 36 15 36z" fill="#002664" stroke="#fff" stroke-width="2.500"/><circle cx="15" cy="14.500" r="4.500" fill="#fff"/></svg>'
 // Zoom at or above which a selected block counts as easy to see.
 const CLOSE_ZOOM = 17
 
@@ -38,25 +21,6 @@ interface Props {
   bottomPad: number
   /** Pilot area [west, south, east, north] from /api/meta; the first view fits this. */
   bbox?: [number, number, number, number]
-}
-
-type Libs = [google.maps.MapsLibrary, google.maps.CoreLibrary]
-let configured = false
-let loading: Promise<Libs> | null = null
-const authFailures = new Set<() => void>()
-
-/** Load the Maps JavaScript API once per page. Google calls gm_authFailure when it refuses the key. */
-function loadMaps(): Promise<Libs> {
-  if (!configured) {
-    configured = true
-    window.gm_authFailure = () => authFailures.forEach((f) => f())
-    setOptions({ key: API_KEY, v: 'quarterly', language: 'en-AU', region: 'AU', authReferrerPolicy: 'origin' })
-  }
-  loading ??= Promise.all([importLibrary('maps'), importLibrary('core')]).catch((e: unknown) => {
-    loading = null
-    throw e
-  })
-  return loading
 }
 
 /** Linear ramp between two zoom levels, held at the end values outside them. */
