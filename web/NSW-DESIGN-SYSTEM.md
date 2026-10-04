@@ -25,10 +25,10 @@ by side. It is a concept demonstration by a student team. It is not a NSW Govern
    There is no masthead text "A NSW Government website".
 3. Every page carries a full-width notice strip at the very top, above the header: "Concept demonstration by a student
    team for Climate Hack-tion 2026. Not a NSW Government website or service. Organisations, people, meters and readings
-   shown are made up." It is always visible, has no close control, and prints. The same text is repeated in the footer.
-   Both come from one component, `components/DemoNotice.tsx` (`where="top"` and `where="footer"`). This covers the public
-   pages, sign-in, the tenant page, every portal, the block finder and the printable offer sheets. The system's print
-   rules hide `.nsw-footer` and strip backgrounds; `styles/mw-components.css` puts the footer and the notice back for print.
+   shown are made up." It is always visible, has no close control, and prints. It
+   comes from one component, `components/DemoNotice.tsx`. This covers the public pages, sign-in, the tenant page, every
+   portal, the block finder and the printable offer sheets. The system's print rules strip backgrounds;
+   `styles/mw-components.css` puts the notice back for print. There is no site footer.
 4. Nothing says or implies the service is run, approved or endorsed by the NSW Government or any real agency, council or
    utility. The "Government portal" in the app means the council programme role inside this made-up programme.
 
@@ -74,14 +74,13 @@ rendering. Every behaviour is reimplemented in React with the system's classes a
 
 | System component | Where it is used |
 |---|---|
-| Notice strip (local, `.mw-demo-notice`) | `DemoNotice.tsx`: top of every page and in the footer |
+| Notice strip (local, `.mw-demo-notice`) | `DemoNotice.tsx`: top of every page |
 | Skip link `.nsw-skip` | `Shell.tsx` `SkipLink`, on every layout |
 | Header `.nsw-header` | `Shell.tsx` `SiteHeader`: portals, public pages, tenant page, block finder |
 | Header logo `.nsw-header__waratah` | `BrandLogo.tsx` (in `SiteHeader`; see branding rules 1 and 2) |
 | Main navigation `.nsw-main-nav` | `Shell.tsx` `PublicLayout` |
 | Side navigation `.nsw-side-nav` | `Shell.tsx` `PortalShell` (all portals) |
 | Breadcrumbs `.nsw-breadcrumbs` | `ui/breadcrumb.tsx`, used by `PageHeader` on every portal page |
-| Footer `.nsw-footer` | `Footer.tsx` |
 | Buttons `.nsw-button` (dark, dark-outline-solid, light, danger, small) | `ui/button.tsx` (about 150 uses) |
 | Form group, label, helper text, error message `.nsw-form__*` | `ui/form.tsx`, `ui/label.tsx`, `fields.tsx`: all react-hook-form fields |
 | Text input, textarea `.nsw-form__input` | `ui/input.tsx`, `ui/textarea.tsx` |
@@ -148,8 +147,8 @@ notice strip, finder layout, chart tooltip, print rules.
 - **Headings** inside `main` without a system size class are scaled down (h1 1.5rem, h2 1.25rem, h3 and h4 1rem) because
   the system's h1 to h4 are display sizes (3rem to 1.5rem) and these are dense back-office pages. Page titles use `nsw-h3`.
 - **"Find a page" (Ctrl K)** is a plain dialog list, not a command palette.
-- **Print.** The system's print CSS hides the header and footer and removes backgrounds and colour. The header is kept
-  hidden; the footer and notice are put back (see branding rule 3).
+- **Print.** The system's print CSS hides the header and removes backgrounds and colour. The header is kept hidden; the
+  notice is put back (see branding rule 3).
 - **Charts** stay on Recharts, coloured from `--nsw-brand-dark`, `--nsw-grey-02`, `--nsw-status-warning`,
   `--nsw-status-success` and `--nsw-grey-01`, each with the table alternative (`ChartBox`) and direct labels or patterns
   as well as colour.

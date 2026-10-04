@@ -1,6 +1,6 @@
-// Page shells on the NSW Design System: notice strip, skip link, header, navigation, main, footer.
-//   PortalShell  signed-in portals: header with user menu, side navigation (grouped), page, footer.
-//   PublicLayout front page, sign-in, enquiry and legal pages: header with main navigation, page, footer.
+// Page shells on the NSW Design System: notice strip, skip link, header, navigation, main.
+//   PortalShell  signed-in portals: header with user menu, side navigation (grouped), page.
+//   PublicLayout front page, sign-in, enquiry and legal pages: header with main navigation, page.
 // Navigation is implemented in React (open and close state, focus return, Escape), not with the package's scripts.
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -13,7 +13,6 @@ import { Icon } from './icons'
 import type { IconType } from './icons'
 import { BrandLogo } from './BrandLogo'
 import { DemoNotice } from './DemoNotice'
-import { Footer } from './Footer'
 import { SessionGuard } from './Session'
 
 export interface NavItem {
@@ -94,7 +93,7 @@ function UserMenu() {
   )
 }
 
-/** The shell for a signed-in portal: header, side navigation, the page, the footer. */
+/** The shell for a signed-in portal: header, side navigation, the page. */
 export function PortalShell({ portal, groups }: { portal: string; groups: NavGroup[] }) {
   const nav = useNavigate()
   const loc = useLocation()
@@ -165,7 +164,6 @@ export function PortalShell({ portal, groups }: { portal: string; groups: NavGro
           <Outlet />
         </main>
       </div>
-      <Footer />
       <Dialog open={find} onOpenChange={setFind}>
         <DialogContent>
           <DialogHeader>
@@ -210,7 +208,7 @@ export function PortalShell({ portal, groups }: { portal: string; groups: NavGro
   )
 }
 
-/** A plain page: header with main navigation, centred column, footer. Used for the front page, sign-in and legal pages. */
+/** A plain page: header with main navigation, centred column. Used for the front page, sign-in and legal pages. */
 export function PublicLayout({ children }: { children?: ReactNode }) {
   const [open, setOpen] = useState(false)
   const loc = useLocation()
@@ -267,7 +265,6 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
       <main id="main" tabIndex={-1} className="nsw-container mw-public-main">
         {children ?? <Outlet />}
       </main>
-      <Footer />
     </div>
   )
 }

@@ -71,8 +71,6 @@ main:focus { outline: none; }
 /* the notice strip: always visible, never dismissible, printed */
 .mw-demo-notice { background: var(--nsw-brand-dark); color: var(--nsw-white); padding: 0.5rem 1rem; border-bottom: 3px solid var(--nsw-status-warning); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .mw-demo-notice p { margin: 0; max-width: var(--nsw-container-width); margin-inline: auto; font-size: var(--nsw-font-size-xs); line-height: var(--nsw-line-height-xs); font-weight: 600; }
-.mw-demo-notice--footer { background: transparent; color: inherit; border: 2px solid currentColor; margin-top: 1rem; }
-.mw-demo-notice--footer p { margin-inline: 0; }
 
 /* header */
 .mw-header-inner { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0; }
@@ -230,9 +228,8 @@ html.dialog-active { overflow: hidden; }
 .mw-tenant-main { max-width: 42rem; }
 
 @media print {
-  .nsw-header, .nsw-skip, .mw-finder-bar, .nsw-footer__upper { display: none !important; }
-  /* the system's print rules hide its footer and strip backgrounds; the notice must still print, top and bottom */
-  .nsw-footer { display: block !important; }
+  .nsw-header, .nsw-skip, .mw-finder-bar { display: none !important; }
+  /* the system's print rules strip backgrounds; the notice must still print */
   .mw-demo-notice { display: block !important; border: 2px solid #000; padding: 0.375rem 0.75rem; margin: 0 0 0.5rem; }
   .mw-demo-notice p { color: #000 !important; }
 }
@@ -251,9 +248,8 @@ html.dialog-active { overflow: hidden; }
 .mw-chart-tip__swatch { width: 0.625rem; height: 0.625rem; display: inline-block; }
 
 /* lists: the app's own lists are unstyled unless marked (the page chooses bullets with .mw-list-disc) */
-:where(main, .mw-dialog, .nsw-footer) :where(ul, ol) { list-style: none; margin: 0; padding: 0; }
+:where(main, .mw-dialog) :where(ul, ol) { list-style: none; margin: 0; padding: 0; }
 .mw-list-disc { list-style: disc !important; padding-left: 1.25rem !important; }
-.mw-footer-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
 
 /* scroll containers must contain visually hidden (absolutely positioned) text, or it widens the page at 320px */
 .nsw-table, .nsw-overflow-x-auto, .nsw-overflow-auto, .nsw-overflow-y-auto { position: relative; }

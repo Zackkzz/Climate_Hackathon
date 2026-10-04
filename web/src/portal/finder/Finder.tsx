@@ -6,7 +6,6 @@ import { decodeDeal, encodeDeal, newDeal, parseHash } from '@/state'
 import type { Route, Sheet, Step } from '@/state'
 import type { Deal } from '@/types'
 import { DemoNotice } from '@/portal/components/DemoNotice'
-import { Footer } from '@/portal/components/Footer'
 import { SiteHeader, SkipLink } from '@/portal/components/Shell'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
 import { Button } from '@/portal/components/ui/button'
@@ -171,8 +170,6 @@ export default function Finder() {
         </p>
       )}
       </main>
-
-      <Footer />
       {how && m && <HowItWorks meta={m} onClose={() => setHow(false)} />}
     </div>
   )

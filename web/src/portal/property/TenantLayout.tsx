@@ -2,7 +2,6 @@ import { Suspense, lazy } from 'react'
 import { useNavigate } from 'react-router'
 import { signOut, useUser } from '@/console/auth'
 import { DemoNotice } from '@/portal/components/DemoNotice'
-import { Footer } from '@/portal/components/Footer'
 import { SiteHeader, SkipLink } from '@/portal/components/Shell'
 import { SessionGuard } from '@/portal/components/Session'
 import { LoadingRows } from '@/portal/components/States'
@@ -40,7 +39,6 @@ export function TenantLayout() {
           <MyFlat />
         </Suspense>
       </main>
-      <Footer />
     </div>
   )
 }
