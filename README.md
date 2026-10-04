@@ -152,6 +152,14 @@ confirm ([docs/policy-australia.md](docs/policy-australia.md)).
 | [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | The plan on all fronts |
 | [DISCLOSURE.md](DISCLOSURE.md) | Tools, data, AI use and prior-work statement |
 
+## NSW Design System variant of the web app
+
+This branch (`meterwise-nsw-design-system`) is the same web app with its presentation moved from Tailwind and shadcn/ui
+to the NSW Design System, for side-by-side comparison. It is a concept demonstration by a student team, not a NSW
+Government website or service: it carries no NSW Government logo, waratah or wordmark, and every page shows a notice
+strip saying so. Components, departures from the system, branding rules and how it was checked are in
+[web/NSW-DESIGN-SYSTEM.md](web/NSW-DESIGN-SYSTEM.md).
+
 ## Limits
 
 - Heat is satellite land surface temperature at about 100 m detail. It ranks neighbourhoods; it does not measure a

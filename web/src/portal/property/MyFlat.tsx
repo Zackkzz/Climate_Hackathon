@@ -21,7 +21,7 @@ import { dateLabel, itemLabel, LEDGER_LABEL, monthLabel } from '@/portal/lib/dat
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="mw-border nsw-fill-white">
+    <section aria-labelledby={id} className="mw-border mw-bg-white">
       <h2 id={id} className="mw-border-b mw-px-4 mw-py-3 mw-text-lg nsw-text-semibold">
         {title}
       </h2>
@@ -32,7 +32,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
 
 function Big({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
-    <div className="mw-min-w-0 nsw-fill-white mw-p-3">
+    <div className="mw-min-w-0 mw-bg-white mw-p-3">
       <dt className="nsw-small mw-text-muted">{label}</dt>
       <dd className="mw-text-2xl nsw-text-semibold mw-tabular">{value}</dd>
       {note && <dd className="nsw-small mw-text-muted">{note}</dd>}
@@ -194,7 +194,7 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
           </div>
         </Section>
       )}
-      {flat.consent === 'declined' && <p className="mw-border nsw-fill-white mw-p-3">You declined the upgrades. You pay no charge.</p>}
+      {flat.consent === 'declined' && <p className="mw-border mw-bg-white mw-p-3">You declined the upgrades. You pay no charge.</p>}
 
       <dl className="nsw-display-grid mw-grid-cols-1 mw-gap-px mw-border mw-bg-border mw-xs-grid-cols-2" aria-label="Your numbers">
         <Big label="You pay each month" value={money(d.deal.charge_per_month)} note={flat.charge_status === 'paused' ? 'Paused for now' : `Until ${monthLabel(d.deal.term_ends)}`} />

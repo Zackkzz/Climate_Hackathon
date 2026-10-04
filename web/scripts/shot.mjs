@@ -19,7 +19,12 @@ const ctx = await browser.newContext({ viewport: { width: Number(width), height:
 const page = await ctx.newPage()
 page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') console.log('CONSOLE', m.type(), m.text().slice(0, 300)) })
 page.on('pageerror', (e) => console.log('PAGEERROR', e.message.slice(0, 300)))
-if (who !== 'public') {
+if (who.startsWith('tenant:')) {
+  await page.goto(base + '/signin')
+  await page.getByRole('textbox', { name: 'Access code' }).fill(who.slice(7))
+  await page.getByRole('button', { name: 'See my flat' }).click()
+  await page.waitForTimeout(2000)
+} else if (who !== 'public') {
   await page.goto(base + '/signin')
   await page.getByLabel('Email address').fill(who)
   await page.getByLabel('Password').fill('Penrith-demo-2026!')

@@ -43,7 +43,7 @@ export default function Enquiry() {
       <PageHeader crumbs={[{ label: 'Home', to: '/' }, { label: 'Enquiry' }]} title="Landlord or strata enquiry" description="Ask for your block of rented flats to be considered. We use these details only to reply to you." />
       <Form {...form}>
         <form
-          className="mw-space-y-3 mw-border nsw-fill-white mw-p-4"
+          className="mw-space-y-3 mw-border mw-bg-white mw-p-4"
           noValidate
           onSubmit={form.handleSubmit(async (v) => {
             const r = await act.run(() => http.post<{ id: number }>('/api/property/enquiries', v))

@@ -42,7 +42,7 @@ export default function Reports() {
       <p role="status" className="mw-mb-2 mw-min-h-6 mw-text-success">
         {done}
       </p>
-      <div className="nsw-overflow-x-auto mw-border nsw-fill-white" role="region" aria-label="Reports" tabIndex={0}>
+      <div className="nsw-overflow-x-auto mw-border mw-bg-white" role="region" aria-label="Reports" tabIndex={0}>
         <Table>
           <TableHeader>
             <TableRow>

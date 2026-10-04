@@ -46,7 +46,7 @@ function TopUp({ onDone }: { onDone: () => void }) {
   })
   return (
     <Form {...form}>
-      <form className="mw-mb-4 mw-space-y-3 mw-border nsw-fill-white mw-p-4" noValidate onSubmit={(e) => e.preventDefault()} aria-label="Top up the reserve">
+      <form className="mw-mb-4 mw-space-y-3 mw-border mw-bg-white mw-p-4" noValidate onSubmit={(e) => e.preventDefault()} aria-label="Top up the reserve">
         <h2 className="nsw-text-semibold">Top up the reserve</h2>
         <p className="mw-text-muted">Move money from the grant pool into the reserve, for example to cover a shortfall.</p>
         <div className="nsw-display-grid mw-gap-3 mw-sm-grid-cols-2">

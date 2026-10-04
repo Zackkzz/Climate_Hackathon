@@ -1,4 +1,6 @@
 import { Link } from 'react-router'
+import { Callout } from '@/portal/components/ui/callout'
+import { Card } from '@/portal/components/ui/card'
 
 const PORTALS = [
   { to: '/signin', title: 'Government', text: 'Council programme officers run projects, billing and the reserve. State and council oversight see outcomes, grants and audit.' },
@@ -16,7 +18,9 @@ export default function Front() {
         <p className="mw-mt-2 mw-max-w-2xl">
           Meterwise helps councils and housing providers upgrade rented flats in Western Sydney. Upgrades are a cool roof, heat pump hot water and reverse-cycle air conditioning. They are repaid by a capped charge on each flat's meter, taken from the bill savings. Tenants pay nothing upfront and keep part of the saving.
         </p>
-        <p className="mw-mt-2 mw-max-w-2xl mw-text-muted">This is a prototype. Every organisation, person and meter reading in it is an example.</p>
+        <div className="mw-mt-3 mw-max-w-2xl">
+          <Callout>This is a prototype. Every organisation, person and meter reading in it is an example.</Callout>
+        </div>
       </section>
 
       <section aria-labelledby="sign">
@@ -25,12 +29,10 @@ export default function Front() {
         </h2>
         <ul className="nsw-display-grid mw-gap-3 mw-md-grid-cols-3">
           {PORTALS.map((p) => (
-            <li key={p.title} className="mw-border nsw-fill-white mw-p-4">
-              <h3 className="nsw-text-semibold">{p.title} portal</h3>
-              <p className="mw-mt-1 mw-text-muted">{p.text}</p>
-              <p className="mw-mt-3">
-                <Link to={p.to}>Sign in to the {p.title.toLowerCase()} portal</Link>
-              </p>
+            <li key={p.title}>
+              <Card to={p.to} title={`${p.title} portal`}>
+                {p.text}
+              </Card>
             </li>
           ))}
         </ul>

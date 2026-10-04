@@ -78,7 +78,7 @@ function Readings({ p, role }: TabProps) {
             <label htmlFor="rd-file" className="mw-mb-1 nsw-display-block nsw-small nsw-text-medium">
               Upload readings (CSV)
             </label>
-            <input id="rd-file" ref={file} type="file" accept=".csv,text/csv" disabled={up.busy} onChange={(e) => void upload(e.target.files?.[0])} className="nsw-display-block nsw-width-100 mw-max-w-xs mw-border mw-border-strong nsw-fill-white mw-p-1_5 mw-file-input" aria-describedby="rd-file-help" />
+            <input id="rd-file" ref={file} type="file" accept=".csv,text/csv" disabled={up.busy} onChange={(e) => void upload(e.target.files?.[0])} className="nsw-display-block nsw-width-100 mw-max-w-xs mw-border mw-border-strong mw-bg-white mw-p-1_5 mw-file-input" aria-describedby="rd-file-help" />
           </div>
         )}
       </div>

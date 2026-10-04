@@ -11,6 +11,7 @@ import { ChartBox, LegendKey } from '@/portal/components/ChartBox'
 import { Figures, Panel } from '@/portal/components/PageHeader'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
 import { Alert, AlertDescription, AlertTitle } from '@/portal/components/ui/alert'
+import { Accordion } from '@/portal/components/ui/accordion'
 import { Button } from '@/portal/components/ui/button'
 import { Checkbox } from '@/portal/components/ui/checkbox'
 import { Input } from '@/portal/components/ui/input'
@@ -190,8 +191,7 @@ function Inputs({ deal, meta, result, base, onChange, onChangeBlock, shortlisted
         </ul>
       </Panel>
 
-      <details className="mw-border nsw-fill-white">
-        <summary className="mw-px-4 mw-py-2_5 nsw-text-semibold">Advanced: finance terms and prices</summary>
+      <Accordion title="Advanced: finance terms and prices">
         <div className="mw-space-y-4 mw-border-t mw-p-4">
           <h3 className="nsw-text-semibold">Finance</h3>
           <Slider label="Investor's return needed" help="What the investor needs to earn on the money each year." value={Math.round(deal.finance.cost_of_capital * 1000) / 10} min={0} max={12} step={0.5} format={(n) => `${n.toFixed(1)}% a year`} onChange={(n) => setFin({ cost_of_capital: n / 100 })} />
@@ -223,7 +223,7 @@ function Inputs({ deal, meta, result, base, onChange, onChangeBlock, shortlisted
             Reset to defaults
           </Button>
         </div>
-      </details>
+      </Accordion>
     </div>
   )
 }
@@ -538,7 +538,7 @@ function Costs({ r }: { r: AssessResponse }) {
           The fixed monthly charges can repay <strong>{money(p.max_fundable_capex)}</strong> of the {money(p.net_capex)} net cost.{' '}
           <span className={p.fully_funded ? 'nsw-text-medium mw-text-success' : 'nsw-text-medium mw-text-warning'}>{p.fully_funded ? 'Fully funded.' : `${money(p.funding_gap)} short.`}</span>
         </p>
-        <div className="mw-h-3 mw-border nsw-fill-off-white" role="img" aria-label={`The charges can repay ${Math.round(pctFund)}% of the net cost`}>
+        <div className="mw-h-3 mw-border mw-bg-wash" role="img" aria-label={`The charges can repay ${Math.round(pctFund)}% of the net cost`}>
           <div className={'mw-h-full ' + (p.fully_funded ? 'mw-bg-success' : 'mw-bg-warning')} style={{ width: `${pctFund}%` }} />
         </div>
       </div>
@@ -568,8 +568,7 @@ function Impact({ r }: { r: AssessResponse }) {
 
 function Assumptions({ r }: { r: AssessResponse }) {
   return (
-    <details className="mw-border nsw-fill-white">
-      <summary className="mw-px-4 mw-py-2_5 nsw-text-semibold">What this assumes</summary>
+    <Accordion title="What this assumes">
       <div className="mw-space-y-2 mw-border-t mw-p-4">
         <p className="nsw-small mw-text-muted">Every figure here is a modelled estimate, not a quote. Items marked "Sourced" link to where the number comes from; the rest are our own assumptions.</p>
         <div className="mw-max-h-96 nsw-overflow-auto mw-border" role="region" aria-label="Assumptions" tabIndex={0}>
@@ -603,7 +602,7 @@ function Assumptions({ r }: { r: AssessResponse }) {
           </Table>
         </div>
       </div>
-    </details>
+    </Accordion>
   )
 }
 
@@ -683,7 +682,7 @@ export default function Build({ deal, meta, buildings, assess, shortlist, onChan
             <RiskPanel req={req} currentShare={deal.finance.savings_share_to_charge} />
             <Impact r={r} />
             <Assumptions r={r} />
-            <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-3 mw-border nsw-fill-white mw-p-3">
+            <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-3 mw-border mw-bg-white mw-p-3">
               <Button size="lg" onClick={onShare}>
                 Share this deal
               </Button>

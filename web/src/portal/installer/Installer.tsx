@@ -126,15 +126,15 @@ function QuoteDialog({ tender, onClose, onDone }: { tender: Tender; onClose: () 
               <Plus aria-hidden="true" /> Add a line
             </Button>
             <dl className="nsw-display-grid mw-grid-cols-3 mw-gap-px mw-border mw-bg-border nsw-small" aria-label="Quote totals">
-              <div className="nsw-fill-white mw-p-2">
+              <div className="mw-bg-white mw-p-2">
                 <dt className="mw-text-muted">Your total</dt>
                 <dd className="mw-text-lg nsw-text-semibold mw-tabular">{money(total)}</dd>
               </div>
-              <div className="nsw-fill-white mw-p-2">
+              <div className="mw-bg-white mw-p-2">
                 <dt className="mw-text-muted">Modelled cost</dt>
                 <dd className="mw-text-lg nsw-text-semibold mw-tabular">{money(modelled)}</dd>
               </div>
-              <div className="nsw-fill-white mw-p-2">
+              <div className="mw-bg-white mw-p-2">
                 <dt className="mw-text-muted">Difference</dt>
                 <dd className={'mw-text-lg nsw-text-semibold mw-tabular ' + (diff > 0 ? 'mw-text-warning' : 'mw-text-success')}>
                   {diff > 0 ? '+' : diff < 0 ? '-' : ''}

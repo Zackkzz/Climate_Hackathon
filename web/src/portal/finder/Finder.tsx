@@ -117,7 +117,7 @@ export default function Finder() {
       <DemoNotice />
       <SkipLink />
       <SiteHeader />
-      <div className="no-print mw-finder-bar nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-x-4 mw-gap-y-1 mw-border-b nsw-fill-white mw-px-3 mw-py-1 mw-sm-px-4">
+      <div className="no-print mw-finder-bar nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-x-4 mw-gap-y-1 mw-border-b mw-bg-white mw-px-3 mw-py-1 mw-sm-px-4">
         <nav aria-label="Steps" className="mw-order-last nsw-display-flex mw-min-w-0 mw-basis-full nsw-align-items-center mw-sm-order-none mw-sm-basis-auto mw-sm-flex-1">
           <ol className="nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-1">
             {STEPS.map((s) => {
@@ -174,9 +174,7 @@ export default function Finder() {
       )}
       </main>
 
-      <div className="no-print">
-        <Footer />
-      </div>
+      <Footer />
       {how && m && <HowItWorks meta={m} onClose={() => setHow(false)} />}
     </div>
   )

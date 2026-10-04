@@ -65,4 +65,4 @@ export const Upload = make('upload')
 export const Wallet = make('account_balance_wallet')
 export const Wrench = make('build')
 export const Zap = make('bolt')
-export type { IconType as LucideIcon }
+export type { IconType as NavIcon }

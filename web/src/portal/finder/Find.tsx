@@ -63,7 +63,7 @@ function SelectedBlock({ f, onBuild, shortlisted, onShortlist }: { f: BuildingFe
   const user = useUser()
   const rent = rentedPhrase(p.renter_share)
   return (
-    <section className="mw-border nsw-fill-white" aria-live="polite" aria-label="Selected block">
+    <section className="mw-border mw-bg-white" aria-live="polite" aria-label="Selected block">
       <div className="mw-space-y-2 mw-p-3">
         <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-start nsw-justify-content-between mw-gap-2">
           <h2 className="nsw-text-semibold">{p.label}</h2>
@@ -111,7 +111,7 @@ function OwnBlockForm({ meta, pin, pickMode, setPickMode, onCancel, onSubmit }: 
   return (
     <Form {...form}>
       <form
-        className="mw-space-y-3 mw-border nsw-fill-white mw-p-3"
+        className="mw-space-y-3 mw-border mw-bg-white mw-p-3"
         noValidate
         onSubmit={form.handleSubmit((d) => {
           const roof = d.roof_known ? Math.max(20, Number(d.roof) || 20) : estimate
@@ -279,7 +279,7 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
           />
         </Suspense>
         <Legend />
-        {basemapFailed && <div className="nsw-position-absolute mw-left-2 mw-top-2 mw-z-10 mw-border nsw-fill-white mw-px-2 mw-py-1 nsw-small">The street map could not load. Buildings are still shown.</div>}
+        {basemapFailed && <div className="nsw-position-absolute mw-left-2 mw-top-2 mw-z-10 mw-border mw-bg-white mw-px-2 mw-py-1 nsw-small">The street map could not load. Buildings are still shown.</div>}
       </section>
 
       <aside className="mw-min-w-0 mw-space-y-3 mw-p-3 mw-lg-p-4" aria-label="Blocks to look at first">

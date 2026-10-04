@@ -347,7 +347,7 @@ export function ExportBar({ projectId, defaultMonth }: { projectId?: number; def
   return (
     <Form {...form}>
       <form
-        className="nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-2 mw-border nsw-fill-white mw-p-3"
+        className="nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-2 mw-border mw-bg-white mw-p-3"
         noValidate
         onSubmit={form.handleSubmit(async (v) => {
           const t = await act.run(() => api.billingExport(v.month, projectId))

@@ -32,9 +32,9 @@ main:focus { outline: none; }
 
 /* text colours (the system ships fills and strokes, not text colours) */
 .mw-text-muted { color: var(--mw-muted); }
-.mw-text-success { color: var(--nsw-status-success); }
-.mw-text-warning { color: var(--nsw-status-warning); }
-.mw-text-danger { color: var(--nsw-status-error); }
+.mw-text-success { color: var(--nsw-palette-green-01); }
+.mw-text-warning { color: var(--nsw-palette-orange-01); }
+.mw-text-danger { color: var(--nsw-palette-red-01); }
 .mw-text-brand { color: var(--nsw-brand-dark); }
 .mw-text-lg { font-size: var(--nsw-font-size-md); line-height: var(--nsw-line-height-md); }
 .mw-text-xl { font-size: var(--nsw-font-size-md); line-height: var(--nsw-line-height-md); }
@@ -229,7 +229,10 @@ html.dialog-active { overflow: hidden; }
 
 @media print {
   .nsw-header, .nsw-skip, .mw-finder-bar, .nsw-footer__upper { display: none !important; }
-  .mw-demo-notice { display: block !important; border: 2px solid #000; }
+  /* the system's print rules hide its footer and strip backgrounds; the notice must still print, top and bottom */
+  .nsw-footer { display: block !important; }
+  .mw-demo-notice { display: block !important; border: 2px solid #000; padding: 0.375rem 0.75rem; margin: 0 0 0.5rem; }
+  .mw-demo-notice p { color: #000 !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
@@ -253,3 +256,14 @@ html.dialog-active { overflow: hidden; }
 /* scroll containers must contain visually hidden (absolutely positioned) text, or it widens the page at 320px */
 .nsw-table, .nsw-overflow-x-auto, .nsw-overflow-auto, .nsw-overflow-y-auto { position: relative; }
 .mw-finder-bar ol { list-style: none; margin: 0; padding: 0; }
+
+/* headings without a design-system size class are scaled for dense back-office pages (the system's h1 to h4 are display sizes) */
+main h1:not([class*="nsw-h"]) { font-size: var(--nsw-font-size-lg); line-height: var(--nsw-line-height-lg); }
+main h2:not([class*="nsw-h"]) { font-size: var(--nsw-font-size-md); line-height: var(--nsw-line-height-md); }
+main h3:not([class*="nsw-h"]), main h4:not([class*="nsw-h"]), .mw-dialog h3:not([class*="nsw-h"]) { font-size: var(--nsw-font-size-sm); line-height: var(--nsw-line-height-sm); }
+main p { margin: 0 0 0.5rem; }
+main p:last-child { margin-bottom: 0; }
+.mw-table th { text-align: left; } .mw-table th.nsw-text-right { text-align: right; }
+.mw-accordion__heading { margin: 0; font-size: inherit; } .mw-accordion { margin: 0.5rem 0; } .mw-accordion .nsw-accordion__content-wrap { padding: 1rem; border: 1px solid var(--nsw-grey-04); border-top: 0; }
+.mw-bg-white { background: var(--nsw-white); } .mw-bg-wash { background: var(--nsw-off-white); }
+.mw-card { height: 100%; } .mw-callout { margin: 0; }

@@ -97,7 +97,7 @@ function Trust() {
     <>
       <p>This page says plainly what security and privacy controls the running system has, and what it does not have.</p>
       <H>What is switched on in this running system</H>
-      {signedIn ? <LiveControls /> : <p className="mw-border nsw-fill-white mw-p-4 mw-text-muted">The live list is read from the running server. Sign in to see it. The list of things we do not claim is below and applies either way.</p>}
+      {signedIn ? <LiveControls /> : <p className="mw-border mw-bg-white mw-p-4 mw-text-muted">The live list is read from the running server. Sign in to see it. The list of things we do not claim is below and applies either way.</p>}
       <H>Demo accounts</H>
       <p>While the demo is switched on, demo accounts do not need a second sign-in step, and a demo clock and reset exist. The live list above says whether that is the case right now. A real deployment turns all of that off.</p>
       <H>What we do not claim</H>

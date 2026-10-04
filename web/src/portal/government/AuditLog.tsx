@@ -74,7 +74,7 @@ export default function AuditLog() {
       <ErrorAlert error={verify.error} title="We could not verify the chain" />
       {result && <VerifyResult v={result} />}
       {res.data === null && res.error && /cannot use this|access/i.test(res.error) ? (
-        <p className="mw-border nsw-fill-white mw-p-4 mw-text-muted">Your role can check that the log has not been changed, but cannot read individual entries. Use the button above.</p>
+        <p className="mw-border mw-bg-white mw-p-4 mw-text-muted">Your role can check that the log has not been changed, but cannot read individual entries. Use the button above.</p>
       ) : (
       <Gate res={res} rows={8}>
         {(rows) => {
@@ -94,7 +94,7 @@ export default function AuditLog() {
                   <label htmlFor="al-role" className="nsw-small mw-text-muted">
                     Role
                   </label>
-                  <select id="al-role" className="mw-h-9 mw-border mw-border-strong nsw-fill-white mw-px-2" value={role} onChange={(e) => setRole(e.target.value)}>
+                  <select id="al-role" className="mw-h-9 mw-border mw-border-strong mw-bg-white mw-px-2" value={role} onChange={(e) => setRole(e.target.value)}>
                     <option value="all">All roles</option>
                     {roles.map((r) => (
                       <option key={r} value={r}>

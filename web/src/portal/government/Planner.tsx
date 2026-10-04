@@ -84,7 +84,7 @@ export default function Planner() {
       <PageHeader crumbs={[{ label: 'Government', to: '/government' }, { label: 'Portfolio planner' }]} title="Portfolio planner" description="Give a capital budget and a grant budget. The planner picks the blocks that do the most good within them, and says why it left the others out. Buying many units together can lower prices." />
       <Form {...form}>
         <form
-          className="mw-mb-4 mw-border nsw-fill-white mw-p-4"
+          className="mw-mb-4 mw-border mw-bg-white mw-p-4"
           noValidate
           onSubmit={form.handleSubmit(async (v) => {
             setMade(null)

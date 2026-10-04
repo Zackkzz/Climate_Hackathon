@@ -171,7 +171,7 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
       {loading ? (
         <LoadingRows label={`Loading ${caption}`} />
       ) : (
-        <div className="nsw-overflow-x-auto mw-border nsw-fill-white" role="region" aria-label={caption} tabIndex={0}>
+        <div className="nsw-overflow-x-auto mw-border mw-bg-white" role="region" aria-label={caption} tabIndex={0}>
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((hg) => (

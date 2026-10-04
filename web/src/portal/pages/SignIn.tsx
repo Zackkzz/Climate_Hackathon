@@ -71,7 +71,7 @@ export default function SignIn() {
         <PageHeader crumbs={[{ label: 'Home', to: '/' }, { label: 'Sign in' }]} title="Check your sign-in" description="Your account needs a second step. Open your authenticator app and enter the current 6-digit code." />
         <Form {...mfaForm}>
           <form
-            className="mw-space-y-3 mw-border nsw-fill-white mw-p-4"
+            className="mw-space-y-3 mw-border mw-bg-white mw-p-4"
             onSubmit={mfaForm.handleSubmit(async (v) => {
               const r = await mfaAct.run(() => api.mfaLogin(mfa, v.code))
               if (r) finish(r.token, r.user)
@@ -105,7 +105,7 @@ export default function SignIn() {
       )}
       <div className="nsw-display-grid mw-gap-4 mw-md-grid-cols-2">
         <Form {...loginForm}>
-          <form className="mw-space-y-3 mw-border nsw-fill-white mw-p-4" onSubmit={loginForm.handleSubmit((v) => doLogin(v.email, v.password))} noValidate aria-label="Staff and partner sign-in">
+          <form className="mw-space-y-3 mw-border mw-bg-white mw-p-4" onSubmit={loginForm.handleSubmit((v) => doLogin(v.email, v.password))} noValidate aria-label="Staff and partner sign-in">
             <h2 className="nsw-text-semibold">Staff and partners</h2>
             <TextField control={loginForm.control} name="email" label="Email address" type="email" autoComplete="username" />
             <TextField control={loginForm.control} name="password" label="Password" type="password" autoComplete="current-password" />
@@ -116,7 +116,7 @@ export default function SignIn() {
           </form>
         </Form>
         <Form {...codeForm}>
-          <form className="mw-space-y-3 mw-border nsw-fill-white mw-p-4" onSubmit={codeForm.handleSubmit((v) => doCode(v.code))} noValidate aria-label="Tenant access code">
+          <form className="mw-space-y-3 mw-border mw-bg-white mw-p-4" onSubmit={codeForm.handleSubmit((v) => doCode(v.code))} noValidate aria-label="Tenant access code">
             <h2 className="nsw-text-semibold">Tenants</h2>
             <p className="mw-text-muted">Your access code is on the letter from your housing provider.</p>
             <TextField control={codeForm.control} name="code" label="Access code" autoComplete="off" placeholder="FLAT-XXXX" />
@@ -128,7 +128,7 @@ export default function SignIn() {
         </Form>
       </div>
 
-      <section className="mw-mt-6 mw-border nsw-fill-white" aria-labelledby="demo-h">
+      <section className="mw-mt-6 mw-border mw-bg-white" aria-labelledby="demo-h">
         <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center nsw-justify-content-between mw-gap-2 mw-border-b mw-px-4 mw-py-2_5">
           <h2 id="demo-h" className="nsw-text-semibold">
             Demo accounts

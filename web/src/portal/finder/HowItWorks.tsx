@@ -107,7 +107,7 @@ export default function HowItWorks({ meta, onClose }: { meta: Meta; onClose: () 
               </a>{' '}
               (ODbL), drawn with MapLibre GL JS (BSD-3-Clause).
             </li>
-            <li>Interface built with React, Vite, Tailwind CSS and shadcn/ui (MIT). Typeface Public Sans (SIL Open Font Licence).</li>
+            <li>Interface built with React, Vite and the NSW Design System (MIT licence, used as a style library only, with no NSW Government branding). Typeface Public Sans (SIL Open Font Licence). Icons are Material Icons (SIL Open Font Licence, bundled by Fontsource).</li>
           </ul>
         </section>
       </div>

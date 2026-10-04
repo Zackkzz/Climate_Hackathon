@@ -179,7 +179,7 @@ function Body({ o, reload, canEdit }: { o: OutcomesT; reload: () => void; canEdi
                   <TableCell>{t.by}</TableCell>
                   <TableCell>
                     <div className="nsw-display-flex nsw-align-items-center mw-gap-2">
-                      <div className="mw-h-2_5 mw-w-24 mw-border nsw-fill-off-white" role="img" aria-label={`${t.pct} percent of the goal`}>
+                      <div className="mw-h-2_5 mw-w-24 mw-border mw-bg-wash" role="img" aria-label={`${t.pct} percent of the goal`}>
                         <div className="mw-h-full mw-bg-brand" style={{ width: `${Math.min(100, t.pct)}%` }} />
                       </div>
                       <span className="mw-tabular">{t.pct}%</span>

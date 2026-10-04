@@ -130,7 +130,7 @@ export function FormDialog({ title, description, trigger, schema, defaults, fiel
           </Form>
         ) : (
           <div className="mw-space-y-3">
-            <div className="mw-border nsw-fill-off-white mw-p-3" role="status">
+            <div className="mw-border mw-bg-wash mw-p-3" role="status">
               {summary?.(values)}
             </div>
             <ErrorAlert error={act.error} />

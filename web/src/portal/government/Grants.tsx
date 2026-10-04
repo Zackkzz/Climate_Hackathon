@@ -211,7 +211,7 @@ export default function Grants() {
                     <label htmlFor="g-status" className="nsw-small mw-text-muted">
                       Status
                     </label>
-                    <select id="g-status" className="mw-h-9 mw-border mw-border-strong nsw-fill-white mw-px-2" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <select id="g-status" className="mw-h-9 mw-border mw-border-strong mw-bg-white mw-px-2" value={status} onChange={(e) => setStatus(e.target.value)}>
                       <option value="all">All</option>
                       <option value="requested">Waiting for a decision</option>
                       <option value="approved">Approved</option>

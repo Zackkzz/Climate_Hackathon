@@ -100,7 +100,7 @@ export function CsvInput({ value, onChange, parsed, label, previewCols }: { valu
           <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Preview of the file" tabIndex={0}>
             <table className="nsw-width-100 nsw-small">
               <thead>
-                <tr className="nsw-fill-off-white nsw-text-left">
+                <tr className="mw-bg-wash nsw-text-left">
                   {previewCols.map((c) => (
                     <th key={c} className="mw-px-2 mw-py-1 nsw-text-semibold">
                       {c}

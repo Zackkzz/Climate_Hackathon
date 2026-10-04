@@ -199,7 +199,7 @@ export default function ProgrammeOverview() {
                 legend={
                   <>
                     <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
-                      <span className="nsw-display-inline-block mw-size-3 mw-border-2 mw-border-brand nsw-fill-white" aria-hidden="true" /> Billed (outlined)
+                      <span className="nsw-display-inline-block mw-size-3 mw-border-2 mw-border-brand mw-bg-white" aria-hidden="true" /> Billed (outlined)
                     </span>
                     <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
                       <span className="nsw-display-inline-block mw-size-3 mw-bg-brand" aria-hidden="true" /> Collected (solid)
