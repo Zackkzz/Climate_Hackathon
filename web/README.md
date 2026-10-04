@@ -16,17 +16,19 @@ npm run build        # type-check + production build into web/dist (real API, re
 npm run build:mock   # same, but with the built-in demo data (for a static demo)
 ```
 
-### The map (Google Maps)
+### The map (Google Maps, with an OpenStreetMap fallback)
 
-The block finder map uses the Google Maps JavaScript API. Its browser key lives in `web/.env.local`, one line:
+The block finder map and the government Areas map use the Google Maps JavaScript API. Its browser key lives in
+`web/.env.local`, one line:
 
 ```
 VITE_GOOGLE_MAPS_API_KEY=the-key
 ```
 
 Git ignores that file, so the team passes it around directly. Vite reads it for `dev`, `dev:mock` and every build;
-restart the dev server after adding it. Without it the finder still works and the map panel says the map could not
-load.
+restart the dev server after adding it. Without it, or whenever Google Maps cannot load (script blocked, key refused,
+or nothing after 8 seconds), both maps swap in place to an OpenStreetMap map drawn with MapLibre GL JS
+(`src/portal/finder/OsmMap.tsx`, loaded only then), using the OpenStreetMap Foundation's standard tiles.
 
 Google Cloud setup (project `meterwise-platform`):
 
@@ -47,7 +49,8 @@ Before publishing the site at a real address, create a separate key restricted t
 one stays for development.
 
 The server's Content Security Policy (`engine/api/programme.py`) allows the Google Maps hosts; scripts only from
-`maps.googleapis.com` and `maps.gstatic.com`.
+`maps.googleapis.com` and `maps.gstatic.com`. Images and fetches are also allowed from `tile.openstreetmap.org` for the
+fallback map.
 
 The backend serves `web/dist` at `/`. Routing uses the URL hash (`#/find`, `#/build?...`, `#/share?...`), so no server
 fallback rules are needed and all asset and API paths are relative.
@@ -98,6 +101,8 @@ src/
 | TypeScript | type checking | Apache-2.0 |
 | Google Maps JavaScript API, loaded with `@googlemaps/js-api-loader` (Apache-2.0); types `@types/google.maps` (MIT) | base map and map drawing | Google Maps Platform Terms of Service; Google's logo and attribution shown on the map |
 | OpenStreetMap data | building footprints, from the backend, drawn on the Google map | ODbL 1.0, attribution "Buildings © OpenStreetMap contributors" shown on the map |
+| OpenStreetMap standard tiles (`tile.openstreetmap.org`, OpenStreetMap Foundation) | fallback base map when Google Maps cannot load | map data ODbL 1.0; OpenStreetMap Tile Usage Policy; attribution "© OpenStreetMap contributors" shown on the map |
+| MapLibre GL JS (`maplibre-gl`) | draws the fallback map; a separate chunk loaded only when needed | BSD-3-Clause |
 | Heat colour ramp | ColorBrewer YlOrRd, 5 classes | Apache-2.0 (Brewer, Harrower and The Pennsylvania State University) |
 | Icons, logo, favicon | drawn in-house as inline SVG for this project | Original work, no third-party icon set |
 | Fonts | none loaded; system font stack (`ui-rounded`, `system-ui`, Segoe UI, Roboto, ...) | n/a |
@@ -106,5 +111,8 @@ src/
 Electricity and gas emission factors and agency links that appear in the demo "What this assumes" list point to the
 Australian Government (DCCEEW, AER) home pages. In real mode the assumptions and sources come from the backend.
 
-No analytics or cookies are used. The one third-party script is the Google Maps JavaScript API in the block finder,
-which also loads map images and the fonts of its controls from Google.
+No analytics or cookies are used. The one third-party script is the Google Maps JavaScript API on the pages with a map
+(the block finder and the government Areas page), which also loads map images and the fonts of its controls from Google.
+When Google Maps cannot load, the map falls back to OpenStreetMap tiles served by the OpenStreetMap Foundation. In
+either case the visitor's browser contacts that provider directly, which sees the visitor's IP address and the map area
+requested. Meterwise sends neither provider any account or tenant data.

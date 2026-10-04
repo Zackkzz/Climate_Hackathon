@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
-import { MAPS_KEY as API_KEY, MAP_STYLE, loadMaps, mapsAuthFailures as authFailures, mapsKeyRefused } from '@/portal/lib/maps'
+import { MAP_STYLE, startGoogleMaps, useGoogleFirst } from '@/portal/lib/maps'
 import { HEAT_COLORS } from '../../heat'
 import { heatWord } from '../../format'
 import type { HeatBand } from '../../types'
@@ -7,8 +7,6 @@ import { CLOSE_ZOOM, PIN_SVG, centroid, points, polygons, type MapProps } from '
 
 // MapLibre and the OpenStreetMap map load only when Google Maps fails, so the normal bundle stays small.
 const OsmMap = lazy(() => import('./OsmMap'))
-// Give up on Google if the script and the map are not up within this time.
-const LOAD_TIMEOUT_MS = 8000
 
 /** Linear ramp between two zoom levels, held at the end values outside them. */
 function ramp(zoom: number, z0: number, z1: number, from: number, to: number): number {
@@ -64,15 +62,12 @@ interface Live {
 /**
  * The block finder map: Google Maps when it works, otherwise the OpenStreetMap map. Any Google failure (no key at build
  * time, the script not loading, the key refused through gm_authFailure even after the map is up, or a load taking longer
- * than LOAD_TIMEOUT_MS) swaps in the fallback in place. Selection, filters and the shortlist live in the parent, so
+ * than 8 seconds; see startGoogleMaps) swaps in the fallback in place. Selection, filters and the shortlist live in the parent, so
  * they carry over.
  */
 export default function MapView(props: MapProps) {
-  const [onGoogle, setOnGoogle] = useState(() => !!API_KEY && !mapsKeyRefused())
-  useEffect(() => {
-    if (!API_KEY) console.info('Map: no Google Maps key in this build (VITE_GOOGLE_MAPS_API_KEY), so the OpenStreetMap map is shown.')
-  }, [])
-  if (onGoogle) return <GoogleMap {...props} onFail={() => setOnGoogle(false)} />
+  const [onGoogle, fallBack] = useGoogleFirst()
+  if (onGoogle) return <GoogleMap {...props} onFail={fallBack} />
   return (
     <Suspense fallback={<div className="map-wrap" aria-busy="true" />}>
       <OsmMap {...props} />
@@ -92,23 +87,8 @@ function GoogleMap(props: MapProps & { onFail: () => void }) {
 
   // load the API and create the map once
   useEffect(() => {
-    let gone = false
-    let up = false
-    const fail = (why: unknown) => {
-      if (gone) return
-      gone = true
-      console.info('Map: Google Maps is not available, showing the OpenStreetMap map instead.', why instanceof Error ? why.message : why)
-      cb.current.onFail()
-    }
-    const refused = () => fail('key refused (gm_authFailure)')
-    authFailures.add(refused)
-    const timer = window.setTimeout(() => {
-      if (!up) fail(`not loaded after ${LOAD_TIMEOUT_MS / 1000} s`)
-    }, LOAD_TIMEOUT_MS)
-    loadMaps().then(([maps, core]) => {
-      if (gone || !box.current) return
-      if (mapsKeyRefused()) return fail('key refused (gm_authFailure)')
-      up = true
+    const stop = startGoogleMaps(([maps, core]) => {
+      if (!box.current) return
       const map = new maps.Map(box.current, {
         center: { lat: -33.92, lng: 151.075 },
         zoom: 16,
@@ -210,12 +190,10 @@ function GoogleMap(props: MapProps & { onFail: () => void }) {
       live.current = { map, core, shapes, dots, tip: htmlOverlay(maps.OverlayView, tipEl), tipEl, pin: htmlOverlay(maps.OverlayView, pinEl), restyle }
       restyle()
       setStatus('ready')
-    }, fail)
+    }, () => cb.current.onFail())
 
     return () => {
-      gone = true
-      window.clearTimeout(timer)
-      authFailures.delete(refused)
+      stop()
       const l = live.current
       if (l) {
         l.tip.setMap(null)

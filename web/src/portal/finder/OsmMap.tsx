@@ -1,5 +1,6 @@
-// OpenStreetMap fallback for the block finder map, drawn with MapLibre GL. MapView loads this file only when Google Maps
-// is not available (no key, script blocked, key refused, or too slow), so MapLibre stays out of the normal bundle.
+// OpenStreetMap fallbacks, drawn with MapLibre GL: the block finder map (default export) and the Areas page map
+// (AreasOsmMap). MapView and Areas load this file only when Google Maps is not available (no key, script blocked, key
+// refused, or too slow), so MapLibre stays out of the normal bundle and is one chunk for both.
 import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import type { GeoJSONSource, MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
@@ -7,6 +8,8 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { HEAT_COLORS, HEAT_ORDER } from '../../heat'
 import { heatWord } from '../../format'
 import { CLOSE_ZOOM, PIN_SVG, centroid, points, polygons, type MapProps } from './mapData'
+import type { BuildingPoint } from '@/console/types-gov'
+import { dotStyle, ringOf, titleOf } from '@/portal/government/areasMapData'
 
 // OpenStreetMap standard raster tiles: the host the server's Content Security Policy allows for images and fetches.
 const BASEMAP: StyleSpecification = {
@@ -19,6 +22,35 @@ const PLAIN_STYLE: StyleSpecification = {
   version: 8,
   sources: {},
   layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#e9ecef' } }],
+}
+
+/**
+ * Watch for the OpenStreetMap tiles failing. Before the map's own layers exist (dataSource not yet added), carry on with a
+ * plain background; after, the layers stay and only the status line changes. Either way onFailed is called.
+ */
+function watchBasemap(map: maplibregl.Map, dataSource: string, onFailed: () => void) {
+  map.on('error', (e) => {
+    if (!map.getSource(dataSource)) {
+      if (!map.getSource('osm')) return
+      onFailed()
+      map.setStyle(PLAIN_STYLE)
+    } else if ((e as { sourceId?: string }).sourceId === 'osm') onFailed()
+  })
+}
+
+/** Status line and tile credit along the bottom edge of either fallback map. */
+function OsmFoot({ tilesFailed }: { tilesFailed: boolean }) {
+  return (
+    <div className="map-foot">
+      <span role="status">{tilesFailed ? 'The map background could not load. The buildings are still shown.' : 'Showing the OpenStreetMap map.'}</span>
+      <span>
+        ©{' '}
+        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+          OpenStreetMap contributors
+        </a>
+      </span>
+    </div>
+  )
 }
 
 export default function OsmMap(props: MapProps) {
@@ -103,14 +135,7 @@ export default function OsmMap(props: MapProps) {
       setReady(true)
     }
     map.on('style.load', addLayers)
-    map.on('error', () => {
-      if (!map.getSource('buildings') && !map.getSource('osm')) return
-      // If the OpenStreetMap tiles cannot be fetched before the buildings are drawn, carry on with a plain background.
-      if (!map.getSource('buildings')) {
-        setTilesFailed(true)
-        map.setStyle(PLAIN_STYLE)
-      }
-    })
+    watchBasemap(map, 'buildings', () => setTilesFailed(true))
 
     const featureId = (e: MapLayerMouseEvent): string | null => {
       const id = e.features?.[0]?.properties?.id
@@ -215,15 +240,95 @@ export default function OsmMap(props: MapProps) {
         <div ref={box} className="map-host" />
       </div>
       {pickMode && <div className="map-banner">Tap the map to place your block</div>}
-      <div className="map-foot">
-        <span role="status">{tilesFailed ? 'The street map could not load. Buildings are still shown.' : 'Showing the OpenStreetMap map.'}</span>
-        <span>
-          ©{' '}
-          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
-            OpenStreetMap contributors
-          </a>
-        </span>
-      </div>
+      <OsmFoot tilesFailed={tilesFailed} />
     </div>
+  )
+}
+
+/** The Areas page map on OpenStreetMap: the same dots, colours, sizes and rings as the Google version, the building's
+ * details as a tooltip on hover and in a popup on click. */
+export function AreasOsmMap({ pts }: { pts: BuildingPoint[] }) {
+  const box = useRef<HTMLDivElement>(null)
+  const [tilesFailed, setTilesFailed] = useState(false)
+  useEffect(() => {
+    if (!box.current) return
+    const map = new maplibregl.Map({
+      container: box.current,
+      style: BASEMAP,
+      attributionControl: false,
+      center: [151.075, -33.92],
+      zoom: 12,
+      maxZoom: 19,
+      dragRotate: false,
+      pitchWithRotate: false,
+      cooperativeGestures: true,
+    })
+    map.touchZoomRotate.disableRotation()
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
+    if (pts.length > 0) {
+      const b = new maplibregl.LngLatBounds()
+      for (const p of pts) b.extend([p.lon, p.lat])
+      map.fitBounds(b, { padding: { top: 32, left: 32, right: 48, bottom: 56 }, maxZoom: 17, duration: 0 })
+    }
+    const data = {
+      type: 'FeatureCollection' as const,
+      features: pts.map((p) => ({
+        type: 'Feature' as const,
+        geometry: { type: 'Point' as const, coordinates: [p.lon, p.lat] },
+        properties: { title: titleOf(p), ...dotStyle(p.heat_band, ringOf(p)) },
+      })),
+    }
+    map.on('style.load', () => {
+      if (map.getSource('areas')) return
+      map.addSource('areas', { type: 'geojson', data })
+      map.addLayer({
+        id: 'a-dot',
+        type: 'circle',
+        source: 'areas',
+        layout: { 'circle-sort-key': ['get', 'z'] },
+        paint: {
+          'circle-color': ['get', 'fill'],
+          'circle-opacity': 0.95,
+          'circle-radius': ['get', 'radius'],
+          'circle-stroke-color': ['get', 'stroke'],
+          'circle-stroke-width': ['get', 'strokeWidth'],
+        },
+      })
+    })
+    watchBasemap(map, 'areas', () => setTilesFailed(true))
+    const titleAt = (e: MapLayerMouseEvent): string | null => {
+      const t = e.features?.[0]?.properties?.title
+      return typeof t === 'string' ? t : null
+    }
+    // Google shows the building's details as a tooltip on hover and in an info window on click; this does the same.
+    map.on('mousemove', 'a-dot', (e) => {
+      map.getCanvas().style.cursor = 'pointer'
+      map.getCanvas().title = titleAt(e) ?? ''
+    })
+    map.on('mouseleave', 'a-dot', () => {
+      map.getCanvas().style.cursor = ''
+      map.getCanvas().removeAttribute('title')
+    })
+    const info = new maplibregl.Popup({ offset: 10, maxWidth: '18rem' })
+    map.on('click', 'a-dot', (e) => {
+      const t = titleAt(e)
+      if (t) info.setLngLat(e.lngLat).setText(t).addTo(map)
+    })
+    const ro = new ResizeObserver(() => map.resize())
+    ro.observe(box.current)
+    return () => {
+      ro.disconnect()
+      info.remove()
+      map.remove()
+    }
+  }, [pts])
+  return (
+    <>
+      {/* MapLibre makes its container position: relative, so it gets a host inside the absolutely placed canvas box. */}
+      <div className="mw-areas-map__canvas">
+        <div ref={box} className="mw-areas-map__host" />
+      </div>
+      <OsmFoot tilesFailed={tilesFailed} />
+    </>
   )
 }
