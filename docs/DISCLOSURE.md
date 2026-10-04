@@ -21,8 +21,9 @@ to:
 
 ## AI tools
 
-We used Codex and Claude Code to aid with the development of the application itself; however, research and ideating
-was done, for the most part, without AI assistance.
+We used Codex and Claude Code to aid with the development of the application, and Claude Code also helped with
+research and documentation. The core idea came from an AI-generated research proposal, but the team did the ideation
+and research that shaped it into Meterwise.
 
 | Tool | Used for |
 |---|---|
