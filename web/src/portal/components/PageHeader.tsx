@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { AlertTriangle, CheckCircle2, Info, OctagonAlert } from 'lucide-react'
-import { ROLE_LABEL, useUser } from '@/console/auth'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/portal/components/ui/breadcrumb'
 
 export interface Crumb {
@@ -12,8 +11,6 @@ export interface Crumb {
 
 /** Breadcrumbs, a page title, one line of plain description and the page actions. Every page starts with this. */
 export function PageHeader({ crumbs, title, description, actions }: { crumbs: Crumb[]; title: ReactNode; description?: ReactNode; actions?: ReactNode }) {
-  const user = useUser()
-  const context = user ? [user.org?.name, user.title ?? ROLE_LABEL[user.role]].filter(Boolean).join(' | ') : ''
   return (
     <header className="mb-6 flex flex-col gap-2 border-b-2 border-navy-900 pb-4">
       <Breadcrumb>
@@ -36,8 +33,7 @@ export function PageHeader({ crumbs, title, description, actions }: { crumbs: Cr
       </Breadcrumb>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          {context && <p className="text-sm font-semibold uppercase tracking-wide text-teal">{context}</p>}
-          <h1 className="mt-0.5">{title}</h1>
+          <h1>{title}</h1>
           {description && <p className="mt-1 max-w-3xl text-lg text-muted-foreground">{description}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
