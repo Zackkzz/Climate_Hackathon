@@ -202,7 +202,7 @@ The first lookup in each 1 km square takes 20 to 40 seconds; the result is cache
 lookups, and `POST /api/assess` for the same spot, are instant.
 
 ```json
-{"heat_anomaly_c": -0.34, "heat_band": "average", "site_lst_c": 37.8, "area_median_lst_c": 38.1, "scene_count": 9,
+{"heat_anomaly_c": -0.34, "heat_band": "cooler", "site_lst_c": 37.8, "area_median_lst_c": 38.1, "scene_count": 9,
  "first_date": "2023-12-11", "last_date": "2026-02-10", "window_km": 4.0, "site_radius_m": 50.0,
  "source": "https://planetarycomputer.microsoft.com/dataset/landsat-c2-l2"}
 ```
