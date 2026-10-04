@@ -8,6 +8,13 @@ import argparse
 import sys
 from pathlib import Path
 
+if sys.version_info < (3, 12):
+    raise SystemExit(
+        "Meterwise requires Python 3.12 or later. "
+        f"This environment uses Python {sys.version.split()[0]}. "
+        "Recreate .venv with Python 3.12 or later and install requirements.txt."
+    )
+
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "engine"))
 
