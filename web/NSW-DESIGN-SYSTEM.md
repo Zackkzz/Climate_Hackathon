@@ -11,6 +11,7 @@ by side. It is a concept demonstration by a student team. It is not a NSW Govern
    labelled concept demonstration only. NSW Government branding guidelines restrict the logo to NSW Government entities
    or approved use. **Before any public deployment or reuse, remove the logo or obtain permission.** To remove it: make
    `components/BrandLogo.tsx` return `null` and delete `assets/nsw-government-logo.svg` (nothing else refers to them).
+   The favicon (`public/favicon.svg`) is the logo's waratah on its own; replace it too.
 2. The artwork is the header component's own SVG (`svg.nsw-header__waratah-gov`, viewBox 0 0 259 280), copied
    unaltered from `src/components/header/_header.hbs` in the design system repository
    (https://github.com/NSWGTP/nsw-design-system, `master`, last changed in commit 3ec89ad, 15 September 2026). The npm

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Meterwise">
+  <title>Meterwise</title>
+  <g fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+    <polyline points="3,14 16,3.5 29,14"/>
+    <path d="M8 28a8 8 0 0 1 16 0"/>
+    <line x1="16" y1="28" x2="20.5" y2="21.5"/>
+  </g>
+</svg>
