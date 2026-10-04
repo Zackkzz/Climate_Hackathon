@@ -74,7 +74,7 @@ Needs Python 3.12 and Node 20 or later.
 ```bash
 python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt     # macOS/Linux: .venv/bin/python
-cd web && npm install && npm run build && cd ..
+cd web && npm install && npm run build && cd ..   # first put the Google Maps key file in web/.env.local, see web/README.md
 .venv/Scripts/python run.py                                 # http://localhost:8000
 ```
 
@@ -113,7 +113,6 @@ references (`MW-100001`), not National Metering Identifiers, and readings the sy
 | `METERWISE_SECRET` | generated and stored in the database (demo only) | Token signing key; required (32+ characters) when `METERWISE_DEMO=0` |
 | `METERWISE_CORS_ORIGINS` | local hosts | Comma-separated allowed origins |
 | `METERWISE_AUTOSEED` | `1` | `0` leaves a fresh database empty |
-| `METERWISE_TILE_HOST` | OpenStreetMap tiles | Image host allowed by the Content-Security-Policy |
 | `METERWISE_OIDC_*` | unset | Single sign-on settings; the callback returns 501 until configured |
 | `METERWISE_NOW` | real time | Fixes the clock's base date (tests) |
 
@@ -194,6 +193,6 @@ Security checks: `scripts/security_check.py` (see [docs/it-assurance.md](docs/it
 
 ## Data credits
 
-© OpenStreetMap contributors (ODbL). Landsat imagery courtesy of the U.S. Geological Survey. Australian Bureau of
+Base map © Google (Google Maps Platform). Building footprints © OpenStreetMap contributors (ODbL). Landsat imagery courtesy of the U.S. Geological Survey. Australian Bureau of
 Statistics 2021 Census (CC BY 4.0). Weather from Open-Meteo using Copernicus ERA5. Full list in
 [DISCLOSURE.md](DISCLOSURE.md).

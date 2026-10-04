@@ -213,7 +213,6 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
   const [own, setOwn] = useState(false)
   const [pickMode, setPickMode] = useState(false)
   const [pin, setPin] = useState<{ lat: number; lon: number } | null>(null)
-  const [basemapFailed, setBasemapFailed] = useState(false)
   const [band, setBand] = useState('all')
 
   const selected = selectedId ? buildings.features.find((f) => f.properties.id === selectedId) ?? null : null
@@ -275,11 +274,9 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
             }}
             bbox={meta.pilot.bbox}
             bottomPad={0}
-            onBasemapFailed={() => setBasemapFailed(true)}
           />
         </Suspense>
         <Legend />
-        {basemapFailed && <div className="absolute left-2 top-2 z-10 border bg-card px-2 py-1 text-sm">The street map could not load. Buildings are still shown.</div>}
       </section>
 
       <aside className="min-w-0 space-y-3 p-3 lg:p-4" aria-label="Blocks to look at first">

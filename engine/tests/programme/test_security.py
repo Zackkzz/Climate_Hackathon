@@ -116,7 +116,7 @@ def test_security_headers_everywhere(client):
         r = client.get(path)
         h = r.headers
         assert "frame-ancestors 'none'" in h["content-security-policy"]
-        assert "tile.openstreetmap.org" in h["content-security-policy"]
+        assert "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com;" in h["content-security-policy"]
         assert h["x-content-type-options"] == "nosniff" and "max-age" in h["strict-transport-security"]
         assert h["referrer-policy"] and h["permissions-policy"] and h["x-request-id"]
         if path.startswith("/api/"):

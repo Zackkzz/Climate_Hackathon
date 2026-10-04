@@ -23,10 +23,14 @@ from programme.errors import ProgError, bad
 
 log = logging.getLogger("meterwise.request")
 MAX_BODY = 2_000_000
-TILE_HOST = os.environ.get("METERWISE_TILE_HOST", "https://tile.openstreetmap.org https://*.tile.openstreetmap.org")
-CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: "
-       f"{TILE_HOST}; font-src 'self'; connect-src 'self' {TILE_HOST}; object-src 'none'; base-uri 'self'; form-action 'self'; "
-       "frame-ancestors 'none'")
+# Google Maps JavaScript API for the block finder map: its script, map images, the fonts of its controls and its data
+# calls (https://developers.google.com/maps/documentation/javascript/content-security-policy). Scripts are limited to
+# the two Maps hosts, not *.googleapis.com, which would also admit files anyone can host on storage.googleapis.com.
+GMAPS_SCRIPT = "https://maps.googleapis.com https://maps.gstatic.com"
+GMAPS_DATA = "https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com"
+CSP = (f"default-src 'self'; script-src 'self' {GMAPS_SCRIPT}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+       f"img-src 'self' data: blob: {GMAPS_DATA}; font-src 'self' https://fonts.gstatic.com; connect-src 'self' {GMAPS_DATA}; "
+       "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
 
 
 # ------------------------------------------------------------------------------------------- plumbing
