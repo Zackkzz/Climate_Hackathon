@@ -253,6 +253,7 @@ def open_fault(p: Principal, fid: int, body: dict, sim_resolve_month: str | None
     pausing = f["participating"] and f["charge_status"] in ("active", "paused") and pr["stage"] == "active"
     fid_new = db.insert("faults", flat_id=fid, project_id=pr["id"], item=item, description=desc,
                         reported_by=p.role, opened_on=clock.today(), opened_month=month, status="open",
+                        tenancy_id=(S.active_tenancy(fid) or {}).get("id"),
                         charge_paused=int(bool(pausing)), months_paused=0, cover_total=0,
                         sim_resolve_month=sim_resolve_month)
     if pausing:
@@ -455,14 +456,29 @@ def reading_obj(r: dict) -> dict:
     return {**{k: r[k] for k in READING_KEYS}, "source_label": SOURCE_LABELS.get(r["source"], r["source"])}
 
 
-def readings_of(fid: int) -> list[dict]:
-    return [reading_obj(r) for r in db.q("SELECT * FROM readings WHERE flat_id = ? ORDER BY month", (fid,))]
+def tenant_faults(p: Principal, fid: int) -> list[dict]:
+    return [fault_obj(x) for x in db.q("SELECT * FROM faults WHERE flat_id = ? AND tenancy_id = ? ORDER BY id DESC",
+                                      (fid, p.tenancy_id))]
+
+
+def readings_of(fid: int, tenancy_id: int | None = None) -> list[dict]:
+    if tenancy_id is None:
+        rows = db.q("SELECT * FROM readings WHERE flat_id = ? ORDER BY month", (fid,))
+    else:
+        rows = db.q("""SELECT r.* FROM readings r JOIN tenancies t ON t.id = ? AND t.flat_id = r.flat_id
+            WHERE r.flat_id = ? AND r.month || '-01' >= t.start_date
+            AND (t.end_date IS NULL OR date(r.month || '-01', '+1 month') <= t.end_date)
+            AND NOT EXISTS (SELECT 1 FROM tenancies other WHERE other.flat_id = r.flat_id AND other.id != t.id
+              AND other.start_date < date(r.month || '-01', '+1 month')
+              AND (other.end_date IS NULL OR other.end_date > r.month || '-01')) ORDER BY r.month""",
+            (tenancy_id, fid))
+    return [reading_obj(r) for r in rows]
 
 
 def readings_get(p: Principal, fid: int) -> list[dict]:
     f = S.get_flat(fid)
     S.check_flat(p, f, ("manager", "owner", "tenant"))
-    return readings_of(fid)
+    return readings_of(fid, p.tenancy_id if p.role == "tenant" else None)
 
 
 def _num(v: Any, name: str, lo: float, hi: float, optional: bool = False) -> float | None:

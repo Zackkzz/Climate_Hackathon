@@ -35,6 +35,9 @@ data/raw/
 .env.*
 *.pem
 *.key
+.secrets/
+backups/
+docs/security-review/evidence/
 # These hold no secrets: they only switch the web app's built-in demo data on, and the npm scripts need them.
 !web/.env.example
 !web/.env.mock
@@ -48,3 +51,6 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# Temporary Microsoft Office ownership files
+~$*

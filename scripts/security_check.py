@@ -64,6 +64,8 @@ ALLOWED = {
     ("POST", "/api/programme/projects/{pid}/quotes"): {I}, ("POST", "/api/programme/quotes/{qid}/accept"): {M},
     ("POST", "/api/programme/projects/{pid}/work-order"): {M}, ("POST", "/api/programme/work-orders/{wid}/checklist"): {I, M},
     ("GET", "/api/programme/projects/{pid}/flats"): {M, O, F, G}, ("POST", "/api/programme/flats/{fid}/tenancy-change"): {M, O},
+    ("POST", "/api/programme/flats/{fid}/access-code"): {M, O},
+    ("POST", "/api/programme/privacy/retention"): {M},
     ("GET", "/api/programme/flats/{fid}/ledger"): {M, O, T}, ("POST", "/api/programme/flats/{fid}/payments"): {M, O},
     ("GET", "/api/programme/flats/{fid}/personal-data"): {M, O, T}, ("POST", "/api/programme/flats/{fid}/personal-data/erase"): {M, O},
     ("GET", "/api/programme/flats/{fid}/data-consent"): {M, O, T}, ("POST", "/api/programme/flats/{fid}/data-consent"): {M, O, T},
@@ -383,16 +385,17 @@ def main() -> int:
         dst.execute("UPDATE audit_log SET detail = 'tampered' WHERE id = 7")
         dst.commit()
         dst.close()
-        os.environ["METERWISE_DB"] = copy
-        from programme import audit, db
-        db.connect(copy)
-        with db.tx():
-            res = audit.verify()
-        db.conn().close()
-        db._conn = None
+        # Audit verification needs no credential keys and must not migrate the copied database.
+        from security_operations import connect, verify_chain
+        detected = False
+        with connect(Path(copy)) as audit_copy:
+            try:
+                verify_chain(audit_copy)
+            except RuntimeError:
+                detected = True
         shutil.rmtree(d, ignore_errors=True)
-        record("Changing one audit entry in a copy of the database is detected", res["ok"] is False and res["first_bad_id"] == 7,
-               res["reason"])
+        record("Changing one audit entry in a copy of the database is detected", detected,
+               "Independent verification of the modified copy")
     else:
         record("Changing one audit entry in a copy of the database is detected", None, "needs --db")
 

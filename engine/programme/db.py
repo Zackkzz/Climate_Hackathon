@@ -13,6 +13,8 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
 
+from . import security
+
 ENGINE_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_PATH = ENGINE_DIR / "var" / "meterwise.db"
 
@@ -72,6 +74,9 @@ CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, user_id INTEGER, tenan
   last_seen REAL, revoked INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS login_failures (email TEXT PRIMARY KEY, count INTEGER, first_at REAL, locked_until REAL);
 CREATE TABLE IF NOT EXISTS mfa (user_id INTEGER PRIMARY KEY, secret TEXT, enabled INTEGER DEFAULT 0, last_step INTEGER);
+CREATE TABLE IF NOT EXISTS mfa_challenges (id TEXT PRIMARY KEY, user_id INTEGER, purpose TEXT, expires REAL,
+  attempts INTEGER DEFAULT 0, consumed INTEGER DEFAULT 0);
+CREATE TABLE IF NOT EXISTS privacy_holds (tenancy_id INTEGER PRIMARY KEY, reason TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS gas_disconnections (id INTEGER PRIMARY KEY, project_id INTEGER, org_id INTEGER, meters INTEGER,
   requested_on TEXT, status TEXT, scheduled_for TEXT, completed_on TEXT, note TEXT);
 CREATE TABLE IF NOT EXISTS supply_requests (id INTEGER PRIMARY KEY, project_id INTEGER, org_id INTEGER, kind TEXT,
@@ -102,7 +107,7 @@ def _dict_factory(cur: sqlite3.Cursor, row: tuple) -> dict[str, Any]:
         if name.endswith("_json"):
             out[name[:-5]] = json.loads(val) if val else None
         else:
-            out[name] = val
+            out[name] = security.reveal(val) if name in ("secret", "access_code") else val
     return out
 
 
@@ -117,14 +122,55 @@ def connect(path: str | None = None) -> sqlite3.Connection:
             _conn.close()
         if path != ":memory:":
             Path(path).parent.mkdir(parents=True, exist_ok=True)
-        c = sqlite3.connect(path, check_same_thread=False)
+        c = sqlite3.connect(path, check_same_thread=False, timeout=30)
         c.row_factory = _dict_factory
+        c.execute("PRAGMA secure_delete = ON")
         c.execute("PRAGMA foreign_keys = ON")
         c.execute("PRAGMA journal_mode = WAL") if path != ":memory:" else None
         c.executescript(SCHEMA)
+        _migrate(c)
         c.commit()
         _conn, _path = c, path
         return c
+
+
+def _migrate(c: sqlite3.Connection) -> None:
+    columns = {"tenancies": {"access_code_hash": "TEXT", "access_code_expires": "REAL"},
+               "faults": {"tenancy_id": "INTEGER"}}
+    raw = c.cursor(); raw.row_factory = None
+    for table, additions in columns.items():
+        present = {r[1] for r in raw.execute(f"PRAGMA table_info({table})")}
+        for name, kind in additions.items():
+            if name not in present:
+                raw.execute(f"ALTER TABLE {table} ADD COLUMN {name} {kind}")
+    import time
+    for tid, value, digest, expiry in raw.execute(
+            "SELECT id, access_code, access_code_hash, access_code_expires FROM tenancies WHERE access_code IS NOT NULL").fetchall():
+        plain = security.reveal(value)
+        if not value.startswith(security.PREFIX) or not digest:
+            raw.execute("UPDATE tenancies SET access_code = ?, access_code_hash = ?, access_code_expires = ? WHERE id = ?",
+                        (security.protect(plain), security.code_digest(plain), expiry or time.time() + 90 * 86400, tid))
+    for uid, value in raw.execute("SELECT user_id, secret FROM mfa WHERE secret IS NOT NULL").fetchall():
+        if not value.startswith(security.PREFIX):
+            raw.execute("UPDATE mfa SET secret = ? WHERE user_id = ?", (security.protect(value), uid))
+    raw.execute("CREATE UNIQUE INDEX IF NOT EXISTS tenancy_code_hash ON tenancies(access_code_hash)")
+    # Legacy faults at an ambiguous move-in date remain unassigned and hidden from tenants.
+    raw.execute("""UPDATE faults SET tenancy_id = (SELECT t.id FROM tenancies t WHERE t.flat_id = faults.flat_id
+        AND faults.opened_on > t.start_date AND (t.end_date IS NULL OR faults.opened_on < t.end_date)
+        ORDER BY t.start_date DESC, t.id DESC LIMIT 1) WHERE tenancy_id IS NULL""")
+
+
+def _protected_columns(table: str, cols: dict) -> dict:
+    cols = dict(cols)
+    if table == "tenancies" and "access_code" in cols:
+        import time
+        code = cols["access_code"]
+        cols["access_code_hash"] = security.code_digest(code) if code else None
+        cols["access_code_expires"] = time.time() + 90 * 86400 if code else None
+        cols["access_code"] = security.protect(code)
+    if table == "mfa" and "secret" in cols:
+        cols["secret"] = security.protect(cols["secret"])
+    return cols
 
 
 def conn() -> sqlite3.Connection:
@@ -163,8 +209,10 @@ def wipe() -> None:
         if not t.startswith("sqlite_") and t not in KEEP_ON_WIPE:
             c.execute(f"DROP TABLE IF EXISTS {t}")
     c.execute("DELETE FROM settings WHERE key NOT IN ('secret')")
+    c.execute("PRAGMA secure_delete = ON")
     c.execute("PRAGMA foreign_keys = ON")
     c.executescript(SCHEMA)
+    _migrate(c)
 
 
 def _enc(v: Any) -> Any:
@@ -189,6 +237,7 @@ def ex(sql: str, args: tuple | list = ()) -> int:
 
 
 def insert(table: str, **cols: Any) -> int:
+    cols = _protected_columns(table, cols)
     keys = list(cols)
     return ex(f"INSERT INTO {table} ({', '.join(keys)}) VALUES ({', '.join('?' for _ in keys)})",
               [cols[k] for k in keys])
@@ -197,6 +246,7 @@ def insert(table: str, **cols: Any) -> int:
 def update(table: str, row_id: Any, key: str = "id", **cols: Any) -> None:
     if not cols:
         return
+    cols = _protected_columns(table, cols)
     keys = list(cols)
     ex(f"UPDATE {table} SET {', '.join(k + ' = ?' for k in keys)} WHERE {key} = ?", [cols[k] for k in keys] + [row_id])
 

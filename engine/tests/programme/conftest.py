@@ -10,6 +10,8 @@ import tempfile
 os.environ["METERWISE_OFFLINE"] = "1"
 os.environ["METERWISE_NOW"] = "2026-10-04"
 os.environ["METERWISE_DEMO"] = "1"
+from cryptography.fernet import Fernet
+os.environ["METERWISE_ENCRYPTION_KEYS"] = Fernet.generate_key().decode()
 os.environ.pop("METERWISE_SECRET", None)
 _TMP = tempfile.mkdtemp(prefix="meterwise-tests-")
 os.environ["METERWISE_DB"] = os.path.join(_TMP, "boot.db")

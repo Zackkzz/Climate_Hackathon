@@ -75,7 +75,7 @@ The starting point was a research-style proposal ("GUBETO"). This plan keeps its
 |---|---|---|
 | Pilot dataset | Apartment footprints with heat, storeys, estimated flats and renter share | `data/` |
 | Engine | Weather, thermal model, equipment, tariffs, finance | `engine/meterwise/` |
-| API | FastAPI service implementing [docs/api-contract.md](docs/api-contract.md) | `engine/api/` |
+| API | FastAPI service implementing [docs/api-contract.md](api-contract.md) | `engine/api/` |
 | Web app | Three steps: find a block, build the deal, share it | `web/` |
 | Validation | Tests, plus a report generated from real model output | `engine/tests/`, `validation/` |
 | Policy and delivery | How the charge could work in Australia; pilot and testing plan | `docs/` |
@@ -134,18 +134,18 @@ Build quality is 30% of the score, and the brief asks how impact could be tested
 1. **Is the arithmetic right?** Automated tests check the finance engine against textbook loan formulas and check
    rules that must always hold: the charge never exceeds the capped share of savings, and a cool roof never changes
    a lower-floor flat.
-2. **Is the model believable?** `validation/REPORT.md` compares modelled energy use, hot water energy and cool-roof
+2. **Is the model believable?** `docs/validation/REPORT.md` compares modelled energy use, hot water energy and cool-roof
    effects with published Australian benchmarks, and shows where the model falls outside them. A sensitivity table
    shows whether the conclusion survives different prices and assumptions.
 3. **Does it work in real flats?** This cannot be shown in a weekend. The pilot design in
-   [docs/pilot-and-testing.md](docs/pilot-and-testing.md) describes how it would be measured.
+   [docs/pilot-and-testing.md](pilot-and-testing.md) describes how it would be measured.
 
 Nothing in the submission is presented as measured unless it was measured.
 
 ## 7. Route to real-world use
 
-Detail is in [docs/policy-australia.md](docs/policy-australia.md) and
-[docs/pilot-and-testing.md](docs/pilot-and-testing.md). In short:
+Detail is in [docs/policy-australia.md](policy-australia.md) and
+[docs/pilot-and-testing.md](pilot-and-testing.md). In short:
 
 | Stage | Timing | What happens |
 |---|---|---|
