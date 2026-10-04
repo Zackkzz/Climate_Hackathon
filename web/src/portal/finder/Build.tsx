@@ -10,7 +10,7 @@ import { PACKAGE_KEYS } from '@/types'
 import { BlockUpgrade } from '@/portal/components/BlockUpgrade'
 import { ChartBox, LegendKey } from '@/portal/components/ChartBox'
 import { Figures, Panel } from '@/portal/components/PageHeader'
-import { ErrorAlert, LoadingRows } from '@/portal/components/States'
+import { ErrorAlert, LoadingPanel, Spinner } from '@/portal/components/States'
 import { Alert, AlertDescription, AlertTitle } from '@/portal/components/ui/alert'
 import { Accordion } from '@/portal/components/ui/accordion'
 import { Button } from '@/portal/components/ui/button'
@@ -610,6 +610,7 @@ function Assumptions({ r }: { r: AssessResponse }) {
 function StatFigures({ r }: { r: AssessResponse }) {
   const f = r.finance
   const funded = r.package.fully_funded
+  const ret = f.investor_return_pct
   return (
     <Figures
       label="Who pays what"
@@ -619,7 +620,7 @@ function StatFigures({ r }: { r: AssessResponse }) {
         {
           label: 'Investor is repaid',
           value: moneyApprox(f.total_repaid),
-          note: `over ${f.term_years} years${f.investor_return_pct >= 0 ? `, about ${f.investor_return_pct.toFixed(1)}% a year` : `, a loss of about ${Math.abs(f.investor_return_pct).toFixed(1)}% a year`}${funded ? '' : ' (short of the full cost)'}`,
+          note: ret == null ? 'Nothing to repay: no upgrade is selected' : `over ${f.term_years} years${ret >= 0 ? `, about ${ret.toFixed(1)}% a year` : `, a loss of about ${Math.abs(ret).toFixed(1)}% a year`}${funded ? '' : ' (short of the full cost)'}`,
         },
       ]}
     />
@@ -662,11 +663,25 @@ export default function Build({ deal, meta, buildings, assess, shortlist, onChan
       <div className="mw-min-w-0 mw-space-y-3" aria-busy={assess.updating}>
         <div ref={topRef} />
         {assess.error && !r && <ErrorAlert error={assess.error} onRetry={assess.retry} title="We could not work out the deal" />}
-        {!r && !assess.error && <LoadingRows rows={6} label="Working out the deal" />}
+        {!r && !assess.error && (
+          <LoadingPanel
+            label="Working out the deal"
+            detail={
+              deal.own
+                ? 'Modelling a year of local weather for your block. The first estimate for a new spot can take up to a minute while its satellite heat is looked up.'
+                : 'Modelling a year of local weather for this block. This takes a few seconds.'
+            }
+          />
+        )}
         {r && (
           <>
-            <div role="status" className="nsw-small mw-text-muted">
-              {assess.updating ? 'Updating the result...' : ''}
+            <div role="status" className="mw-updating nsw-small mw-text-muted">
+              {assess.updating && (
+                <>
+                  <Spinner size="sm" />
+                  Updating the result...
+                </>
+              )}
             </div>
             {assess.error && <ErrorAlert error={`${assess.error} The numbers below are from your last successful update.`} onRetry={assess.retry} title="We could not update" />}
             <Verdict r={r} />

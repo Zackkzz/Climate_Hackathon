@@ -232,7 +232,8 @@ export interface FinanceResult {
   reserve: number
   charge_per_month_building: number
   total_repaid: number
-  investor_return_pct: number
+  /** null when nothing is lent (no upgrade selected), so there is no return to work out. */
+  investor_return_pct: number | null
   owner_upfront_cost: number
   tenant_upfront_cost: number
   shortest_equipment_life_years?: number

@@ -327,11 +327,10 @@ function FunderSheet({ r, active }: { r: AssessResponse; active: boolean }) {
           <div className="s-lab">repaid over {f.term_years} years</div>
         </div>
         <div>
-          <div className={'s-num ' + (ret < 0 ? 'warn' : '')}>
-            {ret < 0 ? '-' : ''}
-            {Math.abs(ret).toFixed(1)}%
+          <div className={'s-num ' + (ret != null && ret < 0 ? 'warn' : '')}>
+            {ret == null ? 'None' : `${ret < 0 ? '-' : ''}${Math.abs(ret).toFixed(1)}%`}
           </div>
-          <div className="s-lab">{ret < 0 ? 'estimated loss a year' : 'estimated return a year'}</div>
+          <div className="s-lab">{ret == null ? 'no return: nothing is lent' : ret < 0 ? 'estimated loss a year' : 'estimated return a year'}</div>
         </div>
         <div>
           <div className={'s-num ' + (p.fully_funded ? 'good' : 'warn')}>{p.fully_funded ? 'None' : moneyApprox(p.funding_gap)}</div>

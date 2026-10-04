@@ -43,12 +43,32 @@ export function EmptyState({ title, children, action }: { title: string; childre
   )
 }
 
-/** The system's loader (.nsw-loader) with a text label for assistive technology. */
+/** The system's loader: .nsw-loader holding the spinning .nsw-loader__circle. Decorative; the label says what is loading. */
+export function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
+  return (
+    <span className="nsw-loader" aria-hidden="true">
+      <span className={`nsw-loader__circle nsw-loader__circle--${size}`} />
+    </span>
+  )
+}
+
+/** The system's loader with a text label for assistive technology. */
 export function LoadingRows({ label = 'Loading' }: { rows?: number; label?: string }) {
   return (
     <div role="status" className="mw-loading">
-      <div className="nsw-loader" aria-hidden="true" />
+      <Spinner />
       <span>{label}</span>
+    </div>
+  )
+}
+
+/** A large loader centred in a panel, for a wait of more than a moment, with a line saying what is happening. */
+export function LoadingPanel({ label, detail }: { label: string; detail?: ReactNode }) {
+  return (
+    <div role="status" className="mw-loading-panel mw-border mw-bg-white">
+      <Spinner size="lg" />
+      <p className="nsw-text-semibold">{label}</p>
+      {detail && <p className="nsw-small mw-text-muted">{detail}</p>}
     </div>
   )
 }
