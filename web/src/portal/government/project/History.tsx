@@ -12,7 +12,7 @@ export default function History({ p }: TabProps) {
   const res = useRes<AuditLogEntry[]>(() => api.auditLog({ project_id: p.id, limit: 500 }), [p.id])
   const stages = [...p.stage_history].sort((a, b) => b.at.localeCompare(a.at))
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       <Panel title="Stage history">
         <DataTable
           caption="Stage history"

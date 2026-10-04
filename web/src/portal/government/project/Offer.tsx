@@ -16,30 +16,30 @@ const POS: Record<string, string> = { top: 'Top-floor flats', lower: 'Lower-floo
 function SizingTables({ s }: { s: Sizing }) {
   const e = s.electrical
   return (
-    <div className="space-y-3">
-      <div className="overflow-x-auto border" role="region" aria-label="Right-sized air conditioners" tabIndex={0}>
+    <div className="mw-space-y-3">
+      <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Right-sized air conditioners" tabIndex={0}>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Flats</TableHead>
-              <TableHead className="text-right">Count</TableHead>
-              <TableHead className="text-right">Size without the roof</TableHead>
-              <TableHead className="text-right">Size with the package</TableHead>
-              <TableHead className="text-right">Cost each, without</TableHead>
-              <TableHead className="text-right">Cost each, with</TableHead>
-              <TableHead className="text-right">Load cut</TableHead>
+              <TableHead className="nsw-text-right">Count</TableHead>
+              <TableHead className="nsw-text-right">Size without the roof</TableHead>
+              <TableHead className="nsw-text-right">Size with the package</TableHead>
+              <TableHead className="nsw-text-right">Cost each, without</TableHead>
+              <TableHead className="nsw-text-right">Cost each, with</TableHead>
+              <TableHead className="nsw-text-right">Load cut</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {s.groups.map((g) => (
               <TableRow key={g.position}>
                 <TableCell>{POS[g.position] ?? g.position}</TableCell>
-                <TableCell className="text-right tabular-nums">{g.count}</TableCell>
-                <TableCell className="text-right tabular-nums">{num1(g.unit_kw_without_roof)} kW</TableCell>
-                <TableCell className="text-right tabular-nums">{num1(g.unit_kw_with_package)} kW</TableCell>
-                <TableCell className="text-right tabular-nums">{money(g.unit_cost_without_roof)}</TableCell>
-                <TableCell className="text-right tabular-nums">{money(g.unit_cost_with_package)}</TableCell>
-                <TableCell className="text-right tabular-nums">{pct(g.reduction_pct)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{g.count}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{num1(g.unit_kw_without_roof)} kW</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{num1(g.unit_kw_with_package)} kW</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{money(g.unit_cost_without_roof)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{money(g.unit_cost_with_package)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{pct(g.reduction_pct)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -56,7 +56,7 @@ function SizingTables({ s }: { s: Sizing }) {
         ]}
       />
       {s.warnings.length > 0 && (
-        <ul className="list-disc pl-5">
+        <ul className="mw-list-disc mw-pl-5">
           {s.warnings.map((w, i) => (
             <li key={i}>{w}</li>
           ))}
@@ -70,7 +70,7 @@ function ScheduleView({ sc }: { sc: Schedule }) {
   const [pos, setPos] = useState(sc.groups[0]?.position ?? 'top')
   const g = sc.groups.find((x) => x.position === pos) ?? sc.groups[0]
   return (
-    <div className="space-y-3">
+    <div className="mw-space-y-3">
       <Facts
         items={[
           { label: 'Term', value: `${sc.term_years} years, ${monthLabelAu(sc.start)} to ${monthLabelAu(sc.end)}` },
@@ -79,16 +79,16 @@ function ScheduleView({ sc }: { sc: Schedule }) {
         ]}
       />
       {sc.equipment_life_check && sc.equipment_life_check.some((x) => !x.ok) && (
-        <p className="text-warning">Some equipment may not last the whole term: {sc.equipment_life_check.filter((x) => !x.ok).map((x) => `${x.key.replace(/_/g, ' ')} (${x.life_years} years)`).join(', ')}.</p>
+        <p className="mw-text-warning">Some equipment may not last the whole term: {sc.equipment_life_check.filter((x) => !x.ok).map((x) => `${x.key.replace(/_/g, ' ')} (${x.life_years} years)`).join(', ')}.</p>
       )}
       {g && (
         <>
-          <div className="flex flex-wrap items-center gap-2">
-            <label htmlFor="sched-group" className="text-sm">
+          <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-2">
+            <label htmlFor="sched-group" className="nsw-small">
               Charge schedule for
             </label>
             <Select value={g.position} onValueChange={setPos}>
-              <SelectTrigger id="sched-group" size="sm" className="w-56">
+              <SelectTrigger id="sched-group" size="sm" className="mw-w-56">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -99,7 +99,7 @@ function ScheduleView({ sc }: { sc: Schedule }) {
                 ))}
               </SelectContent>
             </Select>
-            <span className="text-sm text-muted-foreground">
+            <span className="nsw-small mw-text-muted">
               {money(g.charge_per_month)} a month on {money(g.principal_per_flat)} each
             </span>
           </div>
@@ -136,17 +136,17 @@ export default function Offer({ p }: TabProps) {
   }
   const items = a.package.items.filter((i) => i.selected)
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       <Panel title="Frozen assessment" description="These figures were fixed when the offer was issued.">
-        <div className="overflow-x-auto border" role="region" aria-label="Upgrade costs" tabIndex={0}>
+        <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Upgrade costs" tabIndex={0}>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Upgrade</TableHead>
-                <TableHead className="text-right">Cost</TableHead>
-                <TableHead className="text-right">Rebate</TableHead>
-                <TableHead className="text-right">Net cost</TableHead>
-                <TableHead className="text-right">Saves a year</TableHead>
+                <TableHead className="nsw-text-right">Cost</TableHead>
+                <TableHead className="nsw-text-right">Rebate</TableHead>
+                <TableHead className="nsw-text-right">Net cost</TableHead>
+                <TableHead className="nsw-text-right">Saves a year</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -154,39 +154,39 @@ export default function Offer({ p }: TabProps) {
                 <TableRow key={i.key}>
                   <TableCell>
                     {i.label}
-                    <div className="text-sm text-muted-foreground">{i.note}</div>
+                    <div className="nsw-small mw-text-muted">{i.note}</div>
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{money(i.capex)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{i.rebate > 0 ? `-${money(i.rebate)}` : '-'}</TableCell>
-                  <TableCell className="text-right tabular-nums">{money(i.net_capex)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{money(i.saving_per_year)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(i.capex)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{i.rebate > 0 ? `-${money(i.rebate)}` : '-'}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(i.net_capex)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(i.saving_per_year)}</TableCell>
                 </TableRow>
               ))}
-              <TableRow className="font-semibold">
+              <TableRow className="nsw-text-semibold">
                 <TableCell>Total</TableCell>
-                <TableCell className="text-right tabular-nums">{money(a.package.capex_total)}</TableCell>
-                <TableCell className="text-right tabular-nums">{a.package.rebates_total > 0 ? `-${money(a.package.rebates_total)}` : '-'}</TableCell>
-                <TableCell className="text-right tabular-nums">{money(a.package.net_capex)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{money(a.package.capex_total)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{a.package.rebates_total > 0 ? `-${money(a.package.rebates_total)}` : '-'}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{money(a.package.net_capex)}</TableCell>
                 <TableCell />
               </TableRow>
             </TableBody>
           </Table>
         </div>
-        <p className="mt-2">
+        <p className="mw-mt-2">
           The capped charges can repay {money(a.package.max_fundable_capex)}. {a.package.fully_funded ? 'The package is fully funded.' : `That leaves a gap of ${money(a.package.funding_gap)}.`}
         </p>
       </Panel>
 
       <Panel title="Charge on each flat's meter">
-        <div className="overflow-x-auto border" role="region" aria-label="Charges by group of flats" tabIndex={0}>
+        <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Charges by group of flats" tabIndex={0}>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Flats</TableHead>
-                <TableHead className="text-right">Count</TableHead>
-                <TableHead className="text-right">Saves a year</TableHead>
-                <TableHead className="text-right">Charge a month</TableHead>
-                <TableHead className="text-right">Tenant keeps a month</TableHead>
+                <TableHead className="nsw-text-right">Count</TableHead>
+                <TableHead className="nsw-text-right">Saves a year</TableHead>
+                <TableHead className="nsw-text-right">Charge a month</TableHead>
+                <TableHead className="nsw-text-right">Tenant keeps a month</TableHead>
                 <TableHead>Bill neutral</TableHead>
               </TableRow>
             </TableHeader>
@@ -194,10 +194,10 @@ export default function Offer({ p }: TabProps) {
               {a.flat_groups.map((g) => (
                 <TableRow key={g.position}>
                   <TableCell>{g.label}</TableCell>
-                  <TableCell className="text-right tabular-nums">{num(g.count)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{money(g.saving_per_year)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{money(g.charge_per_month)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{money(g.net_saving_per_month)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{num(g.count)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(g.saving_per_year)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(g.charge_per_month)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(g.net_saving_per_month)}</TableCell>
                   <TableCell>{g.bill_neutral ? <StatusBadge tone="good">Yes</StatusBadge> : <StatusBadge tone="bad">No</StatusBadge>}</TableCell>
                 </TableRow>
               ))}
@@ -206,8 +206,8 @@ export default function Offer({ p }: TabProps) {
         </div>
       </Panel>
 
-      <Panel title="Right-sized equipment">{p.sizing ? <SizingTables s={p.sizing} /> : <p className="text-muted-foreground">No sizing was saved with the offer.</p>}</Panel>
-      <Panel title="Charge schedule">{p.schedule ? <ScheduleView sc={p.schedule} /> : <p className="text-muted-foreground">No schedule was saved with the offer.</p>}</Panel>
+      <Panel title="Right-sized equipment">{p.sizing ? <SizingTables s={p.sizing} /> : <p className="mw-text-muted">No sizing was saved with the offer.</p>}</Panel>
+      <Panel title="Charge schedule">{p.schedule ? <ScheduleView sc={p.schedule} /> : <p className="mw-text-muted">No schedule was saved with the offer.</p>}</Panel>
       <Panel title="Documents">
         <DocumentList projectId={p.id} />
       </Panel>

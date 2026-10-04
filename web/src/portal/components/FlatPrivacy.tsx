@@ -75,7 +75,7 @@ export function FlatPrivacy({ flatId, unit, onChanged }: { flatId: number; unit:
         </h3>
         <Gate res={res} rows={2}>
           {(c: DataConsent) => (
-            <div className="space-y-2">
+            <div className="mw-space-y-2">
               <p>{c.given ? <StatusBadge tone="good">Given</StatusBadge> : <StatusBadge tone="warn">Not given</StatusBadge>}</p>
               <Facts
                 items={[
@@ -84,7 +84,7 @@ export function FlatPrivacy({ flatId, unit, onChanged }: { flatId: number; unit:
                   { label: 'Why', value: c.purpose },
                 ]}
               />
-              <p className="text-muted-foreground">{c.note}</p>
+              <p className="mw-text-muted">{c.note}</p>
               <ErrorAlert error={act.error} />
               {c.given ? (
                 <Confirm title="Withdraw meter-data consent?" description={`The programme will stop using new meter readings for unit ${unit}.`} confirmLabel="Withdraw" destructive onConfirm={() => withdraw()}>
@@ -93,15 +93,15 @@ export function FlatPrivacy({ flatId, unit, onChanged }: { flatId: number; unit:
                   </Button>
                 </Confirm>
               ) : (
-                <div className="space-y-2">
+                <div className="mw-space-y-2">
                   <Label htmlFor={`dcn-${flatId}`}>How did the tenant give consent?</Label>
                   <Input id={`dcn-${flatId}`} value={note} onChange={(e) => setNote(e.target.value)} placeholder="For example: signed form on 3 March" aria-invalid={!!noteErr} aria-describedby={noteErr ? `dce-${flatId}` : undefined} />
                   {noteErr && (
-                    <p id={`dce-${flatId}`} className="text-sm text-destructive">
+                    <p id={`dce-${flatId}`} className="nsw-small mw-text-danger">
                       {noteErr}
                     </p>
                   )}
-                  <p className="text-sm text-muted-foreground">Tenants can also give this themselves on their own page. Consent runs for two years unless withdrawn.</p>
+                  <p className="nsw-small mw-text-muted">Tenants can also give this themselves on their own page. Consent runs for two years unless withdrawn.</p>
                   <Button size="sm" disabled={act.busy} onClick={() => void give()}>
                     Record consent
                   </Button>
@@ -112,19 +112,19 @@ export function FlatPrivacy({ flatId, unit, onChanged }: { flatId: number; unit:
         </Gate>
       </section>
 
-      <section aria-labelledby={`pd-${flatId}`} className="border p-3">
-        <h3 id={`pd-${flatId}`} className="mb-2 text-base font-semibold">
+      <section aria-labelledby={`pd-${flatId}`} className="mw-border mw-p-3">
+        <h3 id={`pd-${flatId}`} className="mw-mb-2 nsw-text-semibold">
           Personal data
         </h3>
-        <p className="mb-2 text-muted-foreground">Export everything held about this flat, or erase the names of former tenants.</p>
+        <p className="mw-mb-2 mw-text-muted">Export everything held about this flat, or erase the names of former tenants.</p>
         <ErrorAlert error={exp.error} />
         <ErrorAlert error={erase.error} />
         {erased && (
-          <p role="status" className="mb-2 text-success">
+          <p role="status" className="mw-mb-2 mw-text-success">
             {erased}
           </p>
         )}
-        <div className="flex flex-wrap gap-2">
+        <div className="nsw-display-flex nsw-flex-wrap mw-gap-2">
           <Button
             variant="outline"
             size="sm"

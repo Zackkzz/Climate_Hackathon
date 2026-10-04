@@ -1,65 +1,29 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/portal/lib/utils"
+// NSW Design System in-page alert (.nsw-in-page-alert). variant="destructive" is the error alert.
+import type { HTMLAttributes, ReactNode } from 'react'
+import { cn } from '@/portal/lib/utils'
 
-const alertVariants = cva(
-  "relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
-  {
-    variants: {
-      variant: {
-        default: "bg-card text-card-foreground",
-        destructive:
-          "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 [&>svg]:text-current",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-function Alert({
-  className,
-  variant,
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
-  return (
-    <div
-      data-slot="alert"
-      role="alert"
-      className={cn(alertVariants({ variant }), className)}
-      {...props}
-    />
-  )
+export type AlertVariant = 'default' | 'destructive' | 'warning' | 'success'
+const KIND: Record<AlertVariant, { cls: string; icon: string }> = {
+  default: { cls: 'info', icon: 'info' },
+  destructive: { cls: 'error', icon: 'cancel' },
+  warning: { cls: 'warning', icon: 'warning' },
+  success: { cls: 'success', icon: 'check_circle' },
 }
 
-function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
+export function Alert({ variant = 'default', className, children, ...props }: HTMLAttributes<HTMLDivElement> & { variant?: AlertVariant }) {
+  const k = KIND[variant]
   return (
-    <div
-      data-slot="alert-title"
-      className={cn(
-        "col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight",
-        className
-      )}
-      {...props}
-    />
+    <div className={cn('nsw-in-page-alert', `nsw-in-page-alert--${k.cls}`, className)} {...props}>
+      <span className="material-icons nsw-material-icons nsw-in-page-alert__icon" aria-hidden="true">
+        {k.icon}
+      </span>
+      <div className="nsw-in-page-alert__content">{children}</div>
+    </div>
   )
 }
-
-function AlertDescription({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="alert-description"
-      className={cn(
-        "col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed",
-        className
-      )}
-      {...props}
-    />
-  )
+export function AlertTitle({ children, className }: { children: ReactNode; className?: string }) {
+  return <p className={cn('nsw-in-page-alert__title', className)}>{children}</p>
 }
-
-export { Alert, AlertTitle, AlertDescription }
+export function AlertDescription({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn('mw-alert-body', className)}>{children}</div>
+}

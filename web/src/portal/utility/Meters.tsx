@@ -23,7 +23,7 @@ function charge(s: string) {
 }
 
 const columns: ColumnDef<MeterRow>[] = [
-  { accessorKey: 'meter_id', header: 'Meter reference', cell: (c) => <span className="font-mono text-sm">{c.getValue<string>()}</span> },
+  { accessorKey: 'meter_id', header: 'Meter reference', cell: (c) => <span className="mw-mono nsw-small">{c.getValue<string>()}</span> },
   { accessorKey: 'address', header: 'Address' },
   { accessorKey: 'position', header: 'Floor', cell: (c) => (c.getValue<string>() === 'top' ? 'Top' : 'Lower') },
   { accessorKey: 'stage', header: 'Project stage', cell: (c) => <StageBadge stage={c.getValue<string>() as Stage} />, meta: { csv: (r) => STAGE_NAME[r.stage] ?? r.stage } },
@@ -68,7 +68,7 @@ export default function Meters() {
                     Project stage
                   </span>
                   <Select value={stage} onValueChange={setStage}>
-                    <SelectTrigger aria-labelledby="f-stage" size="sm" className="w-44">
+                    <SelectTrigger aria-labelledby="f-stage" size="sm" className="mw-w-44">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -86,7 +86,7 @@ export default function Meters() {
                     Charge status
                   </span>
                   <Select value={cs} onValueChange={setCs}>
-                    <SelectTrigger aria-labelledby="f-charge" size="sm" className="w-44">
+                    <SelectTrigger aria-labelledby="f-charge" size="sm" className="mw-w-44">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

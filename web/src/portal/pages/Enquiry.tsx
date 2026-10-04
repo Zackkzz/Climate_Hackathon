@@ -39,18 +39,18 @@ export default function Enquiry() {
     )
   }
   return (
-    <div className="max-w-2xl">
+    <div className="mw-max-w-2xl">
       <PageHeader crumbs={[{ label: 'Home', to: '/' }, { label: 'Enquiry' }]} title="Landlord or strata enquiry" description="Ask for your block of rented flats to be considered. We use these details only to reply to you." />
       <Form {...form}>
         <form
-          className="space-y-3 border bg-card p-4"
+          className="mw-space-y-3 mw-border mw-bg-white mw-p-4"
           noValidate
           onSubmit={form.handleSubmit(async (v) => {
             const r = await act.run(() => http.post<{ id: number }>('/api/property/enquiries', v))
             if (r) setSent(r.id)
           })}
         >
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="nsw-display-grid mw-gap-3 mw-sm-grid-cols-2">
             <TextField control={form.control} name="name" label="Your name" autoComplete="name" />
             <TextField control={form.control} name="email" label="Email address" type="email" autoComplete="email" />
             <TextField control={form.control} name="phone" label="Phone (optional)" type="tel" autoComplete="tel" />
@@ -66,7 +66,7 @@ export default function Enquiry() {
             />
           </div>
           <TextField control={form.control} name="address" label="Address of the block" autoComplete="street-address" />
-          <NumberField control={form.control} name="flats" label="Number of flats" min={1} className="sm:max-w-xs" />
+          <NumberField control={form.control} name="flats" label="Number of flats" min={1} className="mw-sm-max-w-xs" />
           <TextAreaField control={form.control} name="message" label="Anything else we should know (optional)" />
           <ErrorAlert error={act.error} title="We could not send your enquiry" />
           <Button type="submit" disabled={act.busy}>

@@ -53,7 +53,7 @@ function MapSvg({ pts }: { pts: BuildingPoint[] }) {
   const py = (lat: number) => H - oy - (lat - b.minLat) * scale
   const withProject = pts.filter((p) => p.project_stage).length
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full border bg-white" role="img" aria-label={`Map of ${pts.length} buildings in the pilot area, with the heat band of each. ${withProject} have a project. The same data is in the table.`}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="mw-h-auto nsw-width-100 mw-border mw-bg-white" role="img" aria-label={`Map of ${pts.length} buildings in the pilot area, with the heat band of each. ${withProject} have a project. The same data is in the table.`}>
       <rect x={0} y={0} width={W} height={H} fill="#f6f7f8" />
       {pts.map((p) => {
         const live = p.project_stage && LIVE.includes(p.project_stage)
@@ -74,22 +74,22 @@ function MapSvg({ pts }: { pts: BuildingPoint[] }) {
 function Legend() {
   return (
     <>
-      <span className="font-medium">Heat band:</span>
+      <span className="nsw-text-medium">Heat band:</span>
       {BANDS.map((b) => (
-        <span key={b} className="inline-flex items-center gap-1.5">
+        <span key={b} className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
           <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
             <Marker band={b} x={12} y={12} ring="none" />
           </svg>
           {heatWord(b)}
         </span>
       ))}
-      <span className="inline-flex items-center gap-1.5">
+      <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
         <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
           <circle cx="13" cy="13" r="9" fill="none" stroke="#0b4f7c" strokeWidth="2.5" />
         </svg>
         Project built or active
       </span>
-      <span className="inline-flex items-center gap-1.5">
+      <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
         <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
           <circle cx="13" cy="13" r="9" fill="none" stroke="#0b4f7c" strokeWidth="2.5" strokeDasharray="3 3" />
         </svg>
@@ -101,7 +101,7 @@ function Legend() {
 
 const pctOf = (n: number) => `${Math.round(n * 100)}%`
 const areaCols: ColumnDef<AreaRow>[] = [
-  { accessorKey: 'area', header: 'Area', cell: (c) => <span className="font-medium">{c.getValue<string>()}</span> },
+  { accessorKey: 'area', header: 'Area', cell: (c) => <span className="nsw-text-medium">{c.getValue<string>()}</span> },
   { accessorKey: 'buildings', header: 'Buildings', meta: { numeric: true } },
   { accessorKey: 'flats_est', header: 'Flats (estimate)', meta: { numeric: true }, cell: (c) => num(c.getValue<number>()) },
   { accessorKey: 'renter_share', header: 'Renting', meta: { numeric: true, csv: (r) => r.renter_share }, cell: (c) => pctOf(c.getValue<number>()) },
@@ -120,7 +120,7 @@ export default function Areas() {
       <PageHeader crumbs={[{ label: 'Government', to: '/government' }, { label: 'Areas' }]} title="Areas" description="Where the hot blocks are, where projects are under way, and how many flats have been upgraded in each area." />
       <Gate res={res} rows={6}>
         {(a) => (
-          <div className="space-y-4">
+          <div className="mw-space-y-4">
             <ChartBox
               title="Map of buildings"
               description="Each marker is a building. Hotter bands have bigger, darker markers."
@@ -132,7 +132,7 @@ export default function Areas() {
               }}
             />
             <div>
-              <h2 id="areas-h" className="mb-2 text-base font-semibold">
+              <h2 id="areas-h" className="mw-mb-2 nsw-text-semibold">
                 Areas
               </h2>
               <DataTable columns={areaCols} data={a.by_area} caption="Areas" csvName="areas" searchPlaceholder="Search areas" getRowId={(r) => r.area} emptyTitle="No areas" />

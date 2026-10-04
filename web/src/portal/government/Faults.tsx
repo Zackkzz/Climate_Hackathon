@@ -34,7 +34,7 @@ export default function Faults() {
   const columns = useMemo<ColumnDef<Fault>[]>(
     () => [
       { accessorKey: 'opened_on', header: 'Reported' },
-      { id: 'problem', header: 'Problem', accessorFn: (f) => `${ITEM[f.item] ?? f.item}: ${f.description}`, cell: ({ row }) => <span className="block min-w-40 whitespace-normal"><span className="font-medium">{ITEM[row.original.item] ?? row.original.item.replace(/_/g, ' ')}</span><br />{row.original.description}</span> },
+      { id: 'problem', header: 'Problem', accessorFn: (f) => `${ITEM[f.item] ?? f.item}: ${f.description}`, cell: ({ row }) => <span className="nsw-display-block mw-min-w-40 mw-ws-normal"><span className="nsw-text-medium">{ITEM[row.original.item] ?? row.original.item.replace(/_/g, ' ')}</span><br />{row.original.description}</span> },
       { id: 'where', header: 'Project and flat', accessorFn: (f) => `Project ${f.project_id}, flat ${f.flat_id}`, cell: ({ row }) => <Link to={`/government/projects/${row.original.project_id}/faults`}>Project {row.original.project_id}, flat {row.original.flat_id}</Link> },
       { accessorKey: 'reported_by', header: 'Reported by' },
       { id: 'status', header: 'Status', accessorFn: (f) => (f.status === 'open' ? 'Open' : 'Fixed'), cell: ({ row }) => <StatusBadge tone={row.original.status === 'open' ? 'warn' : 'good'}>{row.original.status === 'open' ? 'Open' : `Fixed ${row.original.resolved_on ?? ''}`}</StatusBadge> },
@@ -79,7 +79,7 @@ export default function Faults() {
               Filter by status
             </label>
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger id="fault-status" className="w-40">
+              <SelectTrigger id="fault-status" className="mw-w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -100,7 +100,7 @@ export default function Faults() {
           <Form {...form}>
             <form
               noValidate
-              className="space-y-3"
+              className="mw-space-y-3"
               onSubmit={form.handleSubmit(async (v) => {
                 if (!target) return
                 const r = await act.run(() => api.resolveFault(target.id, v.note), 'Fault marked as fixed')

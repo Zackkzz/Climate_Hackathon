@@ -110,11 +110,11 @@ function RespondDialog({ s, onClose, onSaved }: { s: SupplyRequest; onClose: () 
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form className="space-y-3" noValidate onSubmit={form.handleSubmit((v) => setPending(v))}>
+            <form className="mw-space-y-3" noValidate onSubmit={form.handleSubmit((v) => setPending(v))}>
               <SelectField control={form.control} name="status" label="Status" options={(Object.keys(STATUS) as SupplyStatus[]).map((k) => ({ value: k, label: STATUS[k].label }))} />
               <TextAreaField control={form.control} name="response" label="Response" description="Plain words the programme can act on." />
               <ErrorAlert error={act.error} />
-              <div className="flex justify-end gap-2">
+              <div className="nsw-display-flex nsw-justify-content-end mw-gap-2">
                 <Button type="button" variant="outline" onClick={onClose}>
                   Cancel
                 </Button>

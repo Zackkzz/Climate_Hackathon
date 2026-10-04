@@ -11,6 +11,7 @@ import { ChartBox, LegendKey } from '@/portal/components/ChartBox'
 import { Figures, Panel } from '@/portal/components/PageHeader'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
 import { Alert, AlertDescription, AlertTitle } from '@/portal/components/ui/alert'
+import { Accordion } from '@/portal/components/ui/accordion'
 import { Button } from '@/portal/components/ui/button'
 import { Checkbox } from '@/portal/components/ui/checkbox'
 import { Input } from '@/portal/components/ui/input'
@@ -47,12 +48,12 @@ export function normalise(d: Deal): Deal {
 function OptionSelect({ label, options, value, onChange }: { label: string; options: { key: string; label: string }[]; value: string; onChange: (k: string) => void }) {
   const id = useId()
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="text-sm font-medium">
+    <div className="mw-space-y-1">
+      <label htmlFor={id} className="nsw-small nsw-text-medium">
         {label}
       </label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id={id} className="w-full">
+        <SelectTrigger id={id} className="nsw-width-100">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -70,11 +71,11 @@ function OptionSelect({ label, options, value, onChange }: { label: string; opti
 function CountField({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (n: number) => void }) {
   const id = useId()
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="text-sm font-medium">
+    <div className="mw-space-y-1">
+      <label htmlFor={id} className="nsw-small nsw-text-medium">
         {label}
       </label>
-      <Input id={id} type="number" inputMode="numeric" min={min} max={max} value={Number.isFinite(value) ? value : ''} className="tabular-nums" onChange={(e) => e.target.value !== '' && Number.isFinite(Number(e.target.value)) && onChange(Math.min(max, Math.max(min, Math.round(Number(e.target.value)))))} />
+      <Input id={id} type="number" inputMode="numeric" min={min} max={max} value={Number.isFinite(value) ? value : ''} className="mw-tabular" onChange={(e) => e.target.value !== '' && Number.isFinite(Number(e.target.value)) && onChange(Math.min(max, Math.max(min, Math.round(Number(e.target.value)))))} />
     </div>
   )
 }
@@ -84,13 +85,13 @@ function UpgradeRow({ k, on, onToggle, disabledReason, result }: { k: PackageKey
   const item = raw ? (raw.selected ? raw : { ...raw, capex: raw.capex_if_selected ?? raw.capex, rebate: raw.rebate_if_selected ?? raw.rebate, saving_per_year: raw.saving_per_year_if_selected ?? raw.saving_per_year }) : undefined
   const id = useId()
   return (
-    <li className="flex items-start gap-3 border-b py-2.5 last:border-b-0">
-      <Switch id={id} checked={on} onCheckedChange={onToggle} disabled={!!disabledReason} aria-describedby={`${id}-d`} className="mt-1" />
-      <div className="min-w-0">
-        <label htmlFor={id} className="font-medium">
+    <li className="nsw-display-flex nsw-align-items-start mw-gap-3 mw-border-b mw-py-2_5 mw-last-no-border">
+      <Switch id={id} checked={on} onCheckedChange={onToggle} disabled={!!disabledReason} aria-describedby={`${id}-d`} className="mw-mt-1" />
+      <div className="mw-min-w-0">
+        <label htmlFor={id} className="nsw-text-medium">
           {TITLES[k]}
         </label>
-        <p id={`${id}-d`} className="text-sm text-muted-foreground">
+        <p id={`${id}-d`} className="nsw-small mw-text-muted">
           {disabledReason ?? ITEM_BENEFIT[k]}
           {!disabledReason && item && item.capex > 0 && (
             <>
@@ -108,17 +109,17 @@ function UpgradeRow({ k, on, onToggle, disabledReason, result }: { k: PackageKey
 function Slider({ label, help, value, min, max, step, format, onChange }: { label: string; help: string; value: number; min: number; max: number; step: number; format: (n: number) => string; onChange: (n: number) => void }) {
   const id = useId()
   return (
-    <div className="space-y-1">
-      <div className="flex items-baseline justify-between gap-2">
-        <label htmlFor={id} className="text-sm font-medium">
+    <div className="mw-space-y-1">
+      <div className="nsw-display-flex nsw-align-items-baseline nsw-justify-content-between mw-gap-2">
+        <label htmlFor={id} className="nsw-small nsw-text-medium">
           {label}
         </label>
-        <output htmlFor={id} className="tabular-nums">
+        <output htmlFor={id} className="mw-tabular">
           {format(value)}
         </output>
       </div>
-      <input id={id} type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="h-6 w-full accent-primary" />
-      <p className="text-sm text-muted-foreground">{help}</p>
+      <input id={id} type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="mw-h-6 nsw-width-100" />
+      <p className="nsw-small mw-text-muted">{help}</p>
     </div>
   )
 }
@@ -126,15 +127,15 @@ function Slider({ label, help, value, min, max, step, format, onChange }: { labe
 function NumField({ label, help, value, step, unit, onChange }: { label: string; help: string; value: number; step: number; unit: string; onChange: (n: number) => void }) {
   const id = useId()
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="text-sm font-medium">
+    <div className="mw-space-y-1">
+      <label htmlFor={id} className="nsw-small nsw-text-medium">
         {label}
       </label>
-      <div className="flex items-center gap-2">
-        <Input id={id} type="number" min={0} step={step} value={value} className="w-28 tabular-nums" onChange={(e) => e.target.value !== '' && onChange(Math.max(0, Number(e.target.value)))} />
-        <span className="text-sm text-muted-foreground">{unit}</span>
+      <div className="nsw-display-flex nsw-align-items-center mw-gap-2">
+        <Input id={id} type="number" min={0} step={step} value={value} className="mw-w-28 mw-tabular" onChange={(e) => e.target.value !== '' && onChange(Math.max(0, Number(e.target.value)))} />
+        <span className="nsw-small mw-text-muted">{unit}</span>
       </div>
-      <p className="text-sm text-muted-foreground">{help}</p>
+      <p className="nsw-small mw-text-muted">{help}</p>
     </div>
   )
 }
@@ -151,7 +152,7 @@ function Inputs({ deal, meta, result, base, onChange, onChangeBlock, shortlisted
   const left = gasLeft(deal.existing, deal.package)
   const finDef = JSON.stringify(deal.finance) === JSON.stringify(meta.defaults.finance) && JSON.stringify(deal.tariff) === JSON.stringify(meta.defaults.tariff)
   return (
-    <div className="space-y-3">
+    <div className="mw-space-y-3">
       <Panel
         title={base.label}
         description="Your block"
@@ -161,19 +162,19 @@ function Inputs({ deal, meta, result, base, onChange, onChangeBlock, shortlisted
           </Button>
         }
       >
-        <div className="grid grid-cols-2 gap-3">
+        <div className="nsw-display-grid mw-grid-cols-2 mw-gap-3">
           <CountField label="Flats" value={flats} min={1} max={200} onChange={(n) => set({ flats: n })} />
           <CountField label="Storeys" value={storeys} min={1} max={12} onChange={(n) => set({ storeys: n })} />
         </div>
         {shortlisted !== null && (
-          <Button variant="outline" size="sm" className="mt-3" aria-pressed={shortlisted} onClick={onShortlist}>
+          <Button variant="outline" size="sm" className="mw-mt-3" aria-pressed={shortlisted} onClick={onShortlist}>
             {shortlisted ? 'On your shortlist' : 'Add to shortlist'}
           </Button>
         )}
       </Panel>
 
       <Panel title="What's in the flats now?" description="Pick what is there today. This sets the starting bill.">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+        <div className="nsw-display-grid mw-grid-cols-1 mw-gap-3 mw-sm-grid-cols-2 mw-lg-grid-cols-1 mw-xl-grid-cols-2">
           <OptionSelect label="Hot water" options={o.hot_water} value={deal.existing.hot_water} onChange={(k) => setEx('hot_water', k)} />
           <OptionSelect label="Heating" options={o.heating} value={deal.existing.heating} onChange={(k) => setEx('heating', k)} />
           <OptionSelect label="Cooling" options={o.cooling} value={deal.existing.cooling} onChange={(k) => setEx('cooling', k)} />
@@ -190,10 +191,9 @@ function Inputs({ deal, meta, result, base, onChange, onChangeBlock, shortlisted
         </ul>
       </Panel>
 
-      <details className="border bg-card">
-        <summary className="cursor-pointer px-4 py-2.5 font-semibold">Advanced: finance terms and prices</summary>
-        <div className="space-y-4 border-t p-4">
-          <h3 className="font-semibold">Finance</h3>
+      <Accordion title="Advanced: finance terms and prices">
+        <div className="mw-space-y-4 mw-border-t mw-p-4">
+          <h3 className="nsw-text-semibold">Finance</h3>
           <Slider label="Investor's return needed" help="What the investor needs to earn on the money each year." value={Math.round(deal.finance.cost_of_capital * 1000) / 10} min={0} max={12} step={0.5} format={(n) => `${n.toFixed(1)}% a year`} onChange={(n) => setFin({ cost_of_capital: n / 100 })} />
           <Slider label="Repayment period" help="How long the monthly charge stays tied to the flat. Longer means a smaller charge." value={deal.finance.term_years} min={5} max={25} step={1} format={(n) => `${n} years`} onChange={(n) => setFin({ term_years: n })} />
           <Slider
@@ -207,14 +207,14 @@ function Inputs({ deal, meta, result, base, onChange, onChangeBlock, shortlisted
             onChange={(n) => setFin({ savings_share_to_charge: Math.round((1 - n / 100) * 100) / 100 })}
           />
           <Slider label="Cushion for gaps" help="Extra added to what must be repaid, to cover empty flats and admin costs." value={Math.round(deal.finance.reserve * 100)} min={0} max={20} step={1} format={(n) => `${n}%`} onChange={(n) => setFin({ reserve: n / 100 })} />
-          <label className="flex items-start gap-2">
-            <Checkbox checked={deal.finance.apply_rebates} onCheckedChange={(c) => setFin({ apply_rebates: !!c })} className="mt-0.5" />
+          <label className="nsw-display-flex nsw-align-items-start mw-gap-2">
+            <Checkbox checked={deal.finance.apply_rebates} onCheckedChange={(c) => setFin({ apply_rebates: !!c })} className="mw-mt-0_5" />
             <span>
               Count government rebates
-              <span className="block text-sm text-muted-foreground">Rebates cut the cost of eligible upgrades. Turn off to see the deal without them.</span>
+              <span className="nsw-display-block nsw-small mw-text-muted">Rebates cut the cost of eligible upgrades. Turn off to see the deal without them.</span>
             </span>
           </label>
-          <h3 className="font-semibold">Prices</h3>
+          <h3 className="nsw-text-semibold">Prices</h3>
           <NumField label="Electricity" help="Price per unit of electricity." value={deal.tariff.electricity_c_per_kwh} step={0.5} unit="c/kWh" onChange={(n) => setTar({ electricity_c_per_kwh: n })} />
           <NumField label="Electricity fixed charge" help="Daily charge just for being connected." value={deal.tariff.electricity_supply_c_per_day} step={1} unit="c/day" onChange={(n) => setTar({ electricity_supply_c_per_day: n })} />
           <NumField label="Gas" help="Price per megajoule of gas." value={deal.tariff.gas_c_per_mj} step={0.1} unit="c/MJ" onChange={(n) => setTar({ gas_c_per_mj: n })} />
@@ -223,7 +223,7 @@ function Inputs({ deal, meta, result, base, onChange, onChangeBlock, shortlisted
             Reset to defaults
           </Button>
         </div>
-      </details>
+      </Accordion>
     </div>
   )
 }
@@ -232,12 +232,12 @@ function Inputs({ deal, meta, result, base, onChange, onChangeBlock, shortlisted
 function Verdict({ r }: { r: AssessResponse }) {
   const v = makeVerdict(r)
   return (
-    <Alert variant={v.tone === 'bad' ? 'destructive' : 'default'} role="status" className={v.tone === 'good' ? 'border-success/50 bg-success-bg' : v.tone === 'warn' ? 'border-warning/50 bg-warning-bg' : ''}>
-      <AlertTitle className="text-base">{v.headline}</AlertTitle>
+    <Alert variant={v.tone === 'bad' ? 'destructive' : 'default'} role="status" className={v.tone === 'good' ? 'mw-border-success-50 mw-bg-success-bg' : v.tone === 'warn' ? 'mw-border-warning-50 mw-bg-warning-bg' : ''}>
+      <AlertTitle className="">{v.headline}</AlertTitle>
       <AlertDescription>
         <p>{v.detail}</p>
         {v.hints.length > 0 && (
-          <ul className="mt-1 list-disc pl-5">
+          <ul className="mw-mt-1 mw-list-disc mw-pl-5">
             {v.hints.map((h) => (
               <li key={h}>{h}</li>
             ))}
@@ -254,15 +254,15 @@ function Warnings({ r }: { r: AssessResponse }) {
   const rest = r.warnings.slice(3)
   return (
     <Panel title="Things to know">
-      <ul className="list-disc space-y-1 pl-5">
+      <ul className="mw-list-disc mw-space-y-1 mw-pl-5">
         {first.map((x) => (
           <li key={x}>{x}</li>
         ))}
       </ul>
       {rest.length > 0 && (
-        <details className="mt-1">
-          <summary className="cursor-pointer text-primary underline">Show {rest.length} more</summary>
-          <ul className="mt-1 list-disc space-y-1 pl-5">
+        <details className="mw-mt-1">
+          <summary className="mw-text-brand nsw-text-underline">Show {rest.length} more</summary>
+          <ul className="mw-mt-1 mw-list-disc mw-space-y-1 mw-pl-5">
             {rest.map((x) => (
               <li key={x}>{x}</li>
             ))}
@@ -275,15 +275,15 @@ function Warnings({ r }: { r: AssessResponse }) {
 
 function GroupsTable({ r }: { r: AssessResponse }) {
   return (
-    <div className="overflow-x-auto border" role="region" aria-label="Monthly figures for each group of flats" tabIndex={0}>
+    <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Monthly figures for each group of flats" tabIndex={0}>
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Flats</TableHead>
-            <TableHead className="text-right">Bill now</TableHead>
-            <TableHead className="text-right">New bill</TableHead>
-            <TableHead className="text-right">Monthly charge</TableHead>
-            <TableHead className="text-right">Tenant keeps</TableHead>
+            <TableHead className="nsw-text-right">Bill now</TableHead>
+            <TableHead className="nsw-text-right">New bill</TableHead>
+            <TableHead className="nsw-text-right">Monthly charge</TableHead>
+            <TableHead className="nsw-text-right">Tenant keeps</TableHead>
             <TableHead>Better off?</TableHead>
           </TableRow>
         </TableHeader>
@@ -293,10 +293,10 @@ function GroupsTable({ r }: { r: AssessResponse }) {
               <TableCell>
                 {g.label} ({g.count})
               </TableCell>
-              <TableCell className="text-right tabular-nums">{money(g.baseline.bill_per_year / 12)}</TableCell>
-              <TableCell className="text-right tabular-nums">{money(g.upgraded.bill_per_year / 12)}</TableCell>
-              <TableCell className="text-right tabular-nums">{money(g.charge_per_month)}</TableCell>
-              <TableCell className="text-right font-medium tabular-nums">{money(g.net_saving_per_month)}</TableCell>
+              <TableCell className="nsw-text-right mw-tabular">{money(g.baseline.bill_per_year / 12)}</TableCell>
+              <TableCell className="nsw-text-right mw-tabular">{money(g.upgraded.bill_per_year / 12)}</TableCell>
+              <TableCell className="nsw-text-right mw-tabular">{money(g.charge_per_month)}</TableCell>
+              <TableCell className="nsw-text-right nsw-text-medium mw-tabular">{money(g.net_saving_per_month)}</TableCell>
               <TableCell>{g.bill_neutral ? 'Yes' : 'No, pays more'}</TableCell>
             </TableRow>
           ))}
@@ -323,7 +323,7 @@ function DealBalance({ r, sel, onSel }: { r: AssessResponse; sel: GroupSel; onSe
       chart={
         <div>
           {hasLower && (
-            <div className="mb-2 flex flex-wrap gap-1" role="group" aria-label="Which flat to show">
+            <div className="mw-mb-2 nsw-display-flex nsw-flex-wrap mw-gap-1" role="group" aria-label="Which flat to show">
               {([['avg', 'Average flat'], ['top', `Top floor${top ? ` (${top.count})` : ''}`], ['lower', `Lower floors${lower ? ` (${lower.count})` : ''}`]] as [GroupSel, string][]).map(([k, label]) => (
                 <Button key={k} size="sm" variant={sel === k ? 'default' : 'outline'} aria-pressed={sel === k} onClick={() => onSel(k)}>
                   {label}
@@ -333,7 +333,7 @@ function DealBalance({ r, sel, onSel }: { r: AssessResponse; sel: GroupSel; onSe
           )}
           <div className="bars" role="img" aria-label={`For an ${who}: the old bill is ${money(b.old)} a month. The new bill is ${money(b.energy)} plus a fixed monthly charge of ${money(b.charge)}.`}>
             <div className="bar-row">
-              <div className="text-sm">Bill now</div>
+              <div className="nsw-small">Bill now</div>
               <div className="bar-track">
                 <div className="bar-seg old" style={{ width: w(b.old) }}>
                   {money(b.old)}
@@ -341,7 +341,7 @@ function DealBalance({ r, sel, onSel }: { r: AssessResponse; sel: GroupSel; onSe
               </div>
             </div>
             <div className="bar-row">
-              <div className="text-sm">Bill after</div>
+              <div className="nsw-small">Bill after</div>
               <div className="bar-track">
                 <div className="bar-seg energy" style={{ width: w(b.energy) }}>
                   {b.energy / scale > 0.14 ? money(b.energy) : ''}
@@ -373,12 +373,12 @@ function DealBalance({ r, sel, onSel }: { r: AssessResponse; sel: GroupSel; onSe
               </li>
             )}
           </ul>
-          <p className={'mt-2 ' + (worse ? 'font-medium text-destructive' : 'font-medium')}>
+          <p className={'mw-mt-2 ' + (worse ? 'nsw-text-medium mw-text-danger' : 'nsw-text-medium')}>
             {worse ? (
               <>This {who} would pay about {moneyApprox(-b.keep)} a month more.</>
             ) : (
               <>
-                The tenant keeps {money(Math.max(0, b.keep))} a month <span className="font-normal text-muted-foreground">(about {moneyApprox(Math.max(0, b.keep) * 12)} a year)</span>
+                The tenant keeps {money(Math.max(0, b.keep))} a month <span className="nsw-text-normal mw-text-muted">(about {moneyApprox(Math.max(0, b.keep) * 12)} a year)</span>
               </>
             )}
           </p>
@@ -497,16 +497,16 @@ function Costs({ r }: { r: AssessResponse }) {
   return (
     <Panel title="What it costs and who pays">
       {sel.length === 0 ? (
-        <p className="text-muted-foreground">Nothing is switched on yet.</p>
+        <p className="mw-text-muted">Nothing is switched on yet.</p>
       ) : (
-        <div className="overflow-x-auto border" role="region" aria-label="Cost of each upgrade" tabIndex={0}>
+        <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Cost of each upgrade" tabIndex={0}>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Upgrade</TableHead>
-                <TableHead className="text-right">Cost</TableHead>
-                <TableHead className="text-right">Rebate</TableHead>
-                <TableHead className="text-right">Net cost</TableHead>
+                <TableHead className="nsw-text-right">Cost</TableHead>
+                <TableHead className="nsw-text-right">Rebate</TableHead>
+                <TableHead className="nsw-text-right">Net cost</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -514,32 +514,32 @@ function Costs({ r }: { r: AssessResponse }) {
                 <TableRow key={i.key}>
                   <TableCell>
                     {i.label}
-                    <div className="text-sm text-muted-foreground">{i.note}</div>
+                    <div className="nsw-small mw-text-muted">{i.note}</div>
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{money(i.capex)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{i.rebate > 0 ? `-${money(i.rebate)}` : '-'}</TableCell>
-                  <TableCell className="text-right font-medium tabular-nums">{money(i.net_capex)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(i.capex)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{i.rebate > 0 ? `-${money(i.rebate)}` : '-'}</TableCell>
+                  <TableCell className="nsw-text-right nsw-text-medium mw-tabular">{money(i.net_capex)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
             <TableFooter>
               <TableRow>
                 <TableCell>Total</TableCell>
-                <TableCell className="text-right tabular-nums">{money(p.capex_total)}</TableCell>
-                <TableCell className="text-right tabular-nums">{p.rebates_total > 0 ? `-${money(p.rebates_total)}` : '-'}</TableCell>
-                <TableCell className="text-right tabular-nums">{money(p.net_capex)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{money(p.capex_total)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{p.rebates_total > 0 ? `-${money(p.rebates_total)}` : '-'}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{money(p.net_capex)}</TableCell>
               </TableRow>
             </TableFooter>
           </Table>
         </div>
       )}
-      <div className="mt-3 space-y-1">
+      <div className="mw-mt-3 mw-space-y-1">
         <p>
           The fixed monthly charges can repay <strong>{money(p.max_fundable_capex)}</strong> of the {money(p.net_capex)} net cost.{' '}
-          <span className={p.fully_funded ? 'font-medium text-success' : 'font-medium text-warning'}>{p.fully_funded ? 'Fully funded.' : `${money(p.funding_gap)} short.`}</span>
+          <span className={p.fully_funded ? 'nsw-text-medium mw-text-success' : 'nsw-text-medium mw-text-warning'}>{p.fully_funded ? 'Fully funded.' : `${money(p.funding_gap)} short.`}</span>
         </p>
-        <div className="h-3 border bg-muted" role="img" aria-label={`The charges can repay ${Math.round(pctFund)}% of the net cost`}>
-          <div className={'h-full ' + (p.fully_funded ? 'bg-success' : 'bg-warning')} style={{ width: `${pctFund}%` }} />
+        <div className="mw-h-3 mw-border mw-bg-wash" role="img" aria-label={`The charges can repay ${Math.round(pctFund)}% of the net cost`}>
+          <div className={'mw-h-full ' + (p.fully_funded ? 'mw-bg-success' : 'mw-bg-warning')} style={{ width: `${pctFund}%` }} />
         </div>
       </div>
     </Panel>
@@ -561,23 +561,22 @@ function Impact({ r }: { r: AssessResponse }) {
           { label: 'Less energy used', value: `${Math.round(im.energy_reduction_pct)}%`, note: 'Across the whole block, estimated' },
         ]}
       />
-      <p className="text-sm text-muted-foreground">Bill savings for the whole block: about {moneyApprox(im.bill_saving_per_year_building)} a year, before the monthly charge. All figures are modelled estimates.</p>
+      <p className="nsw-small mw-text-muted">Bill savings for the whole block: about {moneyApprox(im.bill_saving_per_year_building)} a year, before the monthly charge. All figures are modelled estimates.</p>
     </Panel>
   )
 }
 
 function Assumptions({ r }: { r: AssessResponse }) {
   return (
-    <details className="border bg-card">
-      <summary className="cursor-pointer px-4 py-2.5 font-semibold">What this assumes</summary>
-      <div className="space-y-2 border-t p-4">
-        <p className="text-sm text-muted-foreground">Every figure here is a modelled estimate, not a quote. Items marked "Sourced" link to where the number comes from; the rest are our own assumptions.</p>
-        <div className="max-h-96 overflow-auto border" role="region" aria-label="Assumptions" tabIndex={0}>
+    <Accordion title="What this assumes">
+      <div className="mw-space-y-2 mw-border-t mw-p-4">
+        <p className="nsw-small mw-text-muted">Every figure here is a modelled estimate, not a quote. Items marked "Sourced" link to where the number comes from; the rest are our own assumptions.</p>
+        <div className="mw-max-h-96 nsw-overflow-auto mw-border" role="region" aria-label="Assumptions" tabIndex={0}>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Assumption</TableHead>
-                <TableHead className="text-right">Value</TableHead>
+                <TableHead className="nsw-text-right">Value</TableHead>
                 <TableHead>Source</TableHead>
               </TableRow>
             </TableHeader>
@@ -585,7 +584,7 @@ function Assumptions({ r }: { r: AssessResponse }) {
               {r.assumptions.map((a) => (
                 <TableRow key={a.key}>
                   <TableCell>{a.label}</TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell className="nsw-text-right mw-tabular">
                     {typeof a.value === 'number' ? (Number.isInteger(a.value) ? num(a.value) : String(a.value)) : a.value} {a.unit}
                   </TableCell>
                   <TableCell>
@@ -603,7 +602,7 @@ function Assumptions({ r }: { r: AssessResponse }) {
           </Table>
         </div>
       </div>
-    </details>
+    </Accordion>
   )
 }
 
@@ -654,18 +653,18 @@ export default function Build({ deal, meta, buildings, assess, shortlist, onChan
   const req = dealToRequest(deal)
 
   return (
-    <div className="grid grid-cols-1 gap-4 p-3 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:p-5">
-      <div className="min-w-0">
-        <h1 className="mb-3 text-xl font-semibold tracking-tight">Build the deal</h1>
+    <div className="nsw-display-grid mw-grid-cols-1 mw-gap-4 mw-p-3 mw-lg-cols-26rem-1fr mw-lg-p-5">
+      <div className="mw-min-w-0">
+        <h1 className="mw-mb-3 mw-text-xl nsw-text-semibold">Build the deal</h1>
         <Inputs deal={ownDeal} meta={meta} result={r} base={base} onChange={handleChange} onChangeBlock={onChangeBlock} shortlisted={shortlisted} onShortlist={() => bid && shortlist.toggle(bid)} />
       </div>
-      <div className="min-w-0 space-y-3" aria-busy={assess.updating}>
+      <div className="mw-min-w-0 mw-space-y-3" aria-busy={assess.updating}>
         <div ref={topRef} />
         {assess.error && !r && <ErrorAlert error={assess.error} onRetry={assess.retry} title="We could not work out the deal" />}
         {!r && !assess.error && <LoadingRows rows={6} label="Working out the deal" />}
         {r && (
           <>
-            <div role="status" className="text-sm text-muted-foreground">
+            <div role="status" className="nsw-small mw-text-muted">
               {assess.updating ? 'Updating the result...' : ''}
             </div>
             {assess.error && <ErrorAlert error={`${assess.error} The numbers below are from your last successful update.`} onRetry={assess.retry} title="We could not update" />}
@@ -683,11 +682,11 @@ export default function Build({ deal, meta, buildings, assess, shortlist, onChan
             <RiskPanel req={req} currentShare={deal.finance.savings_share_to_charge} />
             <Impact r={r} />
             <Assumptions r={r} />
-            <div className="flex flex-wrap items-center gap-3 border bg-card p-3">
+            <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-3 mw-border mw-bg-white mw-p-3">
               <Button size="lg" onClick={onShare}>
                 Share this deal
               </Button>
-              <p className="text-sm text-muted-foreground">Next: a one-page summary for the tenant, the owner and the funder.</p>
+              <p className="nsw-small mw-text-muted">Next: a one-page summary for the tenant, the owner and the funder.</p>
             </div>
           </>
         )}

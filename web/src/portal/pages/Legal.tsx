@@ -15,10 +15,10 @@ const DESCRIPTION: Record<Page, string> = {
 }
 
 function H({ children }: { children: ReactNode }) {
-  return <h2 className="mt-6 text-lg font-semibold">{children}</h2>
+  return <h2 className="mw-mt-6 mw-text-lg nsw-text-semibold">{children}</h2>
 }
 function UL({ children }: { children: ReactNode }) {
-  return <ul className="list-disc space-y-1 pl-5">{children}</ul>
+  return <ul className="mw-list-disc mw-space-y-1 mw-pl-5">{children}</ul>
 }
 
 export default function Legal({ page }: { page: Page }) {
@@ -26,7 +26,7 @@ export default function Legal({ page }: { page: Page }) {
     document.title = `${TITLE[page]} | Meterwise`
   }, [page])
   return (
-    <article className="max-w-3xl space-y-2">
+    <article className="mw-max-w-3xl mw-space-y-2">
       <PageHeader crumbs={[{ label: 'Home', to: '/' }, { label: TITLE[page] }]} title={TITLE[page]} description={DESCRIPTION[page]} />
       {page === 'privacy' && <Privacy />}
       {page === 'accessibility' && <Accessibility />}
@@ -125,7 +125,7 @@ function Trust() {
     <>
       <p>Meterwise protects the information it holds with the controls below. The list under "Controls in place" is read live from the running service.</p>
       <H>Controls in place</H>
-      {signedIn ? <LiveControls /> : <p className="border bg-card p-4 text-muted-foreground">The live list is shown when you are signed in. <Link to="/signin">Sign in</Link> to see it.</p>}
+      {signedIn ? <LiveControls /> : <p className="mw-border mw-bg-white mw-p-4 mw-text-muted">The live list is shown when you are signed in. <Link to="/signin">Sign in</Link> to see it.</p>}
       <H>What the service does</H>
       <UL>
         <li>Sessions end after 12 hours, or after 30 minutes without activity. Signing out ends the session straight away.</li>
@@ -136,7 +136,7 @@ function Trust() {
         <li>Tenant information is limited to a name and unit. Meter references are masked for roles that do not need them.</li>
         <li>Uploaded files are limited in size and rows, and exported files are protected against spreadsheet formula injection.</li>
       </UL>
-      <p className="mt-2">Read the <Link to="/privacy">privacy notice</Link> and the <Link to="/accessibility">accessibility statement</Link> for more.</p>
+      <p className="mw-mt-2">Read the <Link to="/privacy">privacy notice</Link> and the <Link to="/accessibility">accessibility statement</Link> for more.</p>
     </>
   )
 }

@@ -21,7 +21,7 @@ const cols: ColumnDef<Project>[] = [
     id: 'blocked',
     header: 'Blocked by',
     accessorFn: (r) => r.blocked_by.join('; '),
-    cell: ({ row }) => (row.original.blocked_by.length ? <ul className="list-disc pl-4">{row.original.blocked_by.map((b, i) => <li key={i}>{b}</li>)}</ul> : ''),
+    cell: ({ row }) => (row.original.blocked_by.length ? <ul className="mw-list-disc mw-pl-4">{row.original.blocked_by.map((b, i) => <li key={i}>{b}</li>)}</ul> : ''),
     meta: { label: 'Blocked by' },
   },
   {
@@ -29,7 +29,7 @@ const cols: ColumnDef<Project>[] = [
     header: 'Flags',
     accessorFn: (r) => r.flags.map((f) => FLAG[f] ?? f).join('; '),
     cell: ({ row }) => (
-      <span className="flex flex-wrap gap-1">
+      <span className="nsw-display-flex nsw-flex-wrap mw-gap-1">
         {row.original.flags.map((f) => (
           <StatusBadge key={f} tone="warn">
             {FLAG[f] ?? f.replace(/_/g, ' ')}

@@ -36,13 +36,13 @@ export function ChargeBadge({ s }: { s: Flat['charge_status'] }) {
 }
 /** Meter-data consent, shown apart from upgrade consent. */
 export function DataConsentCell({ c }: { c: DataConsent | null | undefined }) {
-  if (c === undefined) return <span className="text-muted-foreground">Checking</span>
-  if (c === null) return <span className="text-muted-foreground">Unknown</span>
+  if (c === undefined) return <span className="mw-text-muted">Checking</span>
+  if (c === null) return <span className="mw-text-muted">Unknown</span>
   if (!c.given) return <StatusBadge tone="warn">Not given</StatusBadge>
   return (
     <span>
       <StatusBadge tone="good">Given</StatusBadge>
-      {c.expires_on && <span className="ml-1 text-sm text-muted-foreground">until {fmtDate(c.expires_on)}</span>}
+      {c.expires_on && <span className="mw-ml-1 nsw-small mw-text-muted">until {fmtDate(c.expires_on)}</span>}
     </span>
   )
 }
@@ -109,7 +109,7 @@ export function FormDialog({ title, description, trigger, schema, defaults, fiel
         {values === null ? (
           <Form {...form}>
             <form
-              className="space-y-3"
+              className="mw-space-y-3"
               noValidate
               onSubmit={form.handleSubmit((v) => {
                 if (summary) setValues(v)
@@ -129,8 +129,8 @@ export function FormDialog({ title, description, trigger, schema, defaults, fiel
             </form>
           </Form>
         ) : (
-          <div className="space-y-3">
-            <div className="border bg-muted p-3" role="status">
+          <div className="mw-space-y-3">
+            <div className="mw-border mw-bg-wash mw-p-3" role="status">
               {summary?.(values)}
             </div>
             <ErrorAlert error={act.error} />

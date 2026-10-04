@@ -39,7 +39,7 @@ export default function ProgrammeOverview() {
           const stages = STAGES.map((s) => ({ stage: STAGE_LABEL[s], count: o.pipeline[s] ?? 0 }))
           const monthly = o.monthly.slice(-24)
           return (
-            <div className="space-y-4">
+            <div className="mw-space-y-4">
               <Panel title={p.name}>
                 <Facts
                   items={[
@@ -61,11 +61,11 @@ export default function ProgrammeOverview() {
                 ]}
               />
 
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 [&>*]:min-w-0">
+              <div className="nsw-display-grid mw-grid-cols-1 mw-gap-4 mw-lg-grid-cols-2 mw-children-min-0">
                 <ChartBox
                   title="Projects by stage"
                   chart={
-                    <ChartContainer config={{ count: { label: 'Projects', color: 'var(--chart-1)' } }} className="h-64 w-full" role="img" aria-label={`Projects by stage: ${stages.map((s) => `${s.stage} ${s.count}`).join(', ')}`}>
+                    <ChartContainer config={{ count: { label: 'Projects', color: 'var(--chart-1)' } }} className="mw-h-64 nsw-width-100" role="img" aria-label={`Projects by stage: ${stages.map((s) => `${s.stage} ${s.count}`).join(', ')}`}>
                       <BarChart data={stages} layout="vertical" margin={{ left: 8, right: 28 }}>
                         <CartesianGrid horizontal={false} />
                         <YAxis dataKey="stage" type="category" width={92} tickLine={false} />
@@ -101,9 +101,9 @@ export default function ProgrammeOverview() {
                 description="Billed is the outlined bar. Collected is the solid bar."
                 chart={
                   monthly.length === 0 ? (
-                    <p className="text-muted-foreground">No charges have been billed yet. Billing starts once a project is active.</p>
+                    <p className="mw-text-muted">No charges have been billed yet. Billing starts once a project is active.</p>
                   ) : (
-                    <ChartContainer config={{ billed: { label: 'Billed', color: 'var(--chart-1)' }, collected: { label: 'Collected', color: 'var(--chart-1)' } }} className="h-72 w-full" role="img" aria-label={`Billed and collected each month. Latest ${monthName(monthly[monthly.length - 1].month)}: billed ${money(monthly[monthly.length - 1].billed)}, collected ${money(monthly[monthly.length - 1].collected)}.`}>
+                    <ChartContainer config={{ billed: { label: 'Billed', color: 'var(--chart-1)' }, collected: { label: 'Collected', color: 'var(--chart-1)' } }} className="mw-h-72 nsw-width-100" role="img" aria-label={`Billed and collected each month. Latest ${monthName(monthly[monthly.length - 1].month)}: billed ${money(monthly[monthly.length - 1].billed)}, collected ${money(monthly[monthly.length - 1].collected)}.`}>
                       <BarChart data={monthly} margin={{ left: 8, right: 8 }}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="month" tickFormatter={(m: string) => monthName(m)} minTickGap={16} />
@@ -117,11 +117,11 @@ export default function ProgrammeOverview() {
                 }
                 legend={
                   <>
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className="inline-block size-3 border-2 border-chart-1 bg-card" aria-hidden="true" /> Billed (outlined)
+                    <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
+                      <span className="nsw-display-inline-block mw-size-3 mw-border-2 mw-border-brand mw-bg-white" aria-hidden="true" /> Billed (outlined)
                     </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className="inline-block size-3 bg-chart-1" aria-hidden="true" /> Collected (solid)
+                    <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
+                      <span className="nsw-display-inline-block mw-size-3 mw-bg-brand" aria-hidden="true" /> Collected (solid)
                     </span>
                   </>
                 }

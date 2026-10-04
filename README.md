@@ -231,6 +231,19 @@ Security checks: `scripts/security_check.py` (see [docs/it-assurance.md](docs/it
 | [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) | The plan on all fronts |
 | [docs/DISCLOSURE.md](docs/DISCLOSURE.md) | Tools, data, AI use and prior-work statement |
 
+## NSW Design System variant of the web app
+
+This branch (`meterwise-nsw-design-system`) is the same web app with its presentation moved from Tailwind and shadcn/ui
+to the NSW Design System, for side-by-side comparison. It is a concept demonstration by a student team, not a NSW
+Government website or service, and every page shows a notice strip saying so.
+
+The header shows the NSW Government logo, as the design system's header component supplies it. The logo is the NSW
+Government's. It is used here without permission, for a labelled concept demonstration only. NSW Government branding
+guidelines restrict the logo to NSW Government entities or approved use. Before any public deployment or reuse, the logo
+must be removed (it lives in one component, `web/src/portal/components/BrandLogo.tsx`, and one asset file,
+`web/src/portal/assets/nsw-government-logo.svg`) or permission obtained. Components, departures from the system,
+branding rules and how it was checked are in [web/NSW-DESIGN-SYSTEM.md](web/NSW-DESIGN-SYSTEM.md).
+
 ## Limits
 
 - Heat is satellite land surface temperature at about 100 m detail. It ranks neighbourhoods; it does not measure a

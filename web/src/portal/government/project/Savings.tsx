@@ -55,13 +55,13 @@ function Readings({ p, role }: TabProps) {
 
   return (
     <Panel title="Readings" description="Monthly meter readings for one flat. Each reading shows where it came from.">
-      <div className="mb-3 flex flex-wrap items-end gap-3">
+      <div className="mw-mb-3 nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-3">
         <div>
-          <label htmlFor="rd-flat" className="mb-1 block text-sm font-medium">
+          <label htmlFor="rd-flat" className="mw-mb-1 nsw-display-block nsw-small nsw-text-medium">
             Flat
           </label>
           <Select value={flatId} onValueChange={setFlatId}>
-            <SelectTrigger id="rd-flat" className="w-48">
+            <SelectTrigger id="rd-flat" className="mw-w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -75,19 +75,19 @@ function Readings({ p, role }: TabProps) {
         </div>
         {canEdit(role) && (
           <div>
-            <label htmlFor="rd-file" className="mb-1 block text-sm font-medium">
+            <label htmlFor="rd-file" className="mw-mb-1 nsw-display-block nsw-small nsw-text-medium">
               Upload readings (CSV)
             </label>
-            <input id="rd-file" ref={file} type="file" accept=".csv,text/csv" disabled={up.busy} onChange={(e) => void upload(e.target.files?.[0])} className="block w-full max-w-xs border border-input bg-card p-1.5 text-base file:mr-3 file:border-0 file:bg-secondary file:px-3 file:py-1" aria-describedby="rd-file-help" />
+            <input id="rd-file" ref={file} type="file" accept=".csv,text/csv" disabled={up.busy} onChange={(e) => void upload(e.target.files?.[0])} className="nsw-display-block nsw-width-100 mw-max-w-xs mw-border mw-border-strong mw-bg-white mw-p-1_5 mw-file-input" aria-describedby="rd-file-help" />
           </div>
         )}
       </div>
       {canEdit(role) && (
-        <p id="rd-file-help" className="mb-2 text-sm text-muted-foreground">
+        <p id="rd-file-help" className="mw-mb-2 nsw-small mw-text-muted">
           Columns: month, electricity_kwh, gas_mj, indoor_hours_above_30c. Uploaded rows are labelled as uploaded.
         </p>
       )}
-      {fileErr && <p className="mb-2 text-sm text-destructive" role="alert">{fileErr}</p>}
+      {fileErr && <p className="mw-mb-2 nsw-small mw-text-danger" role="alert">{fileErr}</p>}
       <ErrorAlert error={up.error} title="We could not upload the readings" />
       <Gate res={res} rows={4}>
         {(rows) => (
@@ -119,7 +119,7 @@ function Readings({ p, role }: TabProps) {
 function Result({ run, unit }: { run: MvRun; unit: (id: number) => string }) {
   const rows = run.by_flat.map((b) => ({ flat: `Flat ${unit(b.flat_id)}`, modelled: Math.round(b.result.modelled_saving_per_month * 10) / 10, verified: Math.round(b.result.verified_saving_per_month * 10) / 10 }))
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       <Figures
         label="Savings check result"
         items={[
@@ -131,7 +131,7 @@ function Result({ run, unit }: { run: MvRun; unit: (id: number) => string }) {
           { label: 'Drawn from reserve', value: money(run.reserve_drawn) },
         ]}
       />
-      <p className="text-sm text-muted-foreground">
+      <p className="nsw-small mw-text-muted">
         Period {monthLabelAu(run.period.from)} to {monthLabelAu(run.period.to)}, run on {dateLabelAu(run.run_on)}. Data source: {sourceLabel(run.source, (run as { source_label?: string }).source_label)}.
       </p>
 
@@ -149,7 +149,7 @@ function Result({ run, unit }: { run: MvRun; unit: (id: number) => string }) {
           rows: rows.map((r) => [r.flat, r.modelled, r.verified]),
         }}
         chart={
-          <ChartContainer config={{ modelled: { label: 'Modelled', color: 'var(--chart-2)' }, verified: { label: 'Measured', color: 'var(--chart-1)' } }} className="h-64 w-full">
+          <ChartContainer config={{ modelled: { label: 'Modelled', color: 'var(--chart-2)' }, verified: { label: 'Measured', color: 'var(--chart-1)' } }} className="mw-h-64 nsw-width-100">
             <BarChart data={rows} margin={{ top: 18, right: 8, left: 0, bottom: 0 }} accessibilityLayer>
               <defs>
                 <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -210,7 +210,7 @@ function Result({ run, unit }: { run: MvRun; unit: (id: number) => string }) {
             { id: 'flags', header: 'Notes', accessorFn: (b) => (b.result.flags ?? []).join(' '), cell: ({ row }) => <>{(row.original.result.flags ?? []).map((f, i) => <div key={i}>{f}</div>)}</> },
           ]}
         />
-        {run.by_flat[0] && <div className="mt-3"><Facts items={[{ label: 'Method', value: run.by_flat[0].result.method }]} /></div>}
+        {run.by_flat[0] && <div className="mw-mt-3"><Facts items={[{ label: 'Method', value: run.by_flat[0].result.method }]} /></div>}
       </Panel>
     </div>
   )
@@ -234,14 +234,14 @@ export default function Savings(props: TabProps) {
   })
 
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       {canManage(role) && (
         <Panel title="Run a savings check" description="Compares the measured bills with what they would have been without the upgrade. It can cut a charge and refund tenants from the reserve.">
           <Form {...form}>
-            <form className="flex flex-wrap items-start gap-3" noValidate onSubmit={(e) => e.preventDefault()} aria-label="Run a savings check">
-              <TextField control={form.control} name="from" label="First month" placeholder="YYYY-MM" className="w-40" />
-              <TextField control={form.control} name="to" label="Last month" placeholder="YYYY-MM" className="w-40" />
-              <div className="pt-6">
+            <form className="nsw-display-flex nsw-flex-wrap nsw-align-items-start mw-gap-3" noValidate onSubmit={(e) => e.preventDefault()} aria-label="Run a savings check">
+              <TextField control={form.control} name="from" label="First month" placeholder="YYYY-MM" className="mw-w-40" />
+              <TextField control={form.control} name="to" label="Last month" placeholder="YYYY-MM" className="mw-w-40" />
+              <div className="mw-pt-6">
                 <Confirm title="Run the savings check?" description="If measured savings are lower than modelled, charges on some flats may be reduced and refunds paid from the reserve. This is logged." confirmLabel="Run the check" onConfirm={() => void submit()}>
                   <Button type="button" disabled={act.busy}>
                     {act.busy ? 'Running' : 'Run check'}
@@ -250,19 +250,19 @@ export default function Savings(props: TabProps) {
               </div>
             </form>
           </Form>
-          <div className="mt-2">
+          <div className="mw-mt-2">
             <ErrorAlert error={act.error} title="We could not run the check" />
           </div>
         </Panel>
       )}
 
       {runs.length > 1 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <label htmlFor="mv-run" className="text-sm font-medium">
+        <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-2">
+          <label htmlFor="mv-run" className="nsw-small nsw-text-medium">
             Show the check from
           </label>
           <Select value={String(shown?.id)} onValueChange={(v) => setChosen(Number(v))}>
-            <SelectTrigger id="mv-run" className="w-72">
+            <SelectTrigger id="mv-run" className="mw-w-72">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

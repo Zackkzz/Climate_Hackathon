@@ -17,7 +17,7 @@ const reachOf = (r: DeliveryRoute): number | null => {
 }
 
 const cols: ColumnDef<DeliveryRoute>[] = [
-  { id: 'name', accessorFn: nameOf, header: 'Route', meta: { label: 'Route' }, cell: (c) => <span className="font-medium">{c.getValue<string>()}</span> },
+  { id: 'name', accessorFn: nameOf, header: 'Route', meta: { label: 'Route' }, cell: (c) => <span className="nsw-text-medium">{c.getValue<string>()}</span> },
   {
     id: 'status',
     accessorFn: (r) => r.status,

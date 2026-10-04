@@ -35,20 +35,20 @@ const TABS = [
 function SummaryTab({ p }: { p: PropertyProject }) {
   const s = p.summary
   return (
-    <div className="grid min-w-0 gap-4 lg:grid-cols-2">
-      <Panel title="Where this block is up to" className="min-w-0">
+    <div className="nsw-display-grid mw-min-w-0 mw-gap-4 mw-lg-grid-cols-2">
+      <Panel title="Where this block is up to" className="mw-min-w-0">
         <Facts
           items={[
             { label: 'Stage', value: <StageBadge stage={p.stage} /> },
             { label: 'Since', value: fmtDate(p.stage_since) },
             { label: 'Next step', value: p.next_step },
-            { label: 'Blocked by', value: p.blocked_by.length ? <ul className="list-disc pl-4">{p.blocked_by.map((b, i) => <li key={i}>{b}</li>)}</ul> : 'Nothing' },
+            { label: 'Blocked by', value: p.blocked_by.length ? <ul className="mw-list-disc mw-pl-4">{p.blocked_by.map((b, i) => <li key={i}>{b}</li>)}</ul> : 'Nothing' },
             { label: 'Installer', value: (p.installer_org ? cleanName(p.installer_org.name) : null) ?? 'Not chosen yet' },
             { label: 'Flats', value: p.flats },
           ]}
         />
       </Panel>
-      <Panel title="The deal" description="Modelled figures. They are estimates, not quotes." className="min-w-0">
+      <Panel title="The deal" description="Modelled figures. They are estimates, not quotes." className="mw-min-w-0">
         <Facts
           items={[
             { label: 'Net cost', value: money(s.net_capex) },
@@ -60,7 +60,7 @@ function SummaryTab({ p }: { p: PropertyProject }) {
           ]}
         />
       </Panel>
-      <Panel title="History" className="min-w-0 lg:col-span-2">
+      <Panel title="History" className="mw-min-w-0 mw-lg-col-span-2">
         <DataTable
           columns={[
             { accessorKey: 'at', header: 'Date', cell: ({ row }) => fmtDate(row.original.at) },
@@ -106,8 +106,8 @@ function DocumentsTab({ p }: { p: PropertyProject }) {
     },
   ]
   return (
-    <div className="space-y-3">
-      <p className="text-muted-foreground">Printable pages. They summarise your agreement and are not legal or financial advice. Please have your own adviser review them.</p>
+    <div className="mw-space-y-3">
+      <p className="mw-text-muted">Printable pages. They summarise your agreement and are not legal or financial advice. Please have your own adviser review them.</p>
       <ErrorAlert error={act.error} title="We could not open the document" />
       <Gate res={res}>{(d) => <DataTable columns={cols} data={d} caption="Documents" searchPlaceholder="Search documents" emptyTitle="No documents yet" emptyText="Documents are made when the offer is issued." />}</Gate>
     </div>
@@ -117,7 +117,7 @@ function DocumentsTab({ p }: { p: PropertyProject }) {
 function FaultsTab({ p }: { p: PropertyProject }) {
   const res = useRes(() => api.faults({ project_id: p.id }), [p.id])
   return (
-    <div className="space-y-3">
+    <div className="mw-space-y-3">
       <div>
         <ReportFaultDialog projects={[{ id: p.id, label: p.label }]} defaultProject={p.id} onDone={res.reload} />
       </div>
@@ -149,7 +149,7 @@ export default function BlockPage() {
         {(pr) => (
           <>
             <Tabs value={current} onValueChange={(t) => nav(`/property/blocks/${pid}/${t}`)}>
-              <div className="overflow-x-auto">
+              <div className="nsw-overflow-x-auto">
                 <TabsList>
                   {TABS.map((t) => (
                     <TabsTrigger key={t.key} value={t.key}>
@@ -158,12 +158,12 @@ export default function BlockPage() {
                   ))}
                 </TabsList>
               </div>
-              <TabsContent value="summary" className="mt-4"><SummaryTab p={pr} /></TabsContent>
-              <TabsContent value="consent" className="mt-4"><ConsentTab p={pr} orgKind={user?.org?.kind} reload={res.reload} /></TabsContent>
-              <TabsContent value="flats" className="mt-4"><FlatsTab p={pr} reload={res.reload} /></TabsContent>
-              <TabsContent value="faults" className="mt-4"><FaultsTab p={pr} /></TabsContent>
-              <TabsContent value="documents" className="mt-4"><DocumentsTab p={pr} /></TabsContent>
-              <TabsContent value="charges" className="mt-4"><ChargesTab p={pr} /></TabsContent>
+              <TabsContent value="summary" className="mw-mt-4"><SummaryTab p={pr} /></TabsContent>
+              <TabsContent value="consent" className="mw-mt-4"><ConsentTab p={pr} orgKind={user?.org?.kind} reload={res.reload} /></TabsContent>
+              <TabsContent value="flats" className="mw-mt-4"><FlatsTab p={pr} reload={res.reload} /></TabsContent>
+              <TabsContent value="faults" className="mw-mt-4"><FaultsTab p={pr} /></TabsContent>
+              <TabsContent value="documents" className="mw-mt-4"><DocumentsTab p={pr} /></TabsContent>
+              <TabsContent value="charges" className="mw-mt-4"><ChargesTab p={pr} /></TabsContent>
             </Tabs>
           </>
         )}

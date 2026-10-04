@@ -4,7 +4,7 @@ import type { Sheet } from '@/state'
 import { balanceFor, weekComfort } from '@/verdict'
 import type { BalanceView } from '@/verdict'
 import type { AssessResponse, PackageKey } from '@/types'
-import { toast } from 'sonner'
+import { toast } from '@/portal/components/ui/sonner'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
 import { Button } from '@/portal/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/portal/components/ui/tabs'
@@ -288,7 +288,7 @@ function RepayChart({ r }: { r: AssessResponse }) {
   const bw = iw / years
   const y = (v: number) => m.t + ih - (v / max) * ih
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full max-h-44" role="img" aria-label={`Cumulative repayments reach ${money(yearly * years)} over ${years} years against ${money(cap)} of capital`}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="mw-h-auto nsw-width-100 mw-max-h-44" role="img" aria-label={`Cumulative repayments reach ${money(yearly * years)} over ${years} years against ${money(cap)} of capital`}>
       {Array.from({ length: years }, (_, i) => {
         const cum = yearly * (i + 1)
         return (
@@ -413,28 +413,28 @@ export default function Share({ assess, sheet, onSheet, onBack }: Props) {
       toast.error('Could not copy. Copy the address from your browser instead.')
     }
   }
-  if (assess.error && !r) return <div className="p-4"><ErrorAlert error={assess.error} onRetry={assess.retry} title="We could not prepare the sheets" /></div>
-  if (!r) return <div className="p-4"><LoadingRows rows={6} label="Preparing your sheets" /></div>
+  if (assess.error && !r) return <div className="mw-p-4"><ErrorAlert error={assess.error} onRetry={assess.retry} title="We could not prepare the sheets" /></div>
+  if (!r) return <div className="mw-p-4"><LoadingRows rows={6} label="Preparing your sheets" /></div>
   return (
-    <div className="mx-auto max-w-4xl space-y-3 p-3 lg:p-5">
-      <div className="no-print space-y-3">
-        <div className="flex flex-wrap items-start justify-between gap-2">
+    <div className="mw-mx-auto mw-max-w-4xl mw-space-y-3 mw-p-3 mw-lg-p-5">
+      <div className="no-print mw-space-y-3">
+        <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-start nsw-justify-content-between mw-gap-2">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">Share this deal</h1>
-            <p className="text-muted-foreground">Three one-page sheets from the same numbers, each written for the person reading it.</p>
+            <h1 className="mw-text-xl nsw-text-semibold">Share this deal</h1>
+            <p className="mw-text-muted">Three one-page sheets from the same numbers, each written for the person reading it.</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="nsw-display-flex nsw-flex-wrap mw-gap-2">
             <Button onClick={() => window.print()}>Print / Save as PDF</Button>
             <Button variant="outline" onClick={() => void copy()}>Copy link</Button>
             <Button variant="outline" onClick={onBack}>Back to the deal</Button>
           </div>
         </div>
         <Tabs value={sheet} onValueChange={(v) => onSheet(v as Sheet)}>
-          <TabsList aria-label="Choose a sheet" className="h-auto flex-wrap p-1">
+          <TabsList aria-label="Choose a sheet" className="mw-h-auto nsw-flex-wrap mw-p-1">
             {TABS.map((t) => (
-              <TabsTrigger key={t.key} value={t.key} id={`tab-${t.key}`} aria-controls={`sheet-${t.key}`} className="h-auto flex-col items-start py-1.5">
-                <span className="font-semibold">{t.label}</span>
-                <span className="text-sm font-normal text-muted-foreground">{t.sub}</span>
+              <TabsTrigger key={t.key} value={t.key} id={`tab-${t.key}`} aria-controls={`sheet-${t.key}`} className="mw-h-auto nsw-flex-column nsw-align-items-start mw-py-1_5">
+                <span className="nsw-text-semibold">{t.label}</span>
+                <span className="nsw-small nsw-text-normal mw-text-muted">{t.sub}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -445,7 +445,7 @@ export default function Share({ assess, sheet, onSheet, onBack }: Props) {
         <OwnerSheet r={r} active={sheet === 'owner'} />
         <FunderSheet r={r} active={sheet === 'funder'} />
       </div>
-      <p className="no-print text-center text-sm text-muted-foreground">Print settings: choose "Save as PDF", A4, and turn off headers and footers for the cleanest page.</p>
+      <p className="no-print nsw-text-center nsw-small mw-text-muted">Print settings: choose "Save as PDF", A4, and turn off headers and footers for the cleanest page.</p>
     </div>
   )
 }

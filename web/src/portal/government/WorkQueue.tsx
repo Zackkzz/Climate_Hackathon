@@ -53,7 +53,7 @@ export default function WorkQueue() {
     () => [
       { accessorKey: 'kind', header: 'Kind', cell: ({ row }) => <StatusBadge tone={row.original.tone}>{row.original.kind}</StatusBadge> },
       { accessorKey: 'what', header: 'What' },
-      { accessorKey: 'detail', header: 'What needs to happen', cell: ({ row }) => <span className="whitespace-normal">{row.original.detail}</span> },
+      { accessorKey: 'detail', header: 'What needs to happen', cell: ({ row }) => <span className="mw-ws-normal">{row.original.detail}</span> },
       {
         id: 'go',
         header: 'Go to',

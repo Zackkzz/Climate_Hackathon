@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { MapPin } from 'lucide-react'
+import { MapPin } from '@/portal/components/icons'
 import { Suspense, lazy, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import type { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
-import { portfolio } from '@/api'
+import { getHeat, portfolio } from '@/api'
 import { useUser } from '@/console/auth'
 import { heatWord, money, num1, plural, rentedPhrase } from '@/format'
 import { HEAT_COLORS, HEAT_ORDER } from '@/heat'
@@ -35,8 +35,8 @@ interface Props {
 
 function HeatKey({ band }: { band: BProps['heat_band'] }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
-      <span className="inline-block size-3 border border-foreground/40" style={{ background: HEAT_COLORS[band] }} aria-hidden="true" />
+    <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
+      <span className="nsw-display-inline-block mw-size-3 mw-border mw-border-foreground-40" style={{ background: HEAT_COLORS[band] }} aria-hidden="true" />
       {heatWord(band)}
     </span>
   )
@@ -44,13 +44,13 @@ function HeatKey({ band }: { band: BProps['heat_band'] }) {
 
 function Legend() {
   return (
-    <div className="absolute bottom-12 left-2 z-10 border bg-card/95 px-2 py-1.5 text-sm" aria-label="Map legend: from cooler than most to among the hottest">
-      <div className="flex" aria-hidden="true">
+    <div className="nsw-position-absolute mw-bottom-12 mw-left-2 mw-z-10 mw-border mw-bg-card-95 mw-px-2 mw-py-1_5 nsw-small" aria-label="Map legend: from cooler than most to among the hottest">
+      <div className="nsw-display-flex" aria-hidden="true">
         {HEAT_ORDER.map((b) => (
-          <span key={b} className="h-3 w-8 border border-foreground/30" style={{ background: HEAT_COLORS[b] }} />
+          <span key={b} className="mw-h-3 mw-w-8 mw-border mw-border-foreground-30" style={{ background: HEAT_COLORS[b] }} />
         ))}
       </div>
-      <div className="flex justify-between gap-4">
+      <div className="nsw-display-flex nsw-justify-content-between mw-gap-4">
         <span>Cooler than most</span>
         <span>Among the hottest</span>
       </div>
@@ -63,17 +63,17 @@ function SelectedBlock({ f, onBuild, shortlisted, onShortlist }: { f: BuildingFe
   const user = useUser()
   const rent = rentedPhrase(p.renter_share)
   return (
-    <section className="border bg-card" aria-live="polite" aria-label="Selected block">
-      <div className="space-y-2 p-3">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <h2 className="text-base font-semibold">{p.label}</h2>
+    <section className="mw-border mw-bg-white" aria-live="polite" aria-label="Selected block">
+      <div className="mw-space-y-2 mw-p-3">
+        <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-start nsw-justify-content-between mw-gap-2">
+          <h2 className="nsw-text-semibold">{p.label}</h2>
           <HeatKey band={p.heat_band} />
         </div>
         <p>
           About {plural(p.flats_est, 'flat')}, {plural(p.storeys, 'storey')}
           {p.storeys_source === 'assumed' ? ' (assumed)' : ''}. {rent[0].toUpperCase() + rent.slice(1)}.
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="nsw-display-flex nsw-flex-wrap mw-gap-2">
           <Button onClick={onBuild}>Build the deal</Button>
           <Button variant="outline" aria-pressed={shortlisted} onClick={onShortlist}>
             {shortlisted ? 'On shortlist' : 'Shortlist'}
@@ -87,6 +87,27 @@ function SelectedBlock({ f, onBuild, shortlisted, onShortlist }: { f: BuildingFe
         <MicroclimatePanel id={p.id} />
       </div>
     </section>
+  )
+}
+
+const monthYear = (iso: string) => new Date(iso + 'T00:00:00').toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })
+
+/** Summer satellite heat for the chosen spot. The server caches it, so building the deal reuses this lookup. */
+function SpotHeat({ lat, lon }: { lat: number; lon: number }) {
+  const h = useLoad(() => getHeat(lat, lon), `${lat.toFixed(5)},${lon.toFixed(5)}`)
+  let text: string
+  if (h.loading) text = 'Looking up summer satellite heat for this spot. The first lookup in an area takes 20 to 40 seconds.'
+  else if (h.error || !h.data) text = `${h.error ?? ''} The deal will use no local heat adjustment.`.trim()
+  else {
+    const d = h.data
+    const a = Math.abs(d.heat_anomaly_c)
+    const diff = a < 0.05 ? 'about the same as' : `${a.toFixed(1)} °C ${d.heat_anomaly_c > 0 ? 'hotter' : 'cooler'} than`
+    text = `Satellite heat: on summer days the ground here is ${diff} the land within ${d.window_km / 2} km. From ${d.scene_count} clear Landsat images, ${monthYear(d.first_date)} to ${monthYear(d.last_date)}.`
+  }
+  return (
+    <p className="nsw-small mw-text-muted" aria-live="polite">
+      {text}
+    </p>
   )
 }
 
@@ -111,32 +132,33 @@ function OwnBlockForm({ meta, pin, pickMode, setPickMode, onCancel, onSubmit }: 
   return (
     <Form {...form}>
       <form
-        className="space-y-3 border bg-card p-3"
+        className="mw-space-y-3 mw-border mw-bg-white mw-p-3"
         noValidate
         onSubmit={form.handleSubmit((d) => {
           const roof = d.roof_known ? Math.max(20, Number(d.roof) || 20) : estimate
           onSubmit({ storeys: d.storeys, flats: d.flats, roof_m2: roof, flat_area_m2: flatArea, lat: loc.lat, lon: loc.lon })
         })}
       >
-        <h2 className="text-base font-semibold">Enter your own block</h2>
-        <p className="text-muted-foreground">A few details are enough. You can change them later.</p>
-        <div className="grid grid-cols-2 gap-3">
+        <h2 className="nsw-text-semibold">Enter your own block</h2>
+        <p className="mw-text-muted">A few details are enough. You can change them later.</p>
+        <div className="nsw-display-grid mw-grid-cols-2 mw-gap-3">
           <NumberField control={form.control} name="storeys" label="Storeys" min={1} max={12} />
           <NumberField control={form.control} name="flats" label="Flats" min={1} max={200} />
         </div>
-        <div className="space-y-1">
-          <label className="flex items-center gap-2">
+        <div className="mw-space-y-1">
+          <label className="nsw-display-flex nsw-align-items-center mw-gap-2">
             <Checkbox checked={!v.roof_known} onCheckedChange={(c) => form.setValue('roof_known', !c)} /> I don't know the roof area, estimate it
           </label>
-          {v.roof_known ? <NumberField control={form.control} name="roof" label="Roof area (m²)" min={20} max={5000} /> : <p className="text-sm text-muted-foreground">Estimated roof area: {estimate} m².</p>}
+          {v.roof_known ? <NumberField control={form.control} name="roof" label="Roof area (m²)" min={20} max={5000} /> : <p className="nsw-small mw-text-muted">Estimated roof area: {estimate} m².</p>}
         </div>
-        <div className="space-y-1">
+        <div className="mw-space-y-1">
           <Button type="button" variant="outline" aria-pressed={pickMode} onClick={() => setPickMode(!pickMode)}>
             <MapPin aria-hidden="true" /> {pickMode ? 'Tap the map...' : pin ? 'Move the spot' : 'Choose the spot on the map'}
           </Button>
-          <p className="text-sm text-muted-foreground">{pin ? 'Spot chosen.' : 'Optional. Without it we use the middle of the pilot area.'}</p>
+          <p className="nsw-small mw-text-muted">{pin ? 'Spot chosen.' : 'Optional. Without it we use the middle of the pilot area.'}</p>
+          <SpotHeat lat={loc.lat} lon={loc.lon} />
         </div>
-        <div className="flex gap-2">
+        <div className="nsw-display-flex mw-gap-2">
           <Button type="submit">Build the deal</Button>
           <Button type="button" variant="ghost" onClick={onCancel}>
             Cancel
@@ -156,35 +178,35 @@ function ShortlistView({ ids, buildings, remove, onOpen }: { ids: string[]; buil
   const { results, totals } = state.data
   const byId = new Map(buildings.features.map((f) => [f.properties.id, f.properties]))
   return (
-    <div className="space-y-2">
-      <p className="text-sm text-muted-foreground">Each block gets the standard package with default settings. Figures are estimated.</p>
-      <div className="overflow-x-auto border" role="region" aria-label="Shortlist comparison" tabIndex={0}>
+    <div className="mw-space-y-2">
+      <p className="nsw-small mw-text-muted">Each block gets the standard package with default settings. Figures are estimated.</p>
+      <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Shortlist comparison" tabIndex={0}>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Block</TableHead>
-              <TableHead className="text-right">Capital needed</TableHead>
-              <TableHead className="text-right">Gap</TableHead>
-              <TableHead className="text-right">CO₂e t/yr</TableHead>
+              <TableHead className="nsw-text-right">Capital needed</TableHead>
+              <TableHead className="nsw-text-right">Gap</TableHead>
+              <TableHead className="nsw-text-right">CO₂e t/yr</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {results.map((r) => (
               <TableRow key={r.building_id}>
                 <TableCell>
-                  <Button variant="link" className="h-auto p-0 text-left" onClick={() => onOpen(r.building_id)}>
+                  <Button variant="link" className="mw-h-auto mw-p-0 nsw-text-left" onClick={() => onOpen(r.building_id)}>
                     {r.label}
                   </Button>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="nsw-small mw-text-muted">
                     {plural(r.flats, 'flat')} · {byId.get(r.building_id) ? heatWord(byId.get(r.building_id)?.heat_band) : ''}{' '}
-                    <Button variant="link" size="sm" className="h-auto p-0 text-sm" aria-label={`Remove ${r.label} from shortlist`} onClick={() => remove(r.building_id)}>
+                    <Button variant="link" size="sm" className="mw-h-auto mw-p-0 nsw-small" aria-label={`Remove ${r.label} from shortlist`} onClick={() => remove(r.building_id)}>
                       Remove
                     </Button>
                   </div>
                 </TableCell>
-                <TableCell className="text-right tabular-nums">{money(r.net_capex)}</TableCell>
-                <TableCell className={'text-right tabular-nums ' + (r.funding_gap > 0 ? 'text-warning' : 'text-success')}>{r.funding_gap > 0 ? money(r.funding_gap) : 'None'}</TableCell>
-                <TableCell className="text-right tabular-nums">{num1(r.co2e_t_per_year_saved)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{money(r.net_capex)}</TableCell>
+                <TableCell className={'nsw-text-right mw-tabular ' + (r.funding_gap > 0 ? 'mw-text-warning' : 'mw-text-success')}>{r.funding_gap > 0 ? money(r.funding_gap) : 'None'}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{num1(r.co2e_t_per_year_saved)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -193,14 +215,14 @@ function ShortlistView({ ids, buildings, remove, onOpen }: { ids: string[]; buil
               <TableCell>
                 Total: {plural(totals.buildings, 'block')}, {plural(totals.flats, 'flat')}
               </TableCell>
-              <TableCell className="text-right tabular-nums">{money(totals.net_capex)}</TableCell>
-              <TableCell className="text-right tabular-nums">{totals.funding_gap > 0 ? money(totals.funding_gap) : 'None'}</TableCell>
-              <TableCell className="text-right tabular-nums">{num1(totals.co2e_t_per_year_saved)}</TableCell>
+              <TableCell className="nsw-text-right mw-tabular">{money(totals.net_capex)}</TableCell>
+              <TableCell className="nsw-text-right mw-tabular">{totals.funding_gap > 0 ? money(totals.funding_gap) : 'None'}</TableCell>
+              <TableCell className="nsw-text-right mw-tabular">{num1(totals.co2e_t_per_year_saved)}</TableCell>
             </TableRow>
           </TableFooter>
         </Table>
       </div>
-      <p className="text-sm text-muted-foreground">
+      <p className="nsw-small mw-text-muted">
         {totals.fully_funded_count} of {totals.buildings} blocks can be fully repaid from bill savings.
       </p>
     </div>
@@ -236,7 +258,7 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
         header: 'Block',
         meta: { label: 'Block' },
         cell: ({ row }) => (
-          <Button variant="link" className="h-auto whitespace-normal p-0 text-left" aria-pressed={row.original.id === selectedId} onClick={() => select(row.original.id)}>
+          <Button variant="link" className="mw-h-auto mw-ws-normal mw-p-0 nsw-text-left" aria-pressed={row.original.id === selectedId} onClick={() => select(row.original.id)}>
             {row.original.label}
           </Button>
         ),
@@ -258,9 +280,9 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
   )
 
   return (
-    <div className="grid min-h-[calc(100svh-3.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,34rem)]">
-      <section className="relative h-[55svh] min-h-[320px] border-b lg:sticky lg:top-14 lg:h-[calc(100svh-3.5rem)] lg:border-b-0 lg:border-r" aria-label="Map of blocks">
-        <Suspense fallback={<div className="p-4"><LoadingRows rows={2} label="Loading the map" /></div>}>
+    <div className="nsw-display-grid mw-grid-cols-1 mw-find-grid">
+      <section className="nsw-position-relative mw-map-pane mw-border-b" aria-label="Map of blocks">
+        <Suspense fallback={<div className="mw-p-4"><LoadingRows rows={2} label="Loading the map" /></div>}>
           <MapView
             data={buildings}
             selectedId={selectedId}
@@ -279,14 +301,14 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
           />
         </Suspense>
         <Legend />
-        {basemapFailed && <div className="absolute left-2 top-2 z-10 border bg-card px-2 py-1 text-sm">The street map could not load. Buildings are still shown.</div>}
+        {basemapFailed && <div className="nsw-position-absolute mw-left-2 mw-top-2 mw-z-10 mw-border mw-bg-white mw-px-2 mw-py-1 nsw-small">The street map could not load. Buildings are still shown.</div>}
       </section>
 
-      <aside className="min-w-0 space-y-3 p-3 lg:p-4" aria-label="Blocks to look at first">
+      <aside className="mw-min-w-0 mw-space-y-3 mw-p-3 mw-lg-p-4" aria-label="Blocks to look at first">
         <header>
-          <h1 className="text-xl font-semibold tracking-tight">Where should we upgrade first?</h1>
-          <p className="text-muted-foreground">Select a block on the map or in the table.</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="mw-text-xl nsw-text-semibold">Where should we upgrade first?</h1>
+          <p className="mw-text-muted">Select a block on the map or in the table.</p>
+          <p className="mw-mt-1 nsw-small mw-text-muted">
             Colours show how much hotter the ground gets than the area's middle on hot summer days, measured by satellite. This is surface temperature, not the air inside a flat.
           </p>
         </header>
@@ -310,7 +332,7 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
                 <TabsTrigger value="top">Top blocks</TabsTrigger>
                 <TabsTrigger value="shortlist">Shortlist{shortlist.ids.length > 0 ? ` (${shortlist.ids.length})` : ''}</TabsTrigger>
               </TabsList>
-              <TabsContent value="top" className="mt-2">
+              <TabsContent value="top" className="mw-mt-2">
                 <DataTable
                   caption="Blocks ranked by screening score"
                   columns={columns}
@@ -329,7 +351,7 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
                         Filter by heat
                       </label>
                       <Select value={band} onValueChange={setBand}>
-                        <SelectTrigger id="heat-filter" className="w-[11rem]">
+                        <SelectTrigger id="heat-filter" className="mw-select-auto">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -345,13 +367,13 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
                   }
                 />
               </TabsContent>
-              <TabsContent value="shortlist" className="mt-2">
+              <TabsContent value="shortlist" className="mw-mt-2">
                 <ShortlistView ids={shortlist.ids} buildings={buildings} remove={shortlist.remove} onOpen={(id) => select(id)} />
               </TabsContent>
             </Tabs>
             <Button
               variant="link"
-              className="h-auto p-0"
+              className="mw-h-auto mw-p-0"
               onClick={() => {
                 setOwn(true)
                 setSelectedId(null)

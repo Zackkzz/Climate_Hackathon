@@ -4,12 +4,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 export default function HowItWorks({ meta, onClose }: { meta: Meta; onClose: () => void }) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="mw-sm-max-w-2xl">
         <DialogHeader>
           <DialogTitle>How Meterwise works</DialogTitle>
           <DialogDescription>What it does, what it assumes and where its limits are.</DialogDescription>
         </DialogHeader>
-      <div className="how space-y-4 [&_h3]:mb-1 [&_h3]:text-base [&_h3]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1">
+      <div className="how mw-space-y-4">
         <section>
           <h3>The problem</h3>
           <p>
@@ -48,7 +48,7 @@ export default function HowItWorks({ meta, onClose }: { meta: Meta; onClose: () 
 
         <section>
           <h3>How this could really happen</h3>
-          <p className="text-sm text-muted-foreground">A plan to explore, not something that has been agreed.</p>
+          <p className="nsw-small mw-text-muted">A plan to explore, not something that has been agreed.</p>
           <ul>
             <li>
               <strong>Community housing providers:</strong> they own whole blocks and already have upgrade funding, so this is possible now.
@@ -107,7 +107,7 @@ export default function HowItWorks({ meta, onClose }: { meta: Meta; onClose: () 
               </a>{' '}
               (ODbL), drawn with MapLibre GL JS (BSD-3-Clause).
             </li>
-            <li>Interface built with React, Vite, Tailwind CSS and shadcn/ui (MIT). Typeface Public Sans (SIL Open Font Licence).</li>
+            <li>Interface built with React, Vite and the NSW Design System (MIT licence, used as a style library only, with no NSW Government branding). Typeface Public Sans (SIL Open Font Licence). Icons are Material Icons (SIL Open Font Licence, bundled by Fontsource).</li>
           </ul>
         </section>
       </div>

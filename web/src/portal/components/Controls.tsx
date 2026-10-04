@@ -1,6 +1,6 @@
 // Reads GET /api/government/controls and shows the controls that are in place, in plain terms.
 // Used by the Trust and security page and the IT assurance page.
-import { Check, Minus } from 'lucide-react'
+import { Check, Minus } from '@/portal/components/icons'
 import { api } from '@/console/api'
 import { useRes } from '@/console/useRes'
 import { Gate } from './States'
@@ -63,15 +63,15 @@ export function readControls(raw: unknown): ControlsData {
 }
 
 export function ControlsList({ data }: { data: ControlsData }) {
-  if (data.controls.length === 0) return <p className="text-muted-foreground">No controls were reported.</p>
+  if (data.controls.length === 0) return <p className="mw-text-muted">No controls were reported.</p>
   return (
-    <ul className="divide-y border bg-card">
+    <ul className="mw-divide-y mw-border mw-bg-white">
       {data.controls.map((c) => (
-        <li key={c.key} className="grid gap-1 px-4 py-3 sm:grid-cols-[12rem_1fr_8rem] sm:gap-4">
-          <span className="font-semibold">{c.title}</span>
+        <li key={c.key} className="mw-control-row">
+          <span className="nsw-text-semibold">{c.title}</span>
           <span>{c.text}</span>
-          <span className={'inline-flex items-start gap-1 font-medium ' + (c.on ? 'text-success' : 'text-muted-foreground')}>
-            {c.on ? <Check className="mt-0.5 size-4" aria-hidden="true" /> : <Minus className="mt-0.5 size-4" aria-hidden="true" />}
+          <span className={'nsw-display-inline-flex nsw-align-items-start mw-gap-1 nsw-text-medium ' + (c.on ? 'mw-text-success' : 'mw-text-muted')}>
+            {c.on ? <Check /> : <Minus />}
             {c.on ? 'In place' : 'Not connected'}
           </span>
         </li>

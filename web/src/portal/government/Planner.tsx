@@ -3,7 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router'
-import { toast } from 'sonner'
+import { toast } from '@/portal/components/ui/sonner'
 import { z } from 'zod'
 import { api } from '@/console/api'
 import type { PlanResult } from '@/console/types'
@@ -77,14 +77,14 @@ export default function Planner() {
     ],
     [],
   )
-  const notCols = useMemo<ColumnDef<Not>[]>(() => [{ accessorKey: 'label', header: 'Block' }, { accessorKey: 'reason', header: 'Why it was left out', cell: ({ row }) => <span className="whitespace-normal">{row.original.reason}</span> }], [])
+  const notCols = useMemo<ColumnDef<Not>[]>(() => [{ accessorKey: 'label', header: 'Block' }, { accessorKey: 'reason', header: 'Why it was left out', cell: ({ row }) => <span className="mw-ws-normal">{row.original.reason}</span> }], [])
 
   return (
     <div>
       <PageHeader crumbs={[{ label: 'Government', to: '/government' }, { label: 'Portfolio planner' }]} title="Portfolio planner" description="Give a capital budget and a grant budget. The planner picks the blocks that do the most good within them, and says why it left the others out. Buying many units together can lower prices." />
       <Form {...form}>
         <form
-          className="mb-4 border bg-card p-4"
+          className="mw-mb-4 mw-border mw-bg-white mw-p-4"
           noValidate
           onSubmit={form.handleSubmit(async (v) => {
             setMade(null)
@@ -92,24 +92,24 @@ export default function Planner() {
             if (r) setResult(r)
           })}
         >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="nsw-display-grid mw-gap-3 mw-sm-grid-cols-2 mw-lg-grid-cols-4">
             <NumberField control={form.control} name="capital_budget" label="Capital budget ($)" step={10000} min={0} />
             <NumberField control={form.control} name="grant_budget" label="Grant budget ($)" step={10000} min={0} />
             <SelectField control={form.control} name="objective" label="What matters most" options={OBJ} />
-            <CheckField control={form.control} name="bulk" label="Count bulk-buying discounts" className="sm:pt-7" />
+            <CheckField control={form.control} name="bulk" label="Count bulk-buying discounts" className="mw-sm-pt-7" />
           </div>
-          <div className="mt-3 space-y-2">
+          <div className="mw-mt-3 mw-space-y-2">
             <ErrorAlert error={plan.error} title="We could not plan the portfolio" />
             <Button type="submit" disabled={plan.busy}>
               {plan.busy ? 'Planning' : 'Plan the portfolio'}
             </Button>
-            {plan.busy && <p role="status" className="text-muted-foreground">This can take up to 20 seconds.</p>}
+            {plan.busy && <p role="status" className="mw-text-muted">This can take up to 20 seconds.</p>}
           </div>
         </form>
       </Form>
 
       {result && (
-        <div className="space-y-4">
+        <div className="mw-space-y-4">
           <Figures
             label="Plan totals"
             items={[
@@ -121,17 +121,17 @@ export default function Planner() {
               { label: 'Saved by bulk buying', value: result.bulk.applied ? money(result.bulk.capex_saved) : 'Not counted' },
             ]}
           />
-          <p className="text-muted-foreground">{result.method}</p>
+          <p className="mw-text-muted">{result.method}</p>
           <Panel title="Chosen blocks">
             <DataTable columns={selCols} data={result.selected} caption="Chosen blocks table" getRowId={(s) => s.building_id} csvName="planner-chosen" searchPlaceholder="Search chosen blocks" emptyTitle="No block fits" emptyText="No block fits these budgets." />
             {result.selected.length > 0 && (
-              <div className="mt-3 flex flex-wrap items-end gap-3 border-t pt-3">
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="plan-owner" className="text-sm font-medium">
+              <div className="mw-mt-3 nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-3 mw-border-t mw-pt-3">
+                <div className="nsw-display-flex nsw-flex-column mw-gap-1_5">
+                  <label htmlFor="plan-owner" className="nsw-small nsw-text-medium">
                     Housing provider for the new projects
                   </label>
                   <Select value={ownerId} onValueChange={setOwner}>
-                    <SelectTrigger id="plan-owner" className="w-72">
+                    <SelectTrigger id="plan-owner" className="mw-w-72">
                       <SelectValue placeholder="Choose a provider" />
                     </SelectTrigger>
                     <SelectContent>
@@ -149,13 +149,13 @@ export default function Planner() {
                   </Button>
                 </Confirm>
                 {made === result.selected.length && made > 0 && (
-                  <p role="status" className="font-medium text-success">
+                  <p role="status" className="nsw-text-medium mw-text-success">
                     Done. <Link to="/government/projects">See them in the projects list</Link>.
                   </p>
                 )}
               </div>
             )}
-            <div className="mt-2">
+            <div className="mw-mt-2">
               <ErrorAlert error={create.error} title="Some projects were not started" />
             </div>
           </Panel>
