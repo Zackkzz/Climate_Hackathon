@@ -18,3 +18,7 @@ data/raw
 **/*.key
 **/*.log
 **/.DS_Store
+.secrets
+backups
+output
+docs/security-review

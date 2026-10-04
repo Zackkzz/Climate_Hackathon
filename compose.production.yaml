@@ -1,0 +1,103 @@
+# Separate stack: no inherited demo settings or database volumes.
+services:
+  meterwise:
+    build: .
+    image: meterwise:production
+    environment:
+      METERWISE_DEMO: "0"
+      METERWISE_AUTOSEED: "0"
+      METERWISE_DOCS: "0"
+      METERWISE_DB: /app/engine/var/meterwise.db
+      METERWISE_SECRET_FILE: /run/secrets/signing_key
+      METERWISE_ENCRYPTION_KEYS_FILE: /run/secrets/encryption_keys
+      METERWISE_TRUSTED_PROXIES: 172.30.0.10
+      METERWISE_CORS_ORIGINS: ${METERWISE_ORIGIN:-https://localhost:8443}
+    secrets: [signing_key, encryption_keys]
+    volumes:
+      - production-data:/app/engine/var
+      - production-weather:/app/data/cache
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    networks: [backend]
+
+  gateway:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.gateway
+    image: meterwise-gateway:production
+    ports:
+      - "${METERWISE_BIND:-127.0.0.1}:8443:8443"
+      - "${METERWISE_BIND:-127.0.0.1}:8080:8080"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+    secrets: [tls_certificate, tls_key]
+    depends_on:
+      meterwise: {condition: service_healthy}
+    read_only: true
+    tmpfs: [/var/cache/nginx, /var/run, /tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    user: "101:101"
+    restart: unless-stopped
+    networks:
+      backend: {ipv4_address: 172.30.0.10}
+
+  security-operations:
+    image: meterwise:production
+    command: [python, scripts/security_operations.py, monitor, --directory, /backups, --interval, "3600"]
+    environment:
+      METERWISE_DB: /source/meterwise.db
+      METERWISE_BACKUP_KEYS_FILE: /run/secrets/backup_keys
+    secrets: [backup_keys]
+    volumes:
+      - production-data:/source:ro
+      - production-backups:/backups
+    depends_on:
+      meterwise: {condition: service_healthy}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    healthcheck: {disable: true}
+    network_mode: none
+
+  retention:
+    image: meterwise:production
+    command: [python, scripts/retention.py, --apply, --interval, "86400"]
+    environment:
+      METERWISE_DEMO: "0"
+      METERWISE_AUTOSEED: "0"
+      METERWISE_DB: /app/engine/var/meterwise.db
+      METERWISE_ENCRYPTION_KEYS_FILE: /run/secrets/encryption_keys
+    secrets: [encryption_keys]
+    volumes: [production-data:/app/engine/var]
+    depends_on:
+      meterwise: {condition: service_healthy}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    healthcheck: {disable: true}
+    network_mode: none
+
+volumes:
+  production-data:
+  production-weather:
+  production-backups:
+
+networks:
+  backend:
+    ipam:
+      config: [{subnet: 172.30.0.0/24}]
+
+secrets:
+  signing_key: {file: ./.secrets/signing_key}
+  encryption_keys: {file: ./.secrets/encryption_keys}
+  backup_keys: {file: ./.secrets/backup_keys}
+  tls_certificate: {file: ./.secrets/tls_certificate}
+  tls_key: {file: ./.secrets/tls_key}

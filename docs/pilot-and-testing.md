@@ -10,7 +10,7 @@ The brief asks how the solution's impact could be tested. Four questions decide 
 | Question | How it is tested | When |
 |---|---|---|
 | 1. Is the arithmetic right? | Automated tests | Done this weekend |
-| 2. Does the model match published figures? | Comparison with benchmarks in `validation/REPORT.md` | Done this weekend |
+| 2. Does the model match published figures? | Comparison with benchmarks in `docs/validation/REPORT.md` | Done this weekend |
 | 3. Does the model match real flats? | Real bills and temperature loggers in a few flats | Months 1 to 3 |
 | 4. Does the deal hold up after installation? | Measured bills and temperatures before and after, against a comparison group | Months 3 to 18 |
 

@@ -5,6 +5,7 @@ Usage:  .venv/Scripts/python run.py  [--port 8000] [--reload]
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -58,7 +59,8 @@ if __name__ == "__main__":
     print(f"Meterwise API on http://localhost:{args.port}/api/health"
           + (f" ; web app at http://localhost:{args.port}/" if (DIST / "index.html").exists() else " (no web/dist yet)"))
     if args.host != "127.0.0.1":
-        uvicorn.run(app, host=args.host, port=args.port)
+        uvicorn.run(app, host=args.host, port=args.port,
+                    forwarded_allow_ips=os.environ.get("METERWISE_TRUSTED_PROXIES", "127.0.0.1"))
     else:
         # Listen on IPv4 and IPv6 loopback so "localhost" is fast whichever address a client tries first (Windows).
         import socket

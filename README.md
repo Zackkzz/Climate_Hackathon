@@ -58,7 +58,7 @@ against real bills.
 
 - **69 automated tests** cover the finance arithmetic, rules that must always hold, the thermal model's energy
   balance and the API contract.
-- **[validation/REPORT.md](validation/REPORT.md)** compares the model with published benchmarks: 16 of 22 checks
+- **[docs/validation/REPORT.md](docs/validation/REPORT.md)** compares the model with published benchmarks: 16 of 22 checks
   fall inside ranges set beforehand. The report lists each miss and why it matters. It includes a 20-case
   sensitivity table.
 - **[data/pilot/README.md](data/pilot/README.md)** documents the dataset checks. The heat layer agrees with the NSW
@@ -90,6 +90,14 @@ To run backend tests inside the image:
 ```bash
 docker compose run --rm --no-deps --workdir /app/engine meterwise python -m pytest
 ```
+
+### Production security configuration
+
+The separate `compose.production.yaml` stack disables seeding, requires independently mounted signing and
+credential-encryption keys, serves HTTPS, and runs encrypted backup/audit monitoring and retention services.
+It uses fresh volumes and refuses example identities and programmes. See
+[the remediation and deployment instructions](docs/it-assurance.md#security-review-remediation).
+The default Compose file remains the local demonstration configuration.
 
 ### Local Python and Node
 
@@ -171,7 +179,7 @@ organisation checks; an append-only, hash-chained audit log (`GET /api/programme
 sign-ins, failures, reads of tenant data, exports and every change; security headers and CSP on every response;
 body-size and row limits; CSV formula neutralising; a separate, withdrawable consent per tenancy before any uploaded
 or utility meter reading is accepted; personal-data export and erase; `/.well-known/security.txt`, `/api/health`,
-`/api/ready` and request ids. See [SECURITY.md](SECURITY.md). Python dependencies are pinned in `requirements.lock`
+`/api/ready` and request ids. See [docs/SECURITY.md](docs/SECURITY.md). Python dependencies are pinned in `requirements.lock`
 (`pip freeze`); `docs/sbom/meterwise-sbom.cdx.json` is a CycloneDX list built from `requirements.lock` and
 `web/package-lock.json` by a short script, not by a dedicated SBOM tool.
 
@@ -212,12 +220,16 @@ Security checks: `scripts/security_check.py` (see [docs/it-assurance.md](docs/it
 | `engine/meterwise/` | Weather, thermal model, equipment, tariffs, finance; every default in `params.py` with its source |
 | `engine/api/` | FastAPI service; contract in [docs/api-contract.md](docs/api-contract.md) |
 | `engine/programme/` | Programme system: database, roles, pipeline, ledger, reserve, M&V, documents, portals, simulated clock, seed |
-| `engine/tests/`, `validation/` | Tests and the generated validation report |
+| `engine/tests/`, `validation/` | Tests and the validation report generator |
 | `data/pilot/`, `data/pipeline/` | Pilot dataset and the scripts that build it |
 | `web/` | React app |
-| `docs/` | Policy note, pilot and testing plan, API contract |
-| [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | The plan on all fronts |
-| [DISCLOSURE.md](DISCLOSURE.md) | Tools, data, AI use and prior-work statement |
+| `docs/` | Project documentation, policy, contracts, plans and reports |
+| [docs/validation/REPORT.md](docs/validation/REPORT.md) | Generated model validation report |
+| [docs/SECURITY.md](docs/SECURITY.md) | Security policy and vulnerability reporting |
+| [docs/security-review/Meterwise_Security_Readiness_Review.docx](docs/security-review/Meterwise_Security_Readiness_Review.docx) | Word security readiness report |
+| `docs/security-review/evidence/` | Local vulnerability scans, SBOMs and verification results (ignored by Git) |
+| [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) | The plan on all fronts |
+| [docs/DISCLOSURE.md](docs/DISCLOSURE.md) | Tools, data, AI use and prior-work statement |
 
 ## NSW Design System variant of the web app
 
@@ -245,4 +257,4 @@ branding rules and how it was checked are in [web/NSW-DESIGN-SYSTEM.md](web/NSW-
 
 © OpenStreetMap contributors (ODbL). Landsat imagery courtesy of the U.S. Geological Survey. Australian Bureau of
 Statistics 2021 Census (CC BY 4.0). Weather from Open-Meteo using Copernicus ERA5. Full list in
-[DISCLOSURE.md](DISCLOSURE.md).
+[docs/DISCLOSURE.md](docs/DISCLOSURE.md).

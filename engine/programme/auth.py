@@ -22,7 +22,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from . import audit, db
+from . import audit, db, security
 from .errors import ProgError, bad, forbidden
 
 ROLES = ["manager", "government", "utility", "owner", "installer", "funder", "tenant"]
@@ -59,14 +59,14 @@ def check_startup_secret() -> None:
     """Refuse to start outside demo mode without a strong secret from the environment."""
     if demo_mode():
         return
-    s = os.environ.get("METERWISE_SECRET", "")
+    s = security.setting("METERWISE_SECRET")
     if s.lower() in DEFAULT_SECRETS or len(s) < 32:
         raise RuntimeError("METERWISE_DEMO=0 needs METERWISE_SECRET set in the environment to a random value of at "
                            "least 32 characters. Refusing to start with a default or missing secret.")
 
 
 def _secret() -> bytes:
-    env = os.environ.get("METERWISE_SECRET")
+    env = security.setting("METERWISE_SECRET")
     if env:
         return env.encode()
     s = db.get_setting("secret")
@@ -335,7 +335,11 @@ def login(email: str, password: str, ip: str) -> dict:
     db.ex("DELETE FROM login_failures WHERE email = ?", (email,))
     need, enrolled = _mfa_needed(u)
     if need:
-        ticket = sign({"typ": "mfa", "uid": u["id"], "exp": int(now + 300)})
+        db.ex("DELETE FROM mfa_challenges WHERE expires < ?", (now - 86400,))
+        challenge = secrets.token_urlsafe(24)
+        db.insert("mfa_challenges", id=challenge, user_id=u["id"], purpose="login" if enrolled else "enrol",
+                  expires=now + 300)
+        ticket = sign({"typ": "mfa", "uid": u["id"], "cid": challenge, "exp": int(now + 300)})
         audit.log("auth.password_ok_mfa_pending", by=u["name"], role=u["role"])
         return {"mfa_required": True, "mfa_enrolled": enrolled, "ticket": ticket}
     token = _new_session(u["role"], user_id=u["id"])
@@ -357,15 +361,31 @@ def _ticket_user(ticket: str) -> dict:
     p = unsign(ticket or "")
     if not p or p.get("typ") != "mfa" or time.time() > p.get("exp", 0):
         raise ProgError("unauthorized", "The sign-in step has expired. Enter your password again.")
+    challenge = db.q1("SELECT * FROM mfa_challenges WHERE id = ?", (p.get("cid"),))
+    if not challenge or challenge["user_id"] != p.get("uid") or challenge["consumed"] or \
+            challenge["attempts"] >= 5 or time.time() > challenge["expires"]:
+        raise ProgError("unauthorized", "The sign-in step is no longer valid. Enter your password again.")
     u = db.q1("SELECT * FROM users WHERE id = ?", (p["uid"],))
     if not u:
         raise ProgError("unauthorized", "This account no longer exists.")
     return u
 
 
+def _challenge_attempt(ticket: str) -> None:
+    payload = unsign(ticket)
+    db.ex("UPDATE mfa_challenges SET attempts = attempts + 1 WHERE id = ?", (payload["cid"],))
+    _persist()
+
+
+def _consume(ticket: str) -> None:
+    payload = unsign(ticket)
+    db.ex("UPDATE mfa_challenges SET consumed = 1 WHERE user_id = ?", (payload["uid"],))
+
+
 def mfa_setup(p: Principal | None, ticket: str | None) -> dict:
     """Start TOTP enrolment for the signed-in user (or, with a sign-in ticket, a user who must enrol first)."""
     if p is not None and p.user_id:
+        ticket = None
         u = db.q1("SELECT * FROM users WHERE id = ?", (p.user_id,))
     elif ticket:
         u = _ticket_user(ticket)
@@ -373,9 +393,16 @@ def mfa_setup(p: Principal | None, ticket: str | None) -> dict:
         raise ProgError("unauthorized", "Please sign in.")
     if u["role"] not in STAFF_ROLES:
         raise forbidden("Multi-factor sign-in is for staff accounts.")
+    existing = db.q1("SELECT * FROM mfa WHERE user_id = ?", (u["id"],))
+    if existing and existing["enabled"]:
+        raise forbidden("An authenticator is already enrolled. Replacement requires the controlled recovery process.")
+    if ticket:
+        challenge = db.q1("SELECT * FROM mfa_challenges WHERE id = ?", (unsign(ticket)["cid"],))
+        if challenge["purpose"] != "enrol":
+            raise forbidden("This sign-in step cannot enrol an authenticator.")
     sec = totp_secret()
     db.ex("INSERT INTO mfa (user_id, secret, enabled) VALUES (?, ?, 0) ON CONFLICT(user_id) DO UPDATE SET "
-          "secret = excluded.secret, enabled = 0, last_step = NULL", (u["id"], sec))
+          "secret = excluded.secret, enabled = 0, last_step = NULL", (u["id"], security.protect(sec)))
     audit.log("auth.mfa_setup_started", by=u["name"], role=u["role"])
     uri = f"otpauth://totp/Meterwise:{u['email']}?secret={sec}&issuer=Meterwise&digits=6&period=30"
     return {"secret": sec, "otpauth_uri": uri,
@@ -383,16 +410,27 @@ def mfa_setup(p: Principal | None, ticket: str | None) -> dict:
 
 
 def mfa_verify(p: Principal | None, ticket: str | None, code: str) -> dict:
+    if p and p.user_id:
+        ticket = None
     u = db.q1("SELECT * FROM users WHERE id = ?", (p.user_id,)) if p and p.user_id else _ticket_user(ticket or "")
     m = db.q1("SELECT * FROM mfa WHERE user_id = ?", (u["id"],))
     if not m:
         raise bad("Start multi-factor setup first.")
+    if m["enabled"]:
+        raise forbidden("This authenticator is already enrolled. Use the MFA sign-in step.")
+    if ticket:
+        challenge = db.q1("SELECT * FROM mfa_challenges WHERE id = ?", (unsign(ticket)["cid"],))
+        if challenge["purpose"] != "enrol":
+            raise forbidden("This sign-in step cannot verify enrolment.")
+        _challenge_attempt(ticket)
     st = totp_check(m["secret"], code, m["last_step"])
     if st is None:
         audit.log("auth.mfa_verify_failed", by=u["name"], role=u["role"])
         _persist()
         raise bad("That code is not right. Check the time on your device and try the newest code.")
     db.ex("UPDATE mfa SET enabled = 1, last_step = ? WHERE user_id = ?", (st, u["id"]))
+    db.ex("UPDATE sessions SET revoked = 1 WHERE user_id = ? AND id != ?", (u["id"], p.session_id if p else ""))
+    db.ex("UPDATE mfa_challenges SET consumed = 1 WHERE user_id = ?", (u["id"],))
     audit.log("auth.mfa_enabled", by=u["name"], role=u["role"])
     out: dict[str, Any] = {"mfa_enabled": True}
     if p is None:  # enrolled during sign-in: finish the sign-in
@@ -403,6 +441,10 @@ def mfa_verify(p: Principal | None, ticket: str | None, code: str) -> dict:
 def mfa_login(ticket: str, code: str, ip: str) -> dict:
     rate_check(ip)
     u = _ticket_user(ticket)
+    challenge = db.q1("SELECT * FROM mfa_challenges WHERE id = ?", (unsign(ticket)["cid"],))
+    if challenge["purpose"] != "login":
+        raise forbidden("Complete enrolment before signing in.")
+    _challenge_attempt(ticket)
     m = db.q1("SELECT * FROM mfa WHERE user_id = ?", (u["id"],))
     if not m or not m["enabled"]:
         raise bad("Multi-factor sign-in is not set up for this account yet. Use /api/auth/mfa/setup with your ticket.")
@@ -412,6 +454,7 @@ def mfa_login(ticket: str, code: str, ip: str) -> dict:
         _persist()
         raise ProgError("unauthorized", "That code is not right.")
     db.ex("UPDATE mfa SET last_step = ? WHERE user_id = ?", (st, u["id"]))
+    _consume(ticket)
     audit.log("auth.login", detail={"mfa": True}, by=u["name"], role=u["role"])
     return {"token": _new_session(u["role"], user_id=u["id"]), "user": _user_principal(u).user_obj()}
 
@@ -420,8 +463,8 @@ def tenant_login(code: str, ip: str) -> dict:
     rate_check(ip)
     code = (code or "").strip().upper()
     t = db.q1("SELECT t.*, f.project_id FROM tenancies t JOIN flats f ON f.id = t.flat_id "
-              "WHERE t.access_code = ? AND t.active = 1", (code,))
-    if not t:
+              "WHERE t.access_code_hash = ? AND t.active = 1", (security.code_digest(code),))
+    if not t or (not demo_mode() and (not t["access_code_expires"] or time.time() > t["access_code_expires"])):
         audit.log("auth.tenant_code_failed", by="anonymous", role="anonymous")
         _persist()
         raise ProgError("unauthorized", "That access code was not found. Check the letter from your housing provider.")
@@ -442,9 +485,9 @@ def new_access_code(seed_key: str | None = None) -> str:
             d = hashlib.sha256(f"{seed_key}:{attempt}".encode()).digest()
             body = "".join(_ALPH[b % len(_ALPH)] for b in d[:6])
         else:
-            body = "".join(secrets.choice(_ALPH) for _ in range(6))
+            body = "".join(secrets.choice(_ALPH) for _ in range(6 if demo_mode() else 26))
         code = f"FLAT-{body}"
-        if not db.q1("SELECT 1 FROM tenancies WHERE access_code = ?", (code,)):
+        if not db.q1("SELECT 1 FROM tenancies WHERE access_code_hash = ?", (security.code_digest(code),)):
             return code
     raise RuntimeError("Could not make a unique access code.")
 

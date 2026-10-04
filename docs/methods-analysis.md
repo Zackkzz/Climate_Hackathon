@@ -3,7 +3,7 @@
 *Written 4 October 2026. Covers `engine/meterwise/microclimate.py`, `sizing.py`, `tariff.py`, `mv.py`,
 `portfolio.py` and the endpoints in `engine/api/analysis.py` (contract: `docs/analysis-contract.md`). Every parameter
 named here lives in `engine/meterwise/params.py` with its source or the word "assumption". Real output for pilot
-buildings is in `validation/REPORT.md`, section 4.*
+buildings is in `docs/validation/REPORT.md`, section 4.*
 
 All modules reuse the screening engine: the same building lookup, the same two-node hourly thermal model, the same
 equipment and bill arithmetic, and the same deal rules (`finance.py`). A small private helper,
