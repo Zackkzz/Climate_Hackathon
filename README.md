@@ -69,11 +69,47 @@ against real bills.
 
 ## Run it
 
-Needs Python 3.12 and Node 20 or later.
+### Docker (no local Python or Node required)
+
+Start Docker Desktop, then run from the project root:
 
 ```bash
-python -m venv .venv
-.venv/Scripts/python -m pip install -r requirements.txt     # macOS/Linux: .venv/bin/python
+docker compose up --build -d
+```
+
+Open http://localhost:8000. The image builds the frontend with Node 22 and runs the backend with Python 3.12.
+The first start seeds the example programme and can take a little longer; check progress with
+`docker compose logs -f`. This configuration runs the local demo and publishes the port only on your computer.
+
+The database is saved in the `meterwise-data` Docker volume and survives container rebuilds.
+Use `docker compose down` to stop the app while keeping its data. `docker compose down --volumes` also deletes
+the demo database, so the next start creates fresh example data.
+
+To run backend tests inside the image:
+
+```bash
+docker compose run --rm --no-deps --workdir /app/engine meterwise python -m pytest
+```
+
+### Local Python and Node
+
+Needs Python 3.12 or later and Node 20 or later. Check the Python version before creating the virtual environment;
+macOS's system `python3` may still be Python 3.9.
+
+macOS/Linux (use `python3.13` instead if that is your installed version):
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+cd web && npm install && npm run build && cd ..
+.venv/bin/python run.py
+```
+
+Windows:
+
+```bash
+py -3.12 -m venv .venv
+.venv/Scripts/python -m pip install -r requirements.txt
 cd web && npm install && npm run build && cd ..
 .venv/Scripts/python run.py                                 # http://localhost:8000
 ```

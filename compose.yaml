@@ -1,0 +1,13 @@
+services:
+  meterwise:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      METERWISE_DEMO: "1"
+      METERWISE_DB: /app/engine/var/meterwise.db
+    volumes:
+      - meterwise-data:/app/engine/var
+
+volumes:
+  meterwise-data:
