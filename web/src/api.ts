@@ -2,6 +2,7 @@ import type {
   AssessRequest,
   AssessResponse,
   BuildingCollection,
+  HeatLookup,
   Meta,
   PortfolioRequest,
   PortfolioResponse,
@@ -34,9 +35,6 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
     if (e instanceof DOMException && e.name === 'AbortError') throw e
     throw new ApiError(0, "We couldn't reach the Meterwise server. Check it is running, then try again.")
   }
-  if (res.status === 502 || res.status === 503 || res.status === 504) {
-    throw new ApiError(res.status, "We couldn't reach the Meterwise server. Check it is running, then try again.")
-  }
   if (!res.ok) {
     let detail = ''
     try {
@@ -44,6 +42,10 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
       if (body && typeof body === 'object' && 'detail' in body && typeof body.detail === 'string') detail = body.detail
     } catch {
       /* not JSON */
+    }
+    // a gateway error without the server's own message means the server itself could not be reached
+    if (!detail && (res.status === 502 || res.status === 503 || res.status === 504)) {
+      throw new ApiError(res.status, "We couldn't reach the Meterwise server. Check it is running, then try again.")
     }
     throw new ApiError(res.status, detail || `The server had a problem (error ${res.status}). Please try again.`)
   }
@@ -96,6 +98,16 @@ export async function assess(req: AssessRequest, signal?: AbortSignal): Promise<
     return mockCall(() => m.mockAssess(req), signal, 150)
   }
   return postJson<AssessResponse>('/api/assess', req, signal)
+}
+
+/** Satellite heat for a spot. The first lookup in each 1 km square takes 20 to 40 seconds; later ones are instant. */
+export async function getHeat(lat: number, lon: number, signal?: AbortSignal): Promise<HeatLookup> {
+  if (USE_MOCK) {
+    return mockCall(() => {
+      throw new ApiError(503, 'Satellite heat lookups need the Meterwise server; the built-in demo data does not include them.')
+    }, signal)
+  }
+  return http<HeatLookup>(`/api/heat?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`, { signal })
 }
 
 export async function portfolio(req: PortfolioRequest, signal?: AbortSignal): Promise<PortfolioResponse> {

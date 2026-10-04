@@ -95,7 +95,9 @@ from `/api/meta`.
 ```
 
 - When `building_id` is given, `building` holds overrides only (for example the user corrects the number of flats).
-- When there is no `building_id`, `building` must hold `storeys`, `flats`, `roof_m2`, `lat`, `lon`.
+- When there is no `building_id`, `building` must hold `storeys`, `flats`, `roof_m2`, `lat`, `lon`. If it has no
+  `heat_anomaly_c`, the server looks it up from satellite data for `lat`/`lon` (see `GET /api/heat`). If that is not
+  possible, it uses 0 and adds a warning saying no local heat adjustment was applied.
 - `savings_share_to_charge` is the largest share of a flat's modelled bill saving that the meter charge may take.
   0.8 means the tenant keeps at least 20% of the saving.
 - `disconnect_gas` is only allowed when every gas appliance in `existing` is replaced by the package. The backend
@@ -189,6 +191,29 @@ Rules the backend guarantees:
 - `assumptions[].kind` is `"sourced"` (with a URL in `source`) or `"assumption"` (source is the literal string
   `"assumption"`).
 - Errors use HTTP 400 or 404 with `{"detail": "plain-language message"}`.
+
+## GET /api/heat?lat=-33.9173&lon=151.2313
+
+Satellite heat for any spot in New South Wales, worked out the same way as the pilot's `heat_anomaly_c`
+(`engine/meterwise/heat.py`). Landsat 8/9 summer land surface temperature (Dec-Feb, 2023-24 to 2025-26, Tier 1, clear
+scenes only) is read from the Microsoft Planetary Computer for a 4 km x 4 km window around the 1 km square holding the
+spot. `heat_anomaly_c` = the mean over 50 m around the spot minus the median over the window's land (water excluded).
+The first lookup in each 1 km square takes 20 to 40 seconds; the result is cached in `engine/var/heat`, so later
+lookups, and `POST /api/assess` for the same spot, are instant.
+
+```json
+{"heat_anomaly_c": -0.34, "heat_band": "average", "site_lst_c": 37.8, "area_median_lst_c": 38.1, "scene_count": 9,
+ "first_date": "2023-12-11", "last_date": "2026-02-10", "window_km": 4.0, "site_radius_m": 50.0,
+ "source": "https://planetarycomputer.microsoft.com/dataset/landsat-c2-l2"}
+```
+
+- Differences from the pilot dataset: the pilot uses the building footprint plus 30 m and the median over its two
+  suburbs. Checked on eight pilot buildings, the lookup keeps their order and reads about 0.5 C lower (the land within
+  2 km is a little warmer than the suburbs' median).
+- `heat_band` uses the pilot's band cut points.
+- 503 with `{"detail": "..."}` when no value can be produced: outside NSW, too few clear images, mostly water, the
+  satellite catalogue cannot be reached, the server is offline (`METERWISE_OFFLINE`) or the optional packages
+  (`rasterio`, `pystac-client`, `planetary-computer`) are not installed. 400 for out-of-range coordinates.
 
 ## POST /api/portfolio
 

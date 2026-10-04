@@ -8,6 +8,7 @@ import numpy as np
 
 from . import buildings as B
 from . import finance as F
+from . import heat as H
 from . import params as P
 from .bills import Bill, Tariff, compute_bill
 from .models import AssessRequest, PackageIn
@@ -96,12 +97,18 @@ def resolve_building(req: AssessRequest, ds: B.Dataset) -> tuple[dict[str, Any],
         missing = [k for k in ["storeys", "flats", "roof_m2", "lat", "lon"] if getattr(o, k) is None]
         if missing:
             raise AssessError("Please give either a building_id or the building's " + ", ".join(missing) + ".")
+        anomaly = o.heat_anomaly_c
+        if anomaly is None:
+            try:
+                anomaly = H.heat_at(o.lat, o.lon)["heat_anomaly_c"]
+            except H.HeatUnavailable as e:
+                anomaly = 0.0
+                warnings.append("No satellite heat value is available for this spot, so no local heat adjustment was "
+                                f"applied (the weather is still for this location). {e}")
         b = {"id": None, "label": o.label or "Custom building", "storeys": o.storeys, "flats": o.flats,
              "roof_m2": o.roof_m2, "flat_area_m2": o.flat_area_m2 or P.v("flat_area_m2"), "lat": o.lat, "lon": o.lon,
-             "heat_anomaly_c": o.heat_anomaly_c or 0.0, "storeys_source": "user", "suburb": ""}
+             "heat_anomaly_c": anomaly, "storeys_source": "user", "suburb": ""}
         b["heat_band"] = B.band_for(b["heat_anomaly_c"], ds.anomaly_quintiles)
-        if o.heat_anomaly_c is None:
-            warnings.append("No local heat value was given, so the building is treated as average for the area.")
     if b["flats"] < b["storeys"]:
         warnings.append("There are fewer flats than storeys; the split between top-floor and lower flats is approximate.")
     if b["lat"] is None or b["lon"] is None:

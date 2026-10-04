@@ -4,7 +4,7 @@ import { Suspense, lazy, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import type { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
-import { portfolio } from '@/api'
+import { getHeat, portfolio } from '@/api'
 import { useUser } from '@/console/auth'
 import { heatWord, money, num1, plural, rentedPhrase } from '@/format'
 import { HEAT_COLORS, HEAT_ORDER } from '@/heat'
@@ -90,6 +90,27 @@ function SelectedBlock({ f, onBuild, shortlisted, onShortlist }: { f: BuildingFe
   )
 }
 
+const monthYear = (iso: string) => new Date(iso + 'T00:00:00').toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })
+
+/** Summer satellite heat for the chosen spot. The server caches it, so building the deal reuses this lookup. */
+function SpotHeat({ lat, lon }: { lat: number; lon: number }) {
+  const h = useLoad(() => getHeat(lat, lon), `${lat.toFixed(5)},${lon.toFixed(5)}`)
+  let text: string
+  if (h.loading) text = 'Looking up summer satellite heat for this spot. The first lookup in an area takes 20 to 40 seconds.'
+  else if (h.error || !h.data) text = `${h.error ?? ''} The deal will use no local heat adjustment.`.trim()
+  else {
+    const d = h.data
+    const a = Math.abs(d.heat_anomaly_c)
+    const diff = a < 0.05 ? 'about the same as' : `${a.toFixed(1)} °C ${d.heat_anomaly_c > 0 ? 'hotter' : 'cooler'} than`
+    text = `Satellite heat: on summer days the ground here is ${diff} the land within ${d.window_km / 2} km. From ${d.scene_count} clear Landsat images, ${monthYear(d.first_date)} to ${monthYear(d.last_date)}.`
+  }
+  return (
+    <p className="nsw-small mw-text-muted" aria-live="polite">
+      {text}
+    </p>
+  )
+}
+
 const ownSchema = z.object({
   storeys: z.coerce.number({ message: 'Enter the number of storeys.' }).int('Use a whole number.').min(1, 'At least 1 storey.').max(12, 'Up to 12 storeys.'),
   flats: z.coerce.number({ message: 'Enter the number of flats.' }).int('Use a whole number.').min(1, 'At least 1 flat.').max(200, 'Up to 200 flats.'),
@@ -135,6 +156,7 @@ function OwnBlockForm({ meta, pin, pickMode, setPickMode, onCancel, onSubmit }: 
             <MapPin aria-hidden="true" /> {pickMode ? 'Tap the map...' : pin ? 'Move the spot' : 'Choose the spot on the map'}
           </Button>
           <p className="nsw-small mw-text-muted">{pin ? 'Spot chosen.' : 'Optional. Without it we use the middle of the pilot area.'}</p>
+          <SpotHeat lat={loc.lat} lon={loc.lon} />
         </div>
         <div className="nsw-display-flex mw-gap-2">
           <Button type="submit">Build the deal</Button>
