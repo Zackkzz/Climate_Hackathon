@@ -9,6 +9,8 @@ services:
     environment:
       METERWISE_DEMO: "1"
       METERWISE_DB: /app/engine/var/meterwise.db
+      # unlocks the example-account dropdown at /signin#accounts=<secret>; unset keeps it off
+      METERWISE_ACCOUNTS_SECRET: ${METERWISE_ACCOUNTS_SECRET:-}
     volumes:
       - meterwise-data:/app/engine/var
 
