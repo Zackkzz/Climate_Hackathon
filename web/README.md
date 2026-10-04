@@ -7,7 +7,7 @@ Built against `../docs/api-contract.md`.
 
 ```bash
 cd web
-npm install
+npm install          # and put the .env.local file with the Google Maps key in web/ (see below)
 
 npm run dev:mock     # demo data, no backend needed       -> http://localhost:5173
 npm run dev          # real API: /api is proxied to http://localhost:8000
@@ -15,6 +15,39 @@ npm run dev          # real API: /api is proxied to http://localhost:8000
 npm run build        # type-check + production build into web/dist (real API, relative /api paths)
 npm run build:mock   # same, but with the built-in demo data (for a static demo)
 ```
+
+### The map (Google Maps)
+
+The block finder map uses the Google Maps JavaScript API. Its browser key lives in `web/.env.local`, one line:
+
+```
+VITE_GOOGLE_MAPS_API_KEY=the-key
+```
+
+Git ignores that file, so the team passes it around directly. Vite reads it for `dev`, `dev:mock` and every build;
+restart the dev server after adding it. Without it the finder still works and the map panel says the map could not
+load.
+
+Google Cloud setup (project `meterwise-platform`):
+
+| What | Value |
+| --- | --- |
+| Key | "Meterwise web map (browser)": Maps JavaScript API only; accepted only from `http://localhost` and `http://127.0.0.1` on ports 5173, 8000, 8010 and 8020 |
+| Daily cap | 500 map loads a day for the project (Google's free allowance is 10,000 a month) |
+
+A browser key is visible to anyone who opens the site, so its protection is the address list, the one-API limit and the
+daily cap, not secrecy. Passing the file around the team is fine; just keep it out of git. If the file is lost, a project
+owner can print the key again:
+
+```bash
+gcloud services api-keys get-key-string bd9d3e51-aa27-40b6-83ce-cf04698a00f4 --project=meterwise-platform
+```
+
+Before publishing the site at a real address, create a separate key restricted to that address and build with it; this
+one stays for development.
+
+The server's Content Security Policy (`engine/api/programme.py`) allows the Google Maps hosts; scripts only from
+`maps.googleapis.com` and `maps.gstatic.com`.
 
 The backend serves `web/dist` at `/`. Routing uses the URL hash (`#/find`, `#/build?...`, `#/share?...`), so no server
 fallback rules are needed and all asset and API paths are relative.
@@ -49,7 +82,7 @@ src/
   mock/               demo fixtures and demo model
   components/
     FindStep.tsx      map screen: list, selected card, own-block form, shortlist table
-    MapView.tsx       MapLibre map (lazy loaded)
+    MapView.tsx       Google map (lazy loaded)
     DealStep.tsx      step 2 layout; Inputs.tsx = left column; result/ = verdict, balance, charts, costs
     ShareStep.tsx     tenant / owner / funder sheets, print CSS, copy link
     HowItWorks.tsx    modal;  ui.tsx = small shared controls;  Icons.tsx = icons and logo
@@ -63,9 +96,8 @@ src/
 | React, React DOM | UI | MIT |
 | Vite, @vitejs/plugin-react | build tooling | MIT |
 | TypeScript | type checking | Apache-2.0 |
-| MapLibre GL JS (`maplibre-gl`) | map rendering | BSD-3-Clause |
-| OpenStreetMap standard raster tiles (`tile.openstreetmap.org`) | basemap, no API key | OSM tile usage policy; data under ODbL; attribution shown on the map |
-| OpenStreetMap data | basemap data, building footprints come from the backend | ODbL 1.0, attribution "© OpenStreetMap contributors" shown on the map |
+| Google Maps JavaScript API, loaded with `@googlemaps/js-api-loader` (Apache-2.0); types `@types/google.maps` (MIT) | base map and map drawing | Google Maps Platform Terms of Service; Google's logo and attribution shown on the map |
+| OpenStreetMap data | building footprints, from the backend, drawn on the Google map | ODbL 1.0, attribution "Buildings © OpenStreetMap contributors" shown on the map |
 | Heat colour ramp | ColorBrewer YlOrRd, 5 classes | Apache-2.0 (Brewer, Harrower and The Pennsylvania State University) |
 | Icons, logo, favicon | drawn in-house as inline SVG for this project | Original work, no third-party icon set |
 | Fonts | none loaded; system font stack (`ui-rounded`, `system-ui`, Segoe UI, Roboto, ...) | n/a |
@@ -74,4 +106,5 @@ src/
 Electricity and gas emission factors and agency links that appear in the demo "What this assumes" list point to the
 Australian Government (DCCEEW, AER) home pages. In real mode the assumptions and sources come from the backend.
 
-No analytics, cookies or third-party scripts are used. The only external requests are map tiles from OpenStreetMap.
+No analytics or cookies are used. The one third-party script is the Google Maps JavaScript API in the block finder,
+which also loads map images and the fonts of its controls from Google.

@@ -77,6 +77,10 @@ Start Docker Desktop, then run from the project root:
 docker compose up --build -d
 ```
 
+The block finder map needs the Google Maps browser key at build time. Put it in a `.env` file in the project root
+(git ignores it) as `VITE_GOOGLE_MAPS_API_KEY=...`, or set that variable in your shell, before building. Without it the
+app still runs and the map panel says the map could not load.
+
 Open http://localhost:8000. The image builds the frontend with Node 22 and runs the backend with Python 3.12.
 The first start seeds the example programme and can take a little longer; check progress with
 `docker compose logs -f`. This configuration runs the local demo and publishes the port only on your computer.
@@ -109,7 +113,7 @@ macOS/Linux (use `python3.13` instead if that is your installed version):
 ```bash
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-cd web && npm install && npm run build && cd ..
+cd web && npm install && npm run build && cd ..   # first put the Google Maps key file in web/.env.local, see web/README.md
 .venv/bin/python run.py
 ```
 
@@ -118,7 +122,7 @@ Windows:
 ```bash
 py -3.12 -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt
-cd web && npm install && npm run build && cd ..
+cd web && npm install && npm run build && cd ..   # first put the Google Maps key file in web/.env.local, see web/README.md
 .venv/Scripts/python run.py                                 # http://localhost:8000
 ```
 
@@ -153,11 +157,11 @@ references (`MW-100001`), not National Metering Identifiers, and readings the sy
 | `METERWISE_DB` | `engine/var/meterwise.db` | SQLite database path |
 | `METERWISE_DEMO` | `1` | `0` turns off the system-date controls (`/api/sim/*`), the account list and the MFA exemption for seeded accounts, and requires `METERWISE_SECRET` |
 | `METERWISE_LIST_ACCOUNTS` | `0` | `1` turns on `GET /api/auth/demo-users` (seeded accounts and tenant codes) for local testing; needs `METERWISE_DEMO=1` |
+| `METERWISE_ACCOUNTS_SECRET` | unset | With `METERWISE_DEMO=1`, a secret of 16 or more characters that unlocks the example-account dropdown on sign-in: open `/signin#accounts=<secret>`. The server checks it on `GET /api/auth/demo-users` (header `X-Accounts-Secret`) |
 | `METERWISE_DOCS` | `1` when `METERWISE_DEMO=1`, else `0` | Interactive API docs and `/openapi.json` |
 | `METERWISE_SECRET` | generated and stored in the database (demo only) | Token signing key; required (32+ characters) when `METERWISE_DEMO=0` |
 | `METERWISE_CORS_ORIGINS` | local hosts | Comma-separated allowed origins |
 | `METERWISE_AUTOSEED` | `1` | `0` leaves a fresh database empty |
-| `METERWISE_TILE_HOST` | OpenStreetMap tiles | Image host allowed by the Content-Security-Policy |
 | `METERWISE_OIDC_*` | unset | Single sign-on settings; the callback returns 501 until configured |
 | `METERWISE_NOW` | real time | Fixes the clock's base date (tests) |
 
@@ -209,7 +213,8 @@ sign-in factor only while `METERWISE_DEMO=1`. Organisation names are invented an
 | utility | gas@meterwise.example | Jamie Ortega (Field services coordinator), Tenterra Gas Network |
 
 Tenants sign in with the access code on their flat (`FLAT-` and six characters). Managers and owners see the codes
-in the flat list; with `METERWISE_LIST_ACCOUNTS=1`, `GET /api/auth/demo-users` also lists a few.
+in the flat list; with `METERWISE_LIST_ACCOUNTS=1`, `GET /api/auth/demo-users` also lists a few. With
+`METERWISE_ACCOUNTS_SECRET` set, opening `/signin#accounts=<secret>` shows them in a dropdown on the sign-in page.
 
 Security checks: `scripts/security_check.py` (see [docs/it-assurance.md](docs/it-assurance.md)).
 
@@ -255,6 +260,6 @@ branding rules and how it was checked are in [web/NSW-DESIGN-SYSTEM.md](web/NSW-
 
 ## Data credits
 
-© OpenStreetMap contributors (ODbL). Landsat imagery courtesy of the U.S. Geological Survey. Australian Bureau of
+Base map © Google (Google Maps Platform). Building footprints © OpenStreetMap contributors (ODbL). Landsat imagery courtesy of the U.S. Geological Survey. Australian Bureau of
 Statistics 2021 Census (CC BY 4.0). Weather from Open-Meteo using Copernicus ERA5. Full list in
 [docs/DISCLOSURE.md](docs/DISCLOSURE.md).

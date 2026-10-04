@@ -117,51 +117,41 @@ export function SizingPanel({ req }: { req: AssessRequest }) {
 }
 
 // ---------- risk ----------
+/** One row per group of flats: the middle 8 in 10 outcomes as a bar, the most likely as a tick, and the part of the
+ * scale below $0 (the tenant is worse off) shaded. Laid out in HTML so text stays readable at any width. */
 function BandChart({ r }: { r: Risk }) {
   const lo = Math.min(0, ...r.groups.map((g) => g.net_saving_per_month.p10))
   const hi = Math.max(1, ...r.groups.map((g) => g.net_saving_per_month.p90))
-  const span = hi - lo
-  const min = lo - span * 0.08
-  const max = hi + span * 0.08
-  const w = 600
-  const rowH = 54
-  const padL = 8
-  const padR = 8
-  const h = r.groups.length * rowH + 30
-  const x = (v: number) => padL + ((v - min) / (max - min)) * (w - padL - padR)
+  const pad = (hi - lo) * 0.06
+  const min = lo - pad
+  const max = hi + pad
+  const at = (v: number) => `${((v - min) / (max - min)) * 100}%`
+  const zero = at(0)
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="mw-h-auto nsw-width-100" role="img" aria-label={r.groups.map((g) => `${posLabel(g.position)}: most likely ${money(g.net_saving_per_month.p50)} a month, range ${money(g.net_saving_per_month.p10)} to ${money(g.net_saving_per_month.p90)}`).join('. ')}>
-      <rect x={padL} y={0} width={Math.max(0, x(0) - padL)} height={h - 24} fill="#f6d9d6" opacity={0.7} />
-      <line x1={x(0)} x2={x(0)} y1={0} y2={h - 24} stroke="#b3261e" strokeDasharray="4 3" />
-      <text x={x(0) - 6} y={14} textAnchor="end" fontSize="13" fill="#b3261e">
-        Worse off
-      </text>
-      <text x={x(0) + 6} y={14} fontSize="13" fill="#50575e">
-        Better off
-      </text>
-      {r.groups.map((g, i) => {
-        const cy = 40 + i * rowH
+    <div className="mw-band" role="img" aria-label={r.groups.map((g) => `${posLabel(g.position)}: most likely ${money(g.net_saving_per_month.p50)} a month, range ${money(g.net_saving_per_month.p10)} to ${money(g.net_saving_per_month.p90)}`).join('. ')}>
+      <ul className="mw-band__key" aria-hidden="true">
+        <li><span className="mw-band__swatch mw-band__swatch--range" />Middle 8 in 10 outcomes</li>
+        <li><span className="mw-band__swatch mw-band__swatch--mid" />Most likely</li>
+        <li><span className="mw-band__swatch mw-band__swatch--loss" />Worse off than now (below $0)</li>
+      </ul>
+      {r.groups.map((g) => {
         const p = g.net_saving_per_month
         return (
-          <g key={g.position}>
-            <text x={padL + 2} y={cy - 12} fontSize="13" fontWeight="600" fill="#1b1f23">
-              {posLabel(g.position)}
-            </text>
-            <line x1={x(p.p10)} x2={x(p.p90)} y1={cy + 4} y2={cy + 4} stroke="#0b4f7c" strokeWidth={14} opacity={0.35} />
-            <line x1={x(p.p50)} x2={x(p.p50)} y1={cy - 6} y2={cy + 14} stroke="#0b3a5c" strokeWidth={3} />
-            <text x={x(p.p10)} y={cy + 28} textAnchor="middle" fontSize="13" fill="#1b1f23">
-              {money(p.p10)}
-            </text>
-            <text x={x(p.p90)} y={cy + 28} textAnchor="middle" fontSize="13" fill="#1b1f23">
-              {money(p.p90)}
-            </text>
-            <text x={x(p.p50)} y={cy - 12} textAnchor="middle" fontSize="13" fontWeight="600" fill="#1b1f23">
-              {money(p.p50)}
-            </text>
-          </g>
+          <div key={g.position} className="mw-band__row" aria-hidden="true">
+            <div className="mw-band__label">{posLabel(g.position)}</div>
+            <div className="mw-band__track">
+              <span className="mw-band__loss" style={{ width: zero }} />
+              <span className="mw-band__zero" style={{ left: zero }} />
+              <span className="mw-band__range" style={{ left: at(p.p10), width: `calc(${at(p.p90)} - ${at(p.p10)})` }} />
+              <span className="mw-band__mid" style={{ left: at(p.p50) }} />
+            </div>
+            <div className="mw-band__values">
+              Most likely <strong>{money(p.p50)}</strong> a month, from {money(p.p10)} to {money(p.p90)}
+            </div>
+          </div>
         )
       })}
-    </svg>
+    </div>
   )
 }
 
@@ -192,7 +182,7 @@ export function RiskView({ r, currentShare }: { r: Risk; currentShare?: number }
       <div>
         <h3 className="nsw-text-semibold">What moves the result most</h3>
         <div className="mw-mt-1 nsw-overflow-x-auto mw-border" role="region" aria-label="What moves the result most" tabIndex={0}>
-          <Table>
+          <Table className="mw-table--full">
             <TableHeader>
               <TableRow>
                 <TableHead>Input</TableHead>

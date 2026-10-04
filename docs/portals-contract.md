@@ -127,6 +127,6 @@ Backend:
 Front end:
 
 14. WCAG 2.2 AA: keyboard operable, visible focus, contrast, target size 24 px minimum, reflow at 320 px, labels and error identification, status messages announced, no information by colour alone, skip link, page titles, language attribute.
-15. No third-party scripts, fonts, analytics or trackers. Fonts and icons bundled. Map tiles are the only external request and can be switched to a configured tile server.
+15. No analytics or trackers. Fonts and icons bundled. The one third-party script is the Google Maps JavaScript API in the block finder (map code, images and the fonts of its controls come from Google); the Content Security Policy allows scripts only from `maps.googleapis.com` and `maps.gstatic.com`.
 16. Session timeout warning with extend; sign-out everywhere; no tokens in URLs; tokens in memory plus `sessionStorage` only.
 17. Privacy notice, accessibility statement and terms pages, linked in the footer of every portal.

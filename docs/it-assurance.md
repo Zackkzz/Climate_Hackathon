@@ -26,7 +26,7 @@ some of those sources were read only from search summaries and are marked there.
 | 5 | Single sign-on | Not built. Settings and a callback route exist and return "not configured". | `/api/auth/oidc/*` returns 501 |
 | 6 | Sessions | 12 hours at most, 30 minutes idle, sign-out revokes. Tokens travel in a header, never in a URL or cookie. | `auth.py` |
 | 7 | Audit log | Append-only. The database refuses updates and deletes. Each entry carries the hash of the one before, and a verify route reports the first altered or missing entry. Records sign-ins, failures, reads of tenant data, exports and changes. | `/api/programme/audit-log/verify`, `engine/programme/audit.py` |
-| 8 | Response headers | Content Security Policy (own origin, plus map tiles), HSTS, no-sniff, referrer policy, permissions policy, no framing, no caching of API responses | Any response; `test_security.py` |
+| 8 | Response headers | Content Security Policy (own origin, plus the Google Maps hosts for the block finder map), HSTS, no-sniff, referrer policy, permissions policy, no framing, no caching of API responses | Any response; `test_security.py` |
 | 9 | Input handling | Every request body is validated. Uploads are limited in size and rows. Database queries are parameterised. Exports neutralise spreadsheet formulas. | `test_security.py` |
 | 10 | Consent for meter data | A separate, dated consent per meter with scope, purpose and expiry. Utility readings without it are rejected row by row. Withdrawal stops further loads. | `test_mv_and_data.py` |
 | 11 | Access and erasure requests | Export of one tenant's personal data; erase redacts tenancy-related text and keeps financial amounts. A retention job supports dry runs and holds. | `/api/programme/flats/{id}/personal-data` |
@@ -34,7 +34,7 @@ some of those sources were read only from search summaries and are marked there.
 | 13 | Supply chain | Pinned Python and npm dependencies, and a bill of materials produced from the lock files by a short script (not a dedicated tool). Dependency audits were run on 4 October 2026 (below). | `requirements.lock`, `web/package-lock.json`, `docs/sbom/` |
 | 14 | Disclosure and incidents | `SECURITY.md`, `/.well-known/security.txt`, and a draft runbook that has not been rehearsed | [incident-response.md](incident-response.md) |
 | 15 | Accessibility | Built to WCAG 2.2 AA and checked with an automated tool on each page. Automated checks find only part of the problems; no person using assistive technology has tested it. | Accessibility statement in the app |
-| 16 | No third parties in the browser | No external scripts, fonts or analytics. Map tiles are the one external request and the tile server can be changed. | Content Security Policy |
+| 16 | Third parties in the browser | No analytics or trackers. The one external script is the Google Maps JavaScript API in the block finder; it loads map images and control fonts from Google and tells Google the viewer's address, browser and map area. Scripts are allowed only from Google's two Maps hosts. The browser key is limited to that API, to listed web addresses and to 500 map loads a day, and is kept out of the repository in a git-ignored env file. | Content Security Policy; `web/README.md` |
 
 ## Known weaknesses
 

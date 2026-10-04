@@ -10,3 +10,7 @@ pytest
 shapely
 pyproj
 cryptography
+# satellite heat for a spot chosen on the map (meterwise/heat.py); optional, lookups fall back without them
+rasterio
+pystac-client
+planetary-computer

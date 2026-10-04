@@ -109,15 +109,19 @@ class Seeder:
     def procure(self, pid: int, prices: list[float], accept: int | None = 0, grant: bool = True) -> None:
         self.to(pid, "procurement")
         self.act(self.mgr)
-        S.open_tender(self.mgr, pid, {"installer_org_ids": [self.org["inst1"], self.org["inst2"]],
-                                      "closes_on": clock.madd(clock.month(), 1) + "-20"})
+        # A decision still open when seeding ends (accept=None) must still be possible "today": its tender closes and its
+        # quotes expire after the month the seed finishes in (offset 0), not a few months after they were submitted.
+        end = clock.madd(clock.month(), -clock.offset())
+        closes = clock.madd(end if accept is None else clock.month(), 1) + "-20"
+        valid = clock.madd(end, 2) + "-01" if accept is None else clock.madd(clock.month(), 3) + "-01"
+        S.open_tender(self.mgr, pid, {"installer_org_ids": [self.org["inst1"], self.org["inst2"]], "closes_on": closes})
         pr = S.get_project(pid)
         qids = []
         for k, (email, factor) in enumerate(zip(["installer@meterwise.example", "installer2@meterwise.example"], prices)):
             ip = self.act(self.principal(email))
             items = [{"key": t["key"], "qty": t["qty"], "unit_price": round(t["modelled_unit_price"] * factor, 2)}
                      for t in S.tender_items(pr)]
-            q = S.submit_quote(ip, pid, {"items": items, "valid_until": clock.madd(clock.month(), 3) + "-01",
+            q = S.submit_quote(ip, pid, {"items": items, "valid_until": valid,
                                          "note": "Price includes removal of old equipment and all certificates."})
             qids.append(q["id"])
         if accept is None:

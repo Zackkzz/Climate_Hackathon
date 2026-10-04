@@ -66,7 +66,7 @@ export default function NewProject() {
                           Selected: {pickedFeature.properties.label}, about {pickedFeature.properties.flats_est} flats
                         </p>
                       )}
-                      {picked && !pickedFeature && <p className="mw-text-warning">Building {picked} was not found in the pilot area.</p>}
+                      {picked && !pickedFeature && <p className="mw-text-warning">Building {picked} was not found in the building dataset.</p>}
                       {matches.length === 0 ? (
                         <p className="mw-text-muted">No building matches that address.</p>
                       ) : (

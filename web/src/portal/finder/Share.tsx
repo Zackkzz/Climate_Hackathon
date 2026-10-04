@@ -172,7 +172,7 @@ function TenantSheet({ r, active }: { r: AssessResponse; active: boolean }) {
         if (!c?.period_label) return null
         return (
           <p>
-            Across {c.period_label}, a top-floor flat is estimated to spend {num(c.hours_above_30c_baseline)} hours above 30°C without air conditioning, falling to {num(c.hours_above_30c_upgraded)} with the upgrade.
+            Over the whole year, with no air conditioning running, a top-floor flat is estimated to spend {num(c.hours_above_30c_baseline)} hours above 30°C, falling to {num(c.hours_above_30c_upgraded)} with the upgrade.
           </p>
         )
       })()}
@@ -327,11 +327,10 @@ function FunderSheet({ r, active }: { r: AssessResponse; active: boolean }) {
           <div className="s-lab">repaid over {f.term_years} years</div>
         </div>
         <div>
-          <div className={'s-num ' + (ret < 0 ? 'warn' : '')}>
-            {ret < 0 ? '-' : ''}
-            {Math.abs(ret).toFixed(1)}%
+          <div className={'s-num ' + (ret != null && ret < 0 ? 'warn' : '')}>
+            {ret == null ? 'None' : `${ret < 0 ? '-' : ''}${Math.abs(ret).toFixed(1)}%`}
           </div>
-          <div className="s-lab">{ret < 0 ? 'estimated loss a year' : 'estimated return a year'}</div>
+          <div className="s-lab">{ret == null ? 'no return: nothing is lent' : ret < 0 ? 'estimated loss a year' : 'estimated return a year'}</div>
         </div>
         <div>
           <div className={'s-num ' + (p.fully_funded ? 'good' : 'warn')}>{p.fully_funded ? 'None' : moneyApprox(p.funding_gap)}</div>
@@ -430,11 +429,11 @@ export default function Share({ assess, sheet, onSheet, onBack }: Props) {
           </div>
         </div>
         <Tabs value={sheet} onValueChange={(v) => onSheet(v as Sheet)}>
-          <TabsList aria-label="Choose a sheet" className="mw-h-auto nsw-flex-wrap mw-p-1">
+          <TabsList aria-label="Choose a sheet" className="mw-sheet-tabs">
             {TABS.map((t) => (
-              <TabsTrigger key={t.key} value={t.key} id={`tab-${t.key}`} aria-controls={`sheet-${t.key}`} className="mw-h-auto nsw-flex-column nsw-align-items-start mw-py-1_5">
-                <span className="nsw-text-semibold">{t.label}</span>
-                <span className="nsw-small nsw-text-normal mw-text-muted">{t.sub}</span>
+              <TabsTrigger key={t.key} value={t.key} id={`tab-${t.key}`} aria-controls={`sheet-${t.key}`} >
+                <span className="mw-sheet-tab__label">{t.label}</span>
+                <span className="mw-sheet-tab__sub">{t.sub}</span>
               </TabsTrigger>
             ))}
           </TabsList>

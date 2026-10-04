@@ -3,6 +3,9 @@ WORKDIR /app/web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web/ ./
+# The Google Maps browser key is built into the web app; .dockerignore keeps .env files out, so it comes in as an argument
+ARG VITE_GOOGLE_MAPS_API_KEY=""
+ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
 RUN npm run build
 
 FROM python:3.12-slim-trixie@sha256:dddfd7e07f9d15aeeca61529320492139d21cac7f0070c00609243e51e4e0016 AS runtime
@@ -10,8 +13,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     METERWISE_DB=/app/engine/var/meterwise.db
 WORKDIR /app
+# libexpat1: the rasterio wheel bundles GDAL but links against the system libexpat (satellite heat lookups)
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends libpcre2-8-0=10.46-1~deb13u3 \
+    && apt-get install --yes --no-install-recommends libpcre2-8-0=10.46-1~deb13u3 libexpat1=2.8.3-1~deb13u1 \
     && rm -rf /var/lib/apt/lists/*
 COPY requirements.runtime.lock ./
 RUN pip install --no-cache-dir --require-hashes -r requirements.runtime.lock \

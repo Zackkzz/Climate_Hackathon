@@ -18,6 +18,101 @@ const loginSchema = z.object({ email: z.string().min(1, 'Enter your email addres
 const codeSchema = z.object({ code: z.string().trim().min(1, 'Enter your access code.').regex(/^[A-Za-z0-9-]{6,}$/, 'An access code looks like FLAT-7K2Q.') })
 const mfaSchema = z.object({ code: z.string().trim().regex(/^\d{6}$/, 'Enter the 6 digits from your authenticator app.') })
 
+/** A seeded account from GET /api/auth/demo-users. */
+interface ExampleAccount {
+  role: string
+  name: string
+  email?: string
+  password?: string
+  code?: string
+  org?: { name: string }
+}
+const ROLE_LABEL: Record<string, string> = { manager: 'Programme manager', government: 'Government', owner: 'Property owner', funder: 'Funder', installer: 'Installer', utility: 'Utility', tenant: 'Tenant' }
+const SECRET_KEY = 'mw.accountsSecret'
+
+/**
+ * The example-account list is hidden behind a secret. Open /signin#accounts=<secret> once: the secret is kept in this
+ * browser (local storage) and taken out of the address bar. The part after # never reaches the server, its logs or other sites.
+ * The server checks the secret (METERWISE_ACCOUNTS_SECRET) and answers 404 to anyone without it.
+ */
+function accountsSecret(): string | null {
+  // A malformed link (bad % escape) or blocked storage must never take the sign-in page down: no list, nothing else.
+  try {
+    const m = /[#&]accounts=([^&]+)/.exec(window.location.hash)
+    if (m) {
+      window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
+      const s = decodeURIComponent(m[1])
+      localStorage.setItem(SECRET_KEY, s)
+      return s
+    }
+    return localStorage.getItem(SECRET_KEY)
+  } catch {
+    return null
+  }
+}
+
+const accountKey = (a: ExampleAccount) => a.email ?? a.code ?? a.name
+
+/** A dropdown of example accounts, shown only to someone with the secret. */
+function ExampleAccounts({ busy, onPick }: { busy: boolean; onPick: (a: ExampleAccount) => void }) {
+  const [list, setList] = useState<ExampleAccount[]>([])
+  const [chosen, setChosen] = useState('')
+  const [hash, setHash] = useState(window.location.hash)
+  // adding #accounts=... to the address of an open sign-in page changes only the hash, without a reload
+  useEffect(() => {
+    const on = () => setHash(window.location.hash)
+    window.addEventListener('hashchange', on)
+    return () => window.removeEventListener('hashchange', on)
+  }, [])
+  useEffect(() => {
+    const secret = accountsSecret()
+    if (!secret) return
+    let live = true
+    fetch('/api/auth/demo-users', { headers: { 'X-Accounts-Secret': secret } })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((l: unknown) => {
+        if (live && Array.isArray(l)) setList(l as ExampleAccount[])
+      })
+      .catch(() => {})
+    return () => {
+      live = false
+    }
+  }, [hash])
+  if (list.length === 0) return null
+  const roles = [...new Set(list.map((a) => a.role))]
+  const pick = list.find((a) => accountKey(a) === chosen)
+  return (
+    <section className="mw-mt-4 mw-space-y-3 mw-border mw-bg-white mw-p-4" aria-labelledby="example-accounts">
+      <h2 id="example-accounts" className="nsw-h5">
+        Example accounts
+      </h2>
+      <p className="nsw-small mw-text-muted">Every organisation and person in this list is invented. Choose one to sign in as them.</p>
+      <div className="nsw-form__group">
+        <label className="nsw-form__label" htmlFor="example-account">
+          Account
+        </label>
+        <select id="example-account" className="nsw-form__select" value={chosen} onChange={(e) => setChosen(e.target.value)}>
+          <option value="">Choose an account</option>
+          {roles.map((role) => (
+            <optgroup key={role} label={ROLE_LABEL[role] ?? role}>
+              {list
+                .filter((a) => a.role === role)
+                .map((a) => (
+                  <option key={accountKey(a)} value={accountKey(a)}>
+                    {a.org ? `${a.name}, ${a.org.name}` : a.name}
+                  </option>
+                ))}
+            </optgroup>
+          ))}
+        </select>
+      </div>
+      <Button type="button" disabled={!pick || busy} onClick={() => pick && onPick(pick)}>
+        Sign in as this account
+      </Button>
+    </section>
+  )
+}
+
 export default function SignIn() {
   const nav = useNavigate()
   const loc = useLocation()
@@ -118,7 +213,7 @@ export default function SignIn() {
           </form>
         </Form>
       </div>
-
+      <ExampleAccounts busy={login.busy || tenant.busy} onPick={(a) => (a.code ? doCode(a.code) : doLogin(a.email ?? '', a.password ?? ''))} />
     </div>
   )
 }

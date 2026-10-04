@@ -74,7 +74,7 @@ export function makeVerdict(r: AssessResponse): Verdict {
       .sort((a, b) => a.ratio - b.ratio)[0]
     if (worst && worst.ratio < 0.1 && worst.i.net_capex >= p.funding_gap * 0.25) {
       hints.push(
-        `Taking out the ${ITEM_SHORT[worst.i.key]} would cut ${moneyApprox(worst.i.net_capex)} from the cost and lose only about ${moneyApprox(worst.i.saving_per_year)} a year in savings.`,
+        `Taking out the ${ITEM_SHORT[worst.i.key]} would cut ${moneyApprox(worst.i.net_capex)} from the cost and ${worst.i.saving_per_year >= 1 ? `lose only about ${moneyApprox(worst.i.saving_per_year)} a year in savings` : 'lose no bill savings'}.`,
       )
     }
     if (!gc?.term_years_for_full_funding && r.finance.term_years < 20) hints.push('A longer repayment period spreads the cost over more months. Try it under Advanced.')

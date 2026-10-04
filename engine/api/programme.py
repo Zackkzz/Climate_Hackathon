@@ -6,6 +6,7 @@ runs its service call inside one serialised database transaction with the audit 
 """
 from __future__ import annotations
 
+import hmac
 import json
 import logging
 import os
@@ -23,10 +24,14 @@ from programme.errors import ProgError, bad
 
 log = logging.getLogger("meterwise.request")
 MAX_BODY = 2_000_000
-TILE_HOST = os.environ.get("METERWISE_TILE_HOST", "https://tile.openstreetmap.org https://*.tile.openstreetmap.org")
-CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: "
-       f"{TILE_HOST}; font-src 'self'; connect-src 'self' {TILE_HOST}; object-src 'none'; base-uri 'self'; form-action 'self'; "
-       "frame-ancestors 'none'")
+# Google Maps JavaScript API for the block finder map: its script, map images, the fonts of its controls and its data
+# calls (https://developers.google.com/maps/documentation/javascript/content-security-policy). Scripts are limited to
+# the two Maps hosts, not *.googleapis.com, which would also admit files anyone can host on storage.googleapis.com.
+GMAPS_SCRIPT = "https://maps.googleapis.com https://maps.gstatic.com"
+GMAPS_DATA = "https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com"
+CSP = (f"default-src 'self'; script-src 'self' {GMAPS_SCRIPT}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+       f"img-src 'self' data: blob: {GMAPS_DATA}; font-src 'self' https://fonts.gstatic.com; connect-src 'self' {GMAPS_DATA}; "
+       "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
 
 
 # ------------------------------------------------------------------------------------------- plumbing
@@ -133,9 +138,21 @@ def mfa_login(request: Request, body: dict = Body(...)) -> dict:
     return call(None, auth.mfa_login, body.get("ticket"), str(body.get("code") or ""), _client_ip(request))
 
 
+def accounts_unlocked(request: Request) -> bool:
+    """The example-account list is open with METERWISE_LIST_ACCOUNTS=1 (local testing), or to a request whose
+    X-Accounts-Secret header matches METERWISE_ACCOUNTS_SECRET (at least 16 characters). Demo mode only, either way."""
+    if not auth.demo_mode():
+        return False
+    if os.environ.get("METERWISE_LIST_ACCOUNTS", "0") == "1":
+        return True
+    secret = os.environ.get("METERWISE_ACCOUNTS_SECRET", "")
+    given = request.headers.get("x-accounts-secret", "")
+    return len(secret) >= 16 and hmac.compare_digest(given.encode(), secret.encode())
+
+
 @auth_router.get("/demo-users")
-def demo_users() -> list:
-    if os.environ.get("METERWISE_LIST_ACCOUNTS", "0") != "1" or not auth.demo_mode():
+def demo_users(request: Request) -> list:
+    if not accounts_unlocked(request):
         raise ProgError("not_found", "Not found.")
 
     def f():

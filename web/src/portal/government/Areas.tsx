@@ -1,9 +1,12 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { govApi } from '@/console/api-gov'
 import type { AreaRow, BuildingPoint } from '@/console/types-gov'
 import { useRes } from '@/console/useRes'
 import { heatWord, num } from '@/format'
+import { HEAT_COLORS, HEAT_ORDER } from '@/heat'
+import type { HeatBand } from '@/types'
+import { MAPS_KEY, MAP_STYLE, loadMaps, mapsAuthFailures } from '@/portal/lib/maps'
 import { ChartBox } from '@/portal/components/ChartBox'
 import { DataTable } from '@/portal/components/DataTable'
 import { PageHeader } from '@/portal/components/PageHeader'
@@ -11,62 +14,92 @@ import { Gate } from '@/portal/components/States'
 import { STAGE_LABEL } from '@/portal/components/Status'
 import type { Stage } from '@/console/types'
 
-const BANDS = ['cooler', 'average', 'warm', 'hot', 'hottest']
-const FILL: Record<string, string> = { cooler: '#ffffff', average: '#c9ced3', warm: '#8a939b', hot: '#4a5560', hottest: '#1b1f23' }
 const LIVE = ['commissioned', 'active', 'closed']
+// Project rings in NSW brand colours: dark for built or active, blue for the pipeline.
+const RING = { live: '#002664', pipeline: '#146cfd' }
 
-/** One marker per heat band: a different shape and size as well as a different tone. */
-function Marker({ band, x, y, ring }: { band: string; x: number; y: number; ring: 'none' | 'live' | 'pipeline' }) {
-  const i = Math.max(0, BANDS.indexOf(band))
-  const s = 4 + i * 1.2
-  const common = { fill: FILL[band] ?? '#8a939b', stroke: '#1b1f23', strokeWidth: 1.2 }
-  let shape
-  if (i === 0) shape = <circle cx={x} cy={y} r={s - 1} {...common} />
-  else if (i === 1) shape = <circle cx={x} cy={y} r={s} {...common} />
-  else if (i === 2) shape = <rect x={x - s} y={y - s} width={s * 2} height={s * 2} {...common} />
-  else if (i === 3) shape = <polygon points={`${x},${y - s - 1} ${x + s + 1},${y + s} ${x - s - 1},${y + s}`} {...common} />
-  else shape = <polygon points={`${x},${y - s - 2} ${x + s + 2},${y} ${x},${y + s + 2} ${x - s - 2},${y}`} {...common} />
+type Ring = 'none' | 'live' | 'pipeline'
+const ringOf = (p: BuildingPoint): Ring => (p.project_stage ? (LIVE.includes(p.project_stage) ? 'live' : 'pipeline') : 'none')
+const titleOf = (p: BuildingPoint) =>
+  `${p.building_id}: ${heatWord(p.heat_band)}, about ${p.flats_est} flats${p.project_stage ? `, project at ${STAGE_LABEL[p.project_stage as Stage] ?? p.project_stage}` : ', no project'}`
+
+/** The buildings on the Google map: a dot per building in the finder's heat colours, bigger for hotter bands, with a
+ * ring for a project. A visual aid; "Show as table" has the same data for keyboard and screen reader users. */
+function AreasMap({ pts }: { pts: BuildingPoint[] }) {
+  const box = useRef<HTMLDivElement>(null)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>(MAPS_KEY ? 'loading' : 'failed')
+  useEffect(() => {
+    if (!MAPS_KEY || pts.length === 0) return
+    let gone = false
+    const fail = () => {
+      if (!gone) setStatus('failed')
+    }
+    mapsAuthFailures.add(fail)
+    loadMaps().then(([maps, core]) => {
+      if (gone || !box.current) return
+      const map = new maps.Map(box.current, {
+        styles: MAP_STYLE,
+        backgroundColor: '#ebebeb',
+        disableDefaultUI: true,
+        zoomControl: true,
+        clickableIcons: false,
+        gestureHandling: 'cooperative',
+        headingInteractionEnabled: false,
+        tiltInteractionEnabled: false,
+      })
+      const bounds = new core.LatLngBounds()
+      for (const p of pts) {
+        bounds.extend({ lat: p.lat, lng: p.lon })
+        map.data.add({ geometry: new maps.Data.Point({ lat: p.lat, lng: p.lon }), properties: { band: p.heat_band, ring: ringOf(p), title: titleOf(p) } })
+      }
+      map.fitBounds(bounds, 32)
+      map.data.setStyle((f) => {
+        const band = f.getProperty('band') as HeatBand
+        const i = Math.max(0, HEAT_ORDER.indexOf(band))
+        const ring = f.getProperty('ring') as Ring
+        return {
+          title: f.getProperty('title') as string,
+          zIndex: i + (ring === 'none' ? 0 : 10),
+          icon: {
+            path: core.SymbolPath.CIRCLE,
+            scale: 4 + i,
+            fillColor: HEAT_COLORS[band] ?? '#cdd3d6',
+            fillOpacity: 0.95,
+            strokeColor: ring === 'none' ? '#495054' : RING[ring],
+            strokeWeight: ring === 'none' ? 1 : 3,
+          },
+        }
+      })
+      const info = new maps.InfoWindow()
+      map.data.addListener('click', (e: google.maps.Data.MouseEvent) => {
+        info.setContent(e.feature.getProperty('title') as string)
+        info.setPosition(e.latLng)
+        info.open({ map })
+      })
+      setStatus('ready')
+    }, fail)
+    return () => {
+      gone = true
+      mapsAuthFailures.delete(fail)
+    }
+  }, [pts])
+  const withProject = pts.filter((p) => p.project_stage).length
   return (
-    <g>
-      {ring !== 'none' && <circle cx={x} cy={y} r={s + 6} fill="none" stroke="#0b4f7c" strokeWidth={2.5} strokeDasharray={ring === 'pipeline' ? '3 3' : undefined} />}
-      {shape}
-    </g>
+    <div className="mw-areas-map" role="region" aria-label={`Map of ${pts.length} buildings in the building dataset, coloured by heat band. ${withProject} have a project. The same data is in the table.`}>
+      <div ref={box} className="mw-areas-map__canvas" />
+      {status === 'failed' && (
+        <p className="mw-areas-map__status" role="status">
+          The map could not load. Choose Show as table for the same data.
+        </p>
+      )}
+    </div>
   )
 }
 
-function MapSvg({ pts }: { pts: BuildingPoint[] }) {
-  const W = 640
-  const H = 420
-  const pad = 24
-  const b = useMemo(() => {
-    const lats = pts.map((p) => p.lat)
-    const lons = pts.map((p) => p.lon)
-    return { minLat: Math.min(...lats), maxLat: Math.max(...lats), minLon: Math.min(...lons), maxLon: Math.max(...lons) }
-  }, [pts])
-  const k = Math.cos((((b.minLat + b.maxLat) / 2) * Math.PI) / 180)
-  const spanX = Math.max(1e-6, (b.maxLon - b.minLon) * k)
-  const spanY = Math.max(1e-6, b.maxLat - b.minLat)
-  const scale = Math.min((W - pad * 2) / spanX, (H - pad * 2) / spanY)
-  const ox = (W - spanX * scale) / 2
-  const oy = (H - spanY * scale) / 2
-  const px = (lon: number) => ox + (lon - b.minLon) * k * scale
-  const py = (lat: number) => H - oy - (lat - b.minLat) * scale
-  const withProject = pts.filter((p) => p.project_stage).length
+function Dot({ fill, ring, size = 14 }: { fill: string; ring?: string; size?: number }) {
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="mw-h-auto nsw-width-100 mw-border mw-bg-white" role="img" aria-label={`Map of ${pts.length} buildings in the pilot area, with the heat band of each. ${withProject} have a project. The same data is in the table.`}>
-      <rect x={0} y={0} width={W} height={H} fill="#f6f7f8" />
-      {pts.map((p) => {
-        const live = p.project_stage && LIVE.includes(p.project_stage)
-        return (
-          <g key={p.building_id}>
-            <title>{`${p.building_id}: ${heatWord(p.heat_band)}, about ${p.flats_est} flats${p.project_stage ? `, project at ${STAGE_LABEL[p.project_stage as Stage] ?? p.project_stage}` : ', no project'}`}</title>
-            <Marker band={p.heat_band} x={px(p.lon)} y={py(p.lat)} ring={p.project_stage ? (live ? 'live' : 'pipeline') : 'none'} />
-          </g>
-        )
-      })}
-      <text x={W - 10} y={H - 8} textAnchor="end" fontSize="11" fill="#50575e">
-        North is up. Not to scale.
-      </text>
+    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+      <circle cx="11" cy="11" r={size / 2} fill={fill} stroke={ring ?? '#495054'} strokeWidth={ring ? 3 : 1} />
     </svg>
   )
 }
@@ -75,24 +108,18 @@ function Legend() {
   return (
     <>
       <span className="nsw-text-medium">Heat band:</span>
-      {BANDS.map((b) => (
+      {HEAT_ORDER.map((b, i) => (
         <span key={b} className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
-          <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-            <Marker band={b} x={12} y={12} ring="none" />
-          </svg>
+          <Dot fill={HEAT_COLORS[b]} size={8 + i * 2} />
           {heatWord(b)}
         </span>
       ))}
       <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
-        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-          <circle cx="13" cy="13" r="9" fill="none" stroke="#0b4f7c" strokeWidth="2.5" />
-        </svg>
+        <Dot fill="#ffffff" ring={RING.live} />
         Project built or active
       </span>
       <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
-        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-          <circle cx="13" cy="13" r="9" fill="none" stroke="#0b4f7c" strokeWidth="2.5" strokeDasharray="3 3" />
-        </svg>
+        <Dot fill="#ffffff" ring={RING.pipeline} />
         Project in the pipeline
       </span>
     </>
@@ -123,8 +150,8 @@ export default function Areas() {
           <div className="mw-space-y-4">
             <ChartBox
               title="Map of buildings"
-              description="Each marker is a building. Hotter bands have bigger, darker markers."
-              chart={<MapSvg pts={a.buildings} />}
+              description="Each dot is a building, coloured by heat band. Hotter bands have bigger dots. A ring marks a project. Select a dot for its details."
+              chart={<AreasMap pts={a.buildings} />}
               legend={<Legend />}
               table={{
                 columns: [{ label: 'Building' }, { label: 'Heat band' }, { label: 'Flats (estimate)', numeric: true }, { label: 'Renting', numeric: true }, { label: 'Project stage' }],
