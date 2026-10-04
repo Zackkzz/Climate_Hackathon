@@ -82,12 +82,69 @@ cd web && npm install && npm run build && cd ..
   (needs `data/pipeline/requirements.txt`)
 - Web development with example numbers and no backend: `cd web && npm run dev:mock`
 
+## Programme system
+
+Beyond screening, Meterwise runs an upgrade programme end to end: projects move through a pipeline (screened, audit,
+offer, consent, procurement, installation, commissioned, active, closed) with guards that say in plain words what is
+missing; site audits correct the open-data guesses; tenants and owners consent; installers quote; the accepted quote
+re-prices the deal; a work order carries a commissioning checklist for the package; then each flat's meter charge is
+billed monthly with payments, faults that pause the charge (the reserve covers the paused months, the term is not
+extended), tenancy changes (the charge stays with the meter, the old tenant is settled, the new tenant gets a new
+access code and disclosure), annual measured-savings checks with true-ups refunded from the reserve, and printable
+documents for every reader. Contracts: [docs/programme-contract.md](docs/programme-contract.md) and
+[docs/portals-contract.md](docs/portals-contract.md).
+
+**Run it.** `.venv/Scripts/python run.py` as above. On first start the database (`engine/var/meterwise.db`, or the
+path in `METERWISE_DB`) is created and seeded with one example programme: 11 projects on real pilot buildings at every
+stage, two of them with 19 months of billing history, built by driving the real service functions through time
+(about 10 seconds). Sign-in details for every role are listed at `GET /api/auth/demo-users` and on the sign-in page.
+Every organisation, person, meter number and reading in the seed is a fictional example; meter readings are
+simulated and labelled `"simulated"`.
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `METERWISE_DB` | `engine/var/meterwise.db` | SQLite database path |
+| `METERWISE_DEMO` | `1` | `0` turns off demo users, the simulated clock and reset, and the MFA exemption for demo accounts |
+| `METERWISE_SECRET` | generated and stored in the database (demo only) | Token signing key; required (32+ characters) when `METERWISE_DEMO=0` |
+| `METERWISE_CORS_ORIGINS` | local hosts | Comma-separated allowed origins |
+| `METERWISE_AUTOSEED` | `1` | `0` leaves a fresh database empty |
+| `METERWISE_TILE_HOST` | OpenStreetMap tiles | Image host allowed by the Content-Security-Policy |
+| `METERWISE_OIDC_*` | unset | Single sign-on settings; the callback returns 501 until configured |
+| `METERWISE_NOW` | real time | Fixes the clock's base date (tests) |
+
+**Simulated clock (demo).** `POST /api/sim/advance {"months": 12, "scenario": "mixed"}` runs a year in a few seconds:
+simulated readings, billing, payments (a seeded few late), occasional faults, and a savings check after every 12
+months of charge. `POST /api/sim/reset` reseeds. Randomness is seeded, so the same start gives the same result.
+
+**Portals.** Government (`/api/government/*`: outcomes, targets, areas, grants with decisions, CSV reports, delivery
+routes, the list of security controls), utility (`/api/utility/*`: meters, network impact, bulk readings, charge
+file, remittance, gas disconnections, supply requests) and property (`/api/property/*`, plus the programme routes for
+owners and tenants). Utility, government, funder and installer responses never contain tenant names, access codes or
+ledgers; meter ids are masked for government, funder and installer.
+
+**Security and privacy controls** (checked by tests in `engine/tests/programme/`): sessions with 12-hour absolute
+and 30-minute idle expiry and logout; passwords of 14+ characters checked against common passwords and hashed with
+scrypt; lockout after 5 failures and a per-address sign-in rate limit; TOTP multi-factor sign-in for staff roles
+(demo accounts exempt only while `METERWISE_DEMO=1`, reported by `/api/government/controls`); default-deny role and
+organisation checks; an append-only, hash-chained audit log (`GET /api/programme/audit-log/verify`) recording
+sign-ins, failures, reads of tenant data, exports and every change; security headers and CSP on every response;
+body-size and row limits; CSV formula neutralising; a separate, withdrawable consent per tenancy before any uploaded
+or utility meter reading is accepted; personal-data export and erase; `/.well-known/security.txt`, `/api/health`,
+`/api/ready` and request ids. See [SECURITY.md](SECURITY.md). Python dependencies are pinned in `requirements.lock`
+(`pip freeze`); `docs/sbom/meterwise-sbom.cdx.json` is a CycloneDX list built from `requirements.lock` and
+`web/package-lock.json` by a short script, not by a dedicated SBOM tool.
+
+**What is not real.** No penetration test or certification; no real tenant, meter or payment data; the M&V uses
+simulated readings unless uploaded; the legal status of the service charge under tenancy and credit law is to
+confirm ([docs/policy-australia.md](docs/policy-australia.md)).
+
 ## Layout
 
 | Path | What |
 |---|---|
 | `engine/meterwise/` | Weather, thermal model, equipment, tariffs, finance; every default in `params.py` with its source |
 | `engine/api/` | FastAPI service; contract in [docs/api-contract.md](docs/api-contract.md) |
+| `engine/programme/` | Programme system: database, roles, pipeline, ledger, reserve, M&V, documents, portals, simulated clock, seed |
 | `engine/tests/`, `validation/` | Tests and the generated validation report |
 | `data/pilot/`, `data/pipeline/` | Pilot dataset and the scripts that build it |
 | `web/` | React app |

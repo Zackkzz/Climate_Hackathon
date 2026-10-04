@@ -420,7 +420,10 @@ def main() -> None:
              f"{len(sens_rows)} for full electrification with gas disconnection. In every case shown, each flat's "
              "charge stays within its saving cap, so tenants are never worse off on the modelled numbers.\n")
 
-    L.append("## 4. Limits\n")
+    T.simulate_cached.cache_clear()
+    L += analysis_sections()
+
+    L.append("## 5. Limits\n")
     L.append("- **Not validated against metered data.** No flat-level smart meter or gas meter data for the pilot area "
              "was available, so energy use is compared only with published averages for all dwelling types.")
     L.append("- **Hot water** inputs come from YourHome averages, not from metered flats. People per flat (2.4) is an "
@@ -453,10 +456,154 @@ def main() -> None:
              "Australian tariffed on-bill programme was found. Legal and regulatory questions (who can attach a charge "
              "to a NSW electricity meter) were not assessed.")
     L.append("- The UNSW cool roof results are simulations of other building types, not measurements of walk-up flats.")
+    L.append("- **Analysis modules.** Sizing uses the same two-node model with ideal loads, a percentile rule and unit "
+             "prices that are assumptions, not quotes. The electrical check uses assumed everyday demand and supply "
+             "size. Risk ranges are mostly judgements, and only one weather year exists, so weather variation is a "
+             "scaling. The M&V recovery test uses simulated readings from the engine's own model family, so it checks "
+             "the arithmetic and the regression, not the model's realism. The night part of the microclimate "
+             "adjustment has no measured basis. See docs/methods-analysis.md.")
     L.append("")
     L.append("Screening tool, not engineering or financial advice.\n")
     OUT.write_text("\n".join(L), encoding="utf-8")
     print(f"Wrote {OUT} ({n_pass}/{len(rows)} checks pass)")
+
+
+def pilot_examples() -> list[str]:
+    """Three real pilot buildings, chosen by a fixed rule before running: 3-storey blocks with 12, 8 and 5 estimated
+    flats, each the one with the highest satellite heat value among blocks of that size."""
+    from meterwise import buildings as B
+
+    ds = B.load()
+    out = []
+    for flats in (12, 8, 5):
+        cands = [f["properties"] for f in ds.features
+                 if f["properties"]["storeys"] == 3 and f["properties"]["flats_est"] == flats]
+        if cands:
+            out.append(max(cands, key=lambda p: (p["heat_anomaly_c"], p["id"]))["id"])
+    return out
+
+
+def analysis_sections() -> list[str]:
+    """Section 4: real output from the analysis modules (microclimate, sizing, risk, M&V)."""
+    from meterwise import microclimate as MC
+    from meterwise import mv as MV
+    from meterwise import sizing as SZ
+    from meterwise import tariff as TF
+
+    L: list[str] = []
+    ids = pilot_examples()
+    L.append("## 4. Analysis modules: real output\n")
+    L.append("Pilot buildings used below were picked by a fixed rule before running: 3-storey blocks with 12, 8 and 5 "
+             "estimated flats, each the one with the highest satellite heat value among blocks of that size. Default "
+             "existing flat and default package (cool roof, heat pump hot water, reverse-cycle air conditioner).\n")
+
+    # ---- microclimate
+    L.append("### 4.1 Microclimate\n")
+    L.append("| Building | Surface heat value | Air adjustment day / night | Summer mean max, base -> local | Days over 35 C, "
+             "base -> local | Summer cooling degree hours (24 C), base -> local |")
+    L.append("|---|---|---|---|---|---|")
+    for bid in ids:
+        s = MC.summary(bid, allow_network=False)
+        a, su = s["air_temp_adjustment"], s["summer"]
+        L.append(f"| {s['label']} ({bid}) | {s['heat_anomaly_c']:+.2f} C | +{a['day_c']} / +{a['night_c']} C | "
+                 f"{su['mean_max_c_base']} -> {su['mean_max_c_local']} C | {su['days_over_35_base']} -> "
+                 f"{su['days_over_35_local']} | {fmt(su['cooling_degree_hours_base'])} -> "
+                 f"{fmt(su['cooling_degree_hours_local'])} |")
+    epw = MC.to_epw(ids[0], allow_network=False).rstrip("\r\n").split("\r\n")
+    ok_rows = len(epw) - 8 == 8760 and all(len(x.split(",")) == 35 for x in epw[8:])
+    L.append(f"\nEPW export check for {ids[0]}: {len(epw) - 8} data rows, 35 fields each: "
+             f"{'PASS' if ok_rows else 'FAIL'}. The adjustment is an assumption (see methods-analysis.md); the bill "
+             "model uses the daytime part only.\n")
+
+    # ---- sizing
+    L.append("### 4.2 Right-sizing\n")
+    L.append("| Building | Group | Flats | Design cooling kW without roof -> with package | Cut | Design heating kW | "
+             "Unit kW without -> with | Sized by | Unit for cooling alone, without -> with |")
+    L.append("|---|---|---|---|---|---|---|---|---|")
+    size_cases = [("Typical block (3 storeys, 12 flats)", req())] + [(bid, AssessRequest(building_id=bid)) for bid in ids]
+    capex_saved = []
+    for name, rq in size_cases:
+        s = SZ.size_systems(rq, allow_network=False)
+        capex_saved.append((name, s["capex_saved_by_right_sizing"], s["electrical"]))
+        for g in s["groups"]:
+            L.append(f"| {name} | {g['position']} | {g['count']} | {g['design_cooling_kw_without_roof']} -> "
+                     f"{g['design_cooling_kw_with_package']} | {g['reduction_pct']:.0f}% | {g['design_heating_kw']} | "
+                     f"{g['unit_kw_without_roof']} -> {g['unit_kw_with_package']} | {g['sized_by']} | "
+                     f"{g['unit_kw_for_cooling_only_without_roof']} -> {g['unit_kw_for_cooling_only_with_package']} |")
+    L.append("")
+    for name, cs, e in capex_saved:
+        L.append(f"- {name}: capex saved by right-sizing ${fmt(cs)}; building peak (modelled hour) "
+                 f"{e['building_peak_kw_before']} kW before, {e['building_peak_kw_after']} kW after, "
+                 f"{e['building_peak_kw_after_without_roof']} kW after without the roof; per-flat peak "
+                 f"{e['per_flat_peak_amps_after']} A against an assumed {e['typical_supply_amps']:.0f} A supply; "
+                 f"switchboard upgrade likely: {'yes' if e['switchboard_upgrade_likely'] else 'no'}.")
+    ins = SZ.size_systems(req(package={"ceiling_insulation": True}), allow_network=False)
+    it = next(g for g in ins["groups"] if g["position"] == "top")
+    L.append(f"- With ceiling insulation added (typical block), top-floor design heating falls to {it['design_heating_kw']} "
+             f"kW and the unit to {it['unit_kw_with_package']} kW.")
+    L.append("\nWhat this shows: the cool roof cuts the top-floor design cooling load, but in these Penrith flats the "
+             "winter heating load through the uninsulated ceiling sets the unit size, so the roof alone does not make "
+             "the unit smaller. Lower-floor flats are unchanged by the roof. The proposal's expectation of a large size "
+             "cut is not supported for this building type by this model.\n")
+
+    # ---- risk
+    L.append("### 4.3 Savings risk (default package, 2,000 runs, seed 1)\n")
+    L.append("| Building | Group | Charge/month | Net saving/month p10 / p50 / p90 | Chance tenant worse off | Chance the "
+             "charge exceeds 80% of the real saving | Safe share | Top driver |")
+    L.append("|---|---|---|---|---|---|---|---|")
+    for name, rq in size_cases:
+        rk = TF.risk(rq, 2000, 1, allow_network=False)
+        top = rk["drivers"][0]
+        for g in rk["groups"]:
+            q = g["net_saving_per_month"]
+            L.append(f"| {name} | {g['position']} | ${g['charge_per_month']:.2f} | ${q['p10']:.2f} / ${q['p50']:.2f} / "
+                     f"${q['p90']:.2f} | {g['prob_tenant_worse_off']:.1%} | {g['prob_saving_below_charge']:.1%} | "
+                     f"{rk['safe_share']['savings_share_to_charge']:.2f} | {top['label']} ({top['share_of_variance']:.0%}) |")
+    L.append("\nRanges varied are listed in methods-analysis.md (most are assumptions). The safe share is the largest "
+             "share of the modelled saving the charge could take while 95% of runs leave every tenant group no worse "
+             "off.\n")
+
+    # ---- M&V
+    L.append("### 4.4 M&V: does verification recover a known saving?\n")
+    L.append("Readings are simulated by the engine (labelled so). For simulated data the true saving is known: the same "
+             "household, weather and noise without the upgrade. Pass rule (fixed before running): the verified saving "
+             "is within its own 90% uncertainty of the true saving.\n")
+    L.append("| Building | Group | Seed | True saving/month | Verified | Uncertainty (90%) | Baseline R2 | Result |")
+    L.append("|---|---|---|---|---|---|---|---|")
+    n_ok = n_all = 0
+    for name, rq in size_cases[:2]:
+        rr = assess(rq, allow_network=False)
+        for g in rr["flat_groups"]:
+            pos = g["position"]
+            for seed in (1, 7, 42):
+                b = MV.simulate(rq, pos, 12, "2026-01", seed, "as_modelled", False, allow_network=False)
+                p = MV.simulate(rq, pos, 12, "2027-01", seed, "as_modelled", True, allow_network=False)
+                cf = MV.simulate(rq, pos, 12, "2027-01", seed, "as_modelled", False, allow_network=False)
+                v = MV.verify(rq, pos, b, p, 0.0, allow_network=False)
+                t = MV.verify(rq, pos, b, cf, 0.0, allow_network=False)
+                true = sum(c["actual_cost"] - x["actual_cost"] for c, x in zip(t["by_month"], v["by_month"])) / 12
+                ok = abs(v["verified_saving_per_month"] - true) <= v["uncertainty_per_month"]
+                n_ok += ok
+                n_all += 1
+                L.append(f"| {name} | {pos} | {seed} | ${true:.2f} | ${v['verified_saving_per_month']:.2f} | "
+                         f"${v['uncertainty_per_month']:.2f} | {v['baseline_fit']['r2']:.3f} | "
+                         f"{'PASS' if ok else 'OUTSIDE'} |")
+    L.append(f"\n**{n_ok} of {n_all} recovery checks inside the stated uncertainty.** This tests the method on data "
+             "from the engine's own model family; it is not a test against real meters.\n")
+    L.append("True-up by scenario (typical block, seed 7, charge from the deal):\n")
+    L.append("| Group | Scenario | Verified saving/month | Charge | Action | New charge | Refund |")
+    L.append("|---|---|---|---|---|---|---|")
+    rr = assess(req(), allow_network=False)
+    for g in rr["flat_groups"]:
+        for sc in MV.SCENARIOS:
+            b = MV.simulate(req(), g["position"], 12, "2026-01", 7, sc, False, allow_network=False)
+            p = MV.simulate(req(), g["position"], 12, "2027-01", 7, sc, True, allow_network=False)
+            v = MV.verify(req(), g["position"], b, p, g["charge_per_month"], allow_network=False)
+            tu = v["true_up"]
+            L.append(f"| {g['position']} | {sc} | ${v['verified_saving_per_month']:.2f} | ${g['charge_per_month']:.2f} | "
+                     f"{tu['action']} | ${tu['new_charge_per_month']:.2f} | ${tu['refund']:.2f} |")
+    L.append("")
+    return L
 
 
 if __name__ == "__main__":

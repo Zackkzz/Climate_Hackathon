@@ -1,6 +1,7 @@
 """Meterwise HTTP API (FastAPI). See docs/api-contract.md."""
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from fastapi import FastAPI, Request
@@ -15,14 +16,28 @@ from meterwise.assess import DISCLAIMER, AssessError, assess
 from meterwise.models import OPTIONS, AssessRequest, AssessResponse, PortfolioRequest
 from meterwise.weather import WEATHER_YEAR
 
-app = FastAPI(title="Meterwise API", version="0.1.0",
-              description="Bill-neutral electrification and cool-roof deals for rented flats (screening tool).")
+from api import programme as programme_api
+from api.analysis import router as analysis_router
+
+app = FastAPI(title="Meterwise API", version="0.2.0",
+              description="Bill-neutral electrification and cool-roof deals for rented flats: screening tool and "
+                          "programme system.")
+# CORS: explicit origins from METERWISE_CORS_ORIGINS (comma separated); otherwise local development hosts only.
+_origins = [o.strip() for o in os.environ.get("METERWISE_CORS_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_origins,
+    allow_origin_regex=None if _origins else r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
+programme_api.install(app)
+app.include_router(analysis_router)
+
+
+@app.on_event("startup")
+def _startup() -> None:
+    programme_api.startup()
 
 
 def _plain_validation_message(exc: RequestValidationError) -> str:
@@ -36,7 +51,7 @@ def _plain_validation_message(exc: RequestValidationError) -> str:
 
 @app.exception_handler(RequestValidationError)
 async def _validation_handler(_: Request, exc: RequestValidationError) -> JSONResponse:
-    return JSONResponse(status_code=400, content={"detail": _plain_validation_message(exc)})
+    return JSONResponse(status_code=400, content={"detail": _plain_validation_message(exc), "code": "validation"})
 
 
 @app.exception_handler(AssessError)

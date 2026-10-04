@@ -1,10 +1,6 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App'
-import './styles.css'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// Old public links were /#/find, /#/build?... and /#/share?...: send them to the finder, keeping the hash.
+if (window.location.pathname === '/' && /^#\/(find|build|share)/.test(window.location.hash)) {
+  window.location.replace('/finder' + window.location.hash)
+} else {
+  void import('./portal/main')
+}

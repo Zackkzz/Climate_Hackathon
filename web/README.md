@@ -64,7 +64,7 @@ src/
 | Vite, @vitejs/plugin-react | build tooling | MIT |
 | TypeScript | type checking | Apache-2.0 |
 | MapLibre GL JS (`maplibre-gl`) | map rendering | BSD-3-Clause |
-| OpenFreeMap "positron" style and vector tiles (`tiles.openfreemap.org`) | basemap, no API key | Free to use with attribution; styles/tiles built on OpenMapTiles (BSD-3-Clause schema, CC-BY 4.0 design) |
+| OpenStreetMap standard raster tiles (`tile.openstreetmap.org`) | basemap, no API key | OSM tile usage policy; data under ODbL; attribution shown on the map |
 | OpenStreetMap data | basemap data, building footprints come from the backend | ODbL 1.0, attribution "© OpenStreetMap contributors" shown on the map |
 | Heat colour ramp | ColorBrewer YlOrRd, 5 classes | Apache-2.0 (Brewer, Harrower and The Pennsylvania State University) |
 | Icons, logo, favicon | drawn in-house as inline SVG for this project | Original work, no third-party icon set |
@@ -74,4 +74,4 @@ src/
 Electricity and gas emission factors and agency links that appear in the demo "What this assumes" list point to the
 Australian Government (DCCEEW, AER) home pages. In real mode the assumptions and sources come from the backend.
 
-No analytics, cookies or third-party scripts are used. The only external requests are map style and tiles from OpenFreeMap.
+No analytics, cookies or third-party scripts are used. The only external requests are map tiles from OpenStreetMap.

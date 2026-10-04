@@ -1,6 +1,6 @@
 # Meterwise validation report
 
-Generated 03 October 2026 18:42 by `validation/make_report.py` from real model outputs. Nothing in this file is typed in by hand except the benchmark values and pass ranges, which are fixed in the script before the model runs.
+Generated 04 October 2026 10:19 by `validation/make_report.py` from real model outputs. Nothing in this file is typed in by hand except the benchmark values and pass ranges, which are fixed in the script before the model runs.
 
 Weather: ERA5 reanalysis via Open-Meteo, calendar year 2025, grid point -33.78, 150.67 (Penrith, Western Sydney). Typical block used throughout: 3 storeys, 12 flats of 65 m2, roof 320 m2, satellite heat anomaly +2.0 C (converted to +0.6 C air on hot afternoons, an assumption).
 
@@ -95,7 +95,93 @@ Headline tested: *the package is fully funded by capped monthly charges and ever
 
 Fully funded in 0 of 20 cases for the default package and 0 of 20 for full electrification with gas disconnection. In every case shown, each flat's charge stays within its saving cap, so tenants are never worse off on the modelled numbers.
 
-## 4. Limits
+## 4. Analysis modules: real output
+
+Pilot buildings used below were picked by a fixed rule before running: 3-storey blocks with 12, 8 and 5 estimated flats, each the one with the highest satellite heat value among blocks of that size. Default existing flat and default package (cool roof, heat pump hot water, reverse-cycle air conditioner).
+
+### 4.1 Microclimate
+
+| Building | Surface heat value | Air adjustment day / night | Summer mean max, base -> local | Days over 35 C, base -> local | Summer cooling degree hours (24 C), base -> local |
+|---|---|---|---|---|---|
+| 15-17 Rodgers Street, Kingswood (b_000037) | +2.49 C | +0.75 / +0.35 C | 28.9 -> 29.4 C | 12 -> 14 | 2,912 -> 3,288 |
+| 16-20 Rodgers Street, Kingswood (block 1 of 2) (b_000215) | +1.86 C | +0.55 / +0.3 C | 28.9 -> 29.2 C | 12 -> 13 | 2,912 -> 3,190 |
+| 14 Rodgers Street, Kingswood (b_000216) | +1.84 C | +0.55 / +0.3 C | 28.9 -> 29.2 C | 12 -> 13 | 2,912 -> 3,190 |
+
+EPW export check for b_000037: 8760 data rows, 35 fields each: PASS. The adjustment is an assumption (see methods-analysis.md); the bill model uses the daytime part only.
+
+### 4.2 Right-sizing
+
+| Building | Group | Flats | Design cooling kW without roof -> with package | Cut | Design heating kW | Unit kW without -> with | Sized by | Unit for cooling alone, without -> with |
+|---|---|---|---|---|---|---|---|---|
+| Typical block (3 storeys, 12 flats) | top | 4 | 2.77 -> 1.77 | 36% | 5.9 | 6.0 -> 6.0 | heating | 3.5 -> 2.5 |
+| Typical block (3 storeys, 12 flats) | lower | 8 | 1.4 -> 1.4 | 0% | 1.99 | 2.5 -> 2.5 | heating | 2.5 -> 2.5 |
+| b_000037 | top | 4 | 2.8 -> 1.81 | 36% | 5.9 | 6.0 -> 6.0 | heating | 3.5 -> 2.5 |
+| b_000037 | lower | 8 | 1.42 -> 1.42 | 0% | 1.99 | 2.5 -> 2.5 | heating | 2.5 -> 2.5 |
+| b_000215 | top | 3 | 2.77 -> 1.76 | 36% | 5.9 | 6.0 -> 6.0 | heating | 3.5 -> 2.5 |
+| b_000215 | lower | 5 | 1.4 -> 1.4 | 0% | 1.99 | 2.5 -> 2.5 | heating | 2.5 -> 2.5 |
+| b_000216 | top | 2 | 2.77 -> 1.76 | 36% | 5.9 | 6.0 -> 6.0 | heating | 3.5 -> 2.5 |
+| b_000216 | lower | 3 | 1.4 -> 1.4 | 0% | 1.99 | 2.5 -> 2.5 | heating | 2.5 -> 2.5 |
+
+- Typical block (3 storeys, 12 flats): capex saved by right-sizing $0; building peak (modelled hour) 90.4 kW before, 29.1 kW after, 29.0 kW after without the roof; per-flat peak 29.2 A against an assumed 63 A supply; switchboard upgrade likely: no.
+- b_000037: capex saved by right-sizing $0; building peak (modelled hour) 90.4 kW before, 29.1 kW after, 29.0 kW after without the roof; per-flat peak 29.2 A against an assumed 63 A supply; switchboard upgrade likely: no.
+- b_000215: capex saved by right-sizing $0; building peak (modelled hour) 62.9 kW before, 20.1 kW after, 20.1 kW after without the roof; per-flat peak 29.2 A against an assumed 63 A supply; switchboard upgrade likely: no.
+- b_000216: capex saved by right-sizing $0; building peak (modelled hour) 40.3 kW before, 12.9 kW after, 12.8 kW after without the roof; per-flat peak 29.2 A against an assumed 63 A supply; switchboard upgrade likely: no.
+- With ceiling insulation added (typical block), top-floor design heating falls to 2.26 kW and the unit to 2.5 kW.
+
+What this shows: the cool roof cuts the top-floor design cooling load, but in these Penrith flats the winter heating load through the uninsulated ceiling sets the unit size, so the roof alone does not make the unit smaller. Lower-floor flats are unchanged by the roof. The proposal's expectation of a large size cut is not supported for this building type by this model.
+
+### 4.3 Savings risk (default package, 2,000 runs, seed 1)
+
+| Building | Group | Charge/month | Net saving/month p10 / p50 / p90 | Chance tenant worse off | Chance the charge exceeds 80% of the real saving | Safe share | Top driver |
+|---|---|---|---|---|---|---|---|
+| Typical block (3 storeys, 12 flats) | top | $85.55 | $12.29 / $34.66 / $58.96 | 1.3% | 24.2% | 0.79 | How much hot water and heating people use (62%) |
+| Typical block (3 storeys, 12 flats) | lower | $39.29 | $2.18 / $12.59 / $25.12 | 5.4% | 36.9% | 0.79 | How much hot water and heating people use (62%) |
+| b_000037 | top | $91.65 | $6.08 / $28.45 / $52.76 | 4.1% | 39.4% | 0.79 | How much hot water and heating people use (62%) |
+| b_000037 | lower | $39.23 | $2.17 / $12.58 / $25.09 | 5.4% | 36.9% | 0.79 | How much hot water and heating people use (62%) |
+| b_000215 | top | $86.60 | $11.27 / $33.65 / $57.94 | 1.7% | 26.3% | 0.79 | How much hot water and heating people use (62%) |
+| b_000215 | lower | $39.31 | $2.19 / $12.60 / $25.13 | 5.4% | 36.9% | 0.79 | How much hot water and heating people use (62%) |
+| b_000216 | top | $91.77 | $6.11 / $28.48 / $52.78 | 4.1% | 39.5% | 0.79 | How much hot water and heating people use (62%) |
+| b_000216 | lower | $39.31 | $2.19 / $12.60 / $25.13 | 5.4% | 36.9% | 0.79 | How much hot water and heating people use (62%) |
+
+Ranges varied are listed in methods-analysis.md (most are assumptions). The safe share is the largest share of the modelled saving the charge could take while 95% of runs leave every tenant group no worse off.
+
+### 4.4 M&V: does verification recover a known saving?
+
+Readings are simulated by the engine (labelled so). For simulated data the true saving is known: the same household, weather and noise without the upgrade. Pass rule (fixed before running): the verified saving is within its own 90% uncertainty of the true saving.
+
+| Building | Group | Seed | True saving/month | Verified | Uncertainty (90%) | Baseline R2 | Result |
+|---|---|---|---|---|---|---|---|
+| Typical block (3 storeys, 12 flats) | top | 1 | $123.01 | $110.12 | $13.13 | 0.985 | PASS |
+| Typical block (3 storeys, 12 flats) | top | 7 | $110.21 | $104.44 | $13.23 | 0.989 | PASS |
+| Typical block (3 storeys, 12 flats) | top | 42 | $118.48 | $114.91 | $7.90 | 0.996 | PASS |
+| Typical block (3 storeys, 12 flats) | lower | 1 | $51.24 | $47.44 | $7.29 | 0.959 | PASS |
+| Typical block (3 storeys, 12 flats) | lower | 7 | $47.45 | $45.70 | $6.47 | 0.978 | PASS |
+| Typical block (3 storeys, 12 flats) | lower | 42 | $47.43 | $49.01 | $4.23 | 0.991 | PASS |
+| b_000037 | top | 1 | $122.90 | $110.00 | $13.13 | 0.985 | PASS |
+| b_000037 | top | 7 | $110.10 | $104.33 | $13.23 | 0.989 | PASS |
+| b_000037 | top | 42 | $118.35 | $114.79 | $7.90 | 0.996 | PASS |
+| b_000037 | lower | 1 | $51.16 | $47.36 | $7.29 | 0.959 | PASS |
+| b_000037 | lower | 7 | $47.38 | $45.63 | $6.47 | 0.978 | PASS |
+| b_000037 | lower | 42 | $47.35 | $48.94 | $4.23 | 0.991 | PASS |
+
+**12 of 12 recovery checks inside the stated uncertainty.** This tests the method on data from the engine's own model family; it is not a test against real meters.
+
+True-up by scenario (typical block, seed 7, charge from the deal):
+
+| Group | Scenario | Verified saving/month | Charge | Action | New charge | Refund |
+|---|---|---|---|---|---|---|
+| top | as_modelled | $104.44 | $85.55 | none | $85.55 | $0.00 |
+| top | high_use | $132.96 | $85.55 | none | $85.55 | $0.00 |
+| top | low_use | $75.64 | $85.55 | refund_from_reserve | $60.51 | $300.48 |
+| top | underperforming_hot_water | $63.39 | $85.55 | refund_from_reserve | $50.71 | $418.08 |
+| top | faulty_ac | $17.53 | $85.55 | refund_from_reserve | $14.02 | $858.36 |
+| lower | as_modelled | $45.70 | $39.29 | none | $39.29 | $0.00 |
+| lower | high_use | $56.64 | $39.29 | none | $39.29 | $0.00 |
+| lower | low_use | $34.53 | $39.29 | refund_from_reserve | $27.62 | $140.04 |
+| lower | underperforming_hot_water | $4.65 | $39.29 | refund_from_reserve | $3.72 | $426.84 |
+| lower | faulty_ac | $20.39 | $39.29 | refund_from_reserve | $16.31 | $275.76 |
+
+## 5. Limits
 
 - **Not validated against metered data.** No flat-level smart meter or gas meter data for the pilot area was available, so energy use is compared only with published averages for all dwelling types.
 - **Hot water** inputs come from YourHome averages, not from metered flats. People per flat (2.4) is an assumption: no flats-only household size for Lakemba was found, and the AS/NZS 4234 load tables and the Residential Baseline Study could not be opened.
@@ -108,5 +194,6 @@ Fully funded in 0 of 20 cases for the default package and 0 of 20 for full elect
 - **Emissions** use today's NSW grid factor; the grid is getting cleaner, so savings from electrification will grow. That trend is not modelled.
 - **Finance** assumes the reserve covers all arrears and under-performance; no default data for an Australian tariffed on-bill programme was found. Legal and regulatory questions (who can attach a charge to a NSW electricity meter) were not assessed.
 - The UNSW cool roof results are simulations of other building types, not measurements of walk-up flats.
+- **Analysis modules.** Sizing uses the same two-node model with ideal loads, a percentile rule and unit prices that are assumptions, not quotes. The electrical check uses assumed everyday demand and supply size. Risk ranges are mostly judgements, and only one weather year exists, so weather variation is a scaling. The M&V recovery test uses simulated readings from the engine's own model family, so it checks the arithmetic and the regression, not the model's realism. The night part of the microclimate adjustment has no measured basis. See docs/methods-analysis.md.
 
 Screening tool, not engineering or financial advice.

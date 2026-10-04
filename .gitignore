@@ -9,3 +9,6 @@ data/raw/
 .env.*
 *.log
 .DS_Store
+
+# Programme database (local state)
+engine/var/

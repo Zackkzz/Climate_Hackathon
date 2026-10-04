@@ -46,7 +46,8 @@ The team directed the work, chose the idea and is responsible for the submission
 | UNSW Cool Roofs Cost Benefit Analysis (2022) | Cool roof costs; validation | Public report |
 | National Construction Code, YourHome, Energy Rating | Building fabric and equipment efficiency | Public |
 | Pay As You Save programme rules and field reviews (EEI, Clean Energy Works, Berkeley Lab) | Finance rules | Public |
-| OpenFreeMap | Basemap tiles | Open; attribution shown on the map |
+| OpenStreetMap standard tile layer | Basemap tiles | ODbL data; OSM tile usage policy; attribution shown on the map |
+| NSW Cyber Security Policy 2026-27, OLG Cyber Security Guidelines for Local Government, NSW Design Standards | The security, privacy and accessibility controls | Public; see `docs/research-gov-it-standards.md` for what was read directly and what came from search summaries |
 
 The Landsat scene IDs and the full method are in `data/pilot/README.md`.
 
@@ -54,11 +55,21 @@ The Landsat scene IDs and the full method are in `data/pilot/README.md`.
 
 - **Backend:** Python, FastAPI, Uvicorn, Pydantic, NumPy, SciPy, Requests, pytest, and for the data pipeline
   Shapely, pyproj, rasterio, pystac-client, planetary-computer and matplotlib.
-- **Frontend:** React, Vite, TypeScript, MapLibre GL JS. Colour ramp from ColorBrewer. Icons and logo drawn for
-  this project. No web fonts.
+- **Frontend:** React, Vite, TypeScript, MapLibre GL JS, Tailwind CSS, shadcn/ui components (built on Radix UI),
+  TanStack Table, React Hook Form, Zod, Recharts, React Router, cmdk, sonner, react-day-picker, date-fns and
+  Lucide icons. Public Sans typeface, bundled locally (SIL Open Font Licence). Colour ramp from ColorBrewer.
+  Nothing is loaded from a CDN.
+- **Programme system:** Python standard library only (sqlite3, hashlib, hmac) on top of FastAPI.
+- **Checks:** axe-core through Playwright for accessibility; a Playwright end-to-end script (`web/scripts/e2e.mjs`).
 - **Development tools:** Git, Node.js, Playwright (browser checks).
 
 ## Sources for the policy documents
 
 Linked inline in [docs/policy-australia.md](docs/policy-australia.md),
 [docs/pilot-and-testing.md](docs/pilot-and-testing.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+
+## Simulated and example content
+
+- Meter and temperature readings in the demo are produced by a simulator and labelled "simulated".
+- Every organisation, person, meter number and payment in the demo is made up and flagged as an example.
+- Buildings, satellite heat, weather, tariffs, costs and the model are real and sourced.

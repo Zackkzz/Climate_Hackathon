@@ -311,6 +311,106 @@ PARAMS: dict[str, Param] = {
         "Order used to split the package saving between items", ASSUMPTION,
         "Each item's saving is the extra saving it adds after the items before it. The roof comes last, so its saving is "
         "measured with the new air conditioner in place.", "finance"),
+
+    # ================================================================== analysis modules (added for the programme system)
+    # ------------------------------------------------------------------ microclimate
+    "anomaly_air_night_fraction": Param(
+        0.15, "C air per C surface", "Share of the satellite surface heat difference assumed to remain in the air at night "
+        "after a hot day", ASSUMPTION,
+        "Used only in the microclimate summary and the weather file, not in the bill model (which keeps its daytime-only "
+        "adjustment). Studies comparing satellite surface and air temperature (for example Azevedo et al. 2016, "
+        "https://www.mdpi.com/2072-4292/8/2/153) find the link varies by place, season and time of day; no transferable "
+        "number was found, so this is a judgement.", "microclimate"),
+    "anomaly_air_night_cap_c": Param(0.75, "C", "Largest night-time air temperature adjustment", ASSUMPTION, "", "microclimate"),
+    "cooling_degree_base_c": Param(24.0, "C", "Base temperature for the cooling degree hours in the microclimate summary",
+                                   ASSUMPTION, "A reporting choice, not used by the bill model.", "microclimate"),
+
+    # ------------------------------------------------------------------ sizing
+    "design_load_percentile": Param(
+        99.0, "percentile of hours", "Design cooling and heating load: the hourly load exceeded in only 1% of the year's "
+        "8,760 hours (about 88 hours)", ASSUMPTION,
+        "Follows the idea of the 1% design conditions used in air conditioning design; the exact rule is a judgement.",
+        "sizing"),
+    "split_heating_to_cooling_ratio": Param(1.15, "x", "Heating output of a split system compared with its nominal cooling "
+                                            "size", ASSUMPTION, "Typical of product listings (for example 3.5 kW cooling, about "
+                                            "4 kW heating); varies by model and drops in cold weather.", "sizing"),
+    "sizing_margin": Param(1.1, "x", "Margin added to the design load before picking a unit size", ASSUMPTION, "", "sizing"),
+    "split_system_cost_by_size": Param(
+        ((2.5, 2000.0), (3.5, 2200.0), (5.0, 2700.0), (6.0, 3000.0), (7.1, 3400.0), (8.0, 3800.0), (9.0, 4200.0)),
+        "kW cooling, AUD installed", "Installed price of a single split system by nominal cooling size", ASSUMPTION,
+        "Anchored to the 3.5 kW price used elsewhere ($2,200) and the NSW Government's 'from $1,500' for a single split "
+        "system. The steps between sizes are a judgement, not quotes.", "sizing"),
+    "hpwh_input_kw": Param(1.0, "kW", "Electrical input of a heat pump water heater while running", ASSUMPTION,
+                           "Typical residential units draw roughly 0.5-1.5 kW; not checked against a product register.",
+                           "sizing"),
+    "induction_diversified_kw": Param(3.5, "kW", "Induction cooktop demand allowed for in the supply check (after "
+                                      "diversity)", ASSUMPTION, "Nameplate ratings are often about 7 kW; all zones rarely "
+                                      "run at full power at once.", "sizing"),
+    "resistive_heater_kw": Param(2.4, "kW", "Plug-in electric heater removed when reverse-cycle heating is installed",
+                                 ASSUMPTION, "Common plug-in heater rating.", "sizing"),
+    "existing_flat_peak_kw": Param(4.0, "kW", "Existing peak demand of a flat apart from space heating and cooling (kettle, "
+                                   "oven, washing, fridge, lights)", ASSUMPTION, "", "sizing"),
+    "flat_supply_amps": Param(63.0, "A", "Typical single-phase supply to one flat", ASSUMPTION,
+                              "Older walk-up flats can have smaller supplies (40 A or less). Check the switchboard on site.",
+                              "sizing"),
+    "supply_voltage_v": Param(230.0, "V", "Nominal supply voltage", ASSUMPTION, "Australian nominal low-voltage supply.",
+                              "sizing"),
+    "cost_switchboard_upgrade": Param(2750.0, "AUD per flat", "Switchboard upgrade for one flat, if needed", SRC_NSW_INDUCTION,
+                                      "NSW Government induction page: a switchboard upgrade costs $1,500-$4,000; we use the "
+                                      "middle.", "sizing"),
+
+    # ------------------------------------------------------------------ cool roof ageing and upkeep
+    "roof_reflectance_cool_new": Param(0.83, "ratio", "Solar reflectance of a new cool roof coating", SRC_UNSW_V1,
+                                       "UNSW Cool Roofs CBA Vol 1: average new cool roof product reflectance 0.83.", "roof"),
+    "roof_reflectance_cool_aged_3yr": Param(0.64, "ratio", "Solar reflectance of the same coating after about 3 years",
+                                            SRC_UNSW_V1, "UNSW Vol 1 quotes the IECC ageing formula 0.2 + 0.7 x (new - 0.2); "
+                                            "0.2 + 0.7 x 0.63 = 0.64. The bill model uses this aged value.", "roof"),
+    "roof_wash_interval_years": Param(3, "years", "How often the cool roof is washed to restore reflectance", ASSUMPTION,
+                                      "", "roof"),
+    "roof_wash_cost_per_m2": Param(3.0, "AUD/m2", "Cost of washing the roof once", ASSUMPTION,
+                                   "No published Sydney price was found.", "roof"),
+
+    # ------------------------------------------------------------------ risk ranges (low, most likely, high; triangular)
+    "risk_occupant_use": Param((0.75, 1.0, 1.3), "x modelled", "Range for how much hot water and heating households use",
+                               ASSUMPTION, "Matches 1.8 to 3.1 people per flat against the 2.4 assumed (the range in the "
+                               "validation report).", "risk"),
+    "risk_electricity_price": Param((0.85, 1.0, 1.25), "x default offer", "Range for electricity prices over the term",
+                                    ASSUMPTION, "", "risk"),
+    "risk_gas_price": Param((0.85, 1.0, 1.3), "x default offer", "Range for gas prices over the term", ASSUMPTION, "", "risk"),
+    "risk_hpwh_cop": Param((2.3, 3.0, 3.8), "COP", "Range for heat pump hot water performance", ASSUMPTION,
+                           "YourHome quotes COP 3-5; the low end allows for cold winters and poor installs.", "risk"),
+    "risk_ac_cop": Param((2.6, 3.5, 4.5), "COP/EER", "Range for reverse-cycle air conditioner performance",
+                         SRC_ENERGYRATING_HEATERS, "Energy Rating: non-ducted units 240-570% efficient; we use part of "
+                         "that range.", "risk"),
+    "risk_weather_cooling": Param((0.6, 1.0, 1.5), "x 2025 cooling", "Range for how much cooling a year needs compared "
+                                  "with the 2025 weather year", ASSUMPTION, "Only one weather year is used, so year-to-year "
+                                  "change is represented by scaling.", "risk"),
+    "risk_weather_heating": Param((0.85, 1.0, 1.15), "x 2025 heating", "Range for how much heating a year needs compared "
+                                  "with 2025", ASSUMPTION, "", "risk"),
+    "risk_roof_absorptance": Param((0.17, 0.36, 0.5), "absorptance", "Range for the cool roof's absorptance over the term",
+                                   ASSUMPTION, "0.17 is new (UNSW 0.83 reflectance), 0.36 aged (UNSW formula), 0.5 a dirty "
+                                   "roof that is not washed (judgement).", "risk"),
+    "risk_safe_confidence": Param(0.95, "share of runs", "Share of risk runs in which the tenant must be no worse off for "
+                                  "the 'safe share'", ASSUMPTION, "", "risk"),
+
+    # ------------------------------------------------------------------ measurement and verification (simulated data)
+    "mv_household_sigma": Param(0.10, "spread", "Household-to-household spread in energy use in simulated readings",
+                                ASSUMPTION, "Log-normal spread. For simulated demo data only.", "mv"),
+    "mv_noise_sigma": Param(0.04, "spread", "Month-to-month noise in simulated readings", ASSUMPTION, "", "mv"),
+    "mv_weather_sigma_c": Param(1.0, "C", "Spread of a month's mean temperature around the 2025 value in simulated "
+                                "readings", ASSUMPTION, "", "mv"),
+    "mv_heating_base_c": Param(18.0, "C", "Base temperature for heating degree days in M&V", ASSUMPTION,
+                               "A common base; not tuned.", "mv"),
+    "mv_cooling_base_c": Param(22.0, "C", "Base temperature for cooling degree days in M&V", ASSUMPTION, "", "mv"),
+    "mv_confidence": Param(0.90, "confidence", "Confidence level of the verified saving's uncertainty band", ASSUMPTION,
+                           "Savings verification guides commonly report at 68% or 90%; we use 90%.", "mv"),
+
+    # ------------------------------------------------------------------ portfolio (bulk buying)
+    "bulk_tiers": Param(
+        (("heat_pump_hot_water", 50, 5.0), ("heat_pump_hot_water", 150, 8.0), ("reverse_cycle", 50, 5.0),
+         ("reverse_cycle", 150, 8.0), ("cool_roof_m2", 3000, 5.0), ("cool_roof_m2", 10000, 10.0)),
+        "item, units, % off", "Volume discounts on installed price when many blocks are bought together", ASSUMPTION,
+        "No published Australian volume price tiers were found. Applied to the price before rebates.", "portfolio"),
 }
 
 

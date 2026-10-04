@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 /**
  * MapLibre GL v6 loads its web worker from a file next to the map code
@@ -27,8 +28,9 @@ function maplibreWorker(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), maplibreWorker()],
-  base: './',
+  plugins: [react(), tailwindcss(), maplibreWorker()],
+  base: '/',
+  resolve: { alias: { '@': resolve('src') } },
   optimizeDeps: { exclude: ['maplibre-gl'] },
   server: {
     port: 5173,
