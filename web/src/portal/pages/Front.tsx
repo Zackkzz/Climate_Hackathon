@@ -1,6 +1,12 @@
 import { ArrowRight, Building2, Landmark, Zap } from 'lucide-react'
 import { Link } from 'react-router'
-import { Callout } from '@/portal/components/PageHeader'
+import { assess } from '@/api'
+import { num, num1 } from '@/format'
+import { useLoad } from '@/hooks'
+import type { AssessResponse, Existing, Package } from '@/types'
+import { BlockUpgrade } from '@/portal/components/BlockUpgrade'
+import { Callout, Figures } from '@/portal/components/PageHeader'
+import { Button } from '@/portal/components/ui/button'
 
 const PORTALS = [
   { title: 'Government', icon: Landmark, text: 'Run the programme: projects, billing, the reserve and grants. Oversight sees outcomes, areas and the audit log.' },
@@ -8,7 +14,40 @@ const PORTALS = [
   { title: 'Property', icon: Building2, text: 'Landlords, strata committees and community housing providers manage their blocks. Tenants see their own flat.' },
 ]
 
+// The typical block used in the README and the validation report: a 3-storey, 12-flat walk-up in Penrith with the
+// default package. Sent in full so the drawing and the numbers always describe the same thing.
+const TYPICAL = { storeys: 3, flats: 12, roof_m2: 320, lat: -33.75, lon: 150.7, heat_anomaly_c: 2 }
+const TYPICAL_EXISTING: Existing = { hot_water: 'gas_storage', heating: 'electric_resistive', cooling: 'none', cooktop: 'gas', roof: 'dark' }
+const TYPICAL_PACKAGE: Package = { cool_roof: true, heat_pump_hot_water: true, reverse_cycle: true, induction_cooktop: false, ceiling_insulation: false, disconnect_gas: false }
+const loadTypical = () => assess({ building: TYPICAL, existing: TYPICAL_EXISTING, package: TYPICAL_PACKAGE })
+
+function typicalFigures(r: AssessResponse) {
+  const c = r.flat_groups.find((g) => g.position === 'top')?.comfort
+  const im = r.impact
+  const items: { label: string; value: string; note?: string }[] = []
+  if (c) {
+    items.push({ label: 'Hottest it gets on the top floor', value: `${num1(c.peak_indoor_c_baseline)} to ${num1(c.peak_indoor_c_upgraded)}°C`, note: 'Over a year, with no air conditioning running' })
+    items.push({
+      label: 'Hours above 30°C on the top floor',
+      value: `${num(c.hours_above_30c_baseline)} to ${num(c.hours_above_30c_upgraded)}`,
+      note:
+        c.hours_above_30c_upgraded_as_used != null
+          ? `A year, with no air conditioning running. With the new air conditioner on from 2 to 11 pm when hot: ${num(c.hours_above_30c_upgraded_as_used)}.`
+          : 'A year, with no air conditioning running',
+    })
+  }
+  items.push({ label: 'Energy the block uses', value: `${Math.round(im.energy_reduction_pct)}% less`, note: 'Gas and electricity together' })
+  items.push({
+    label: 'Emissions a year',
+    value: `${num1(im.co2e_t_per_year_saved)} t less`,
+    note: im.co2e_t_per_year_baseline != null && im.co2e_t_per_year_upgraded != null ? `${num1(im.co2e_t_per_year_baseline)} t of CO₂e now, ${num1(im.co2e_t_per_year_upgraded)} t after` : 'Tonnes of CO₂e',
+  })
+  return items
+}
+
 export default function Front() {
+  const typical = useLoad(loadTypical)
+  const r = typical.data
   return (
     <div className="space-y-10">
       <section aria-labelledby="what" className="max-w-3xl">
@@ -26,6 +65,41 @@ export default function Front() {
             Find a block
           </Link>
         </div>
+      </section>
+
+      <section aria-labelledby="changes">
+        <h2 id="changes">What changes in a typical block</h2>
+        <p className="mb-3 mt-1 max-w-3xl text-muted-foreground">
+          A three-storey block of 12 rented flats in Penrith, with gas hot water, plug-in heaters, no air conditioning and a dark roof. The upgrade adds a cool roof, heat pump hot water and reverse-cycle air conditioning. Every figure is a modelled estimate.
+        </p>
+        <BlockUpgrade
+          existing={TYPICAL_EXISTING}
+          pkg={TYPICAL_PACKAGE}
+          storeys={TYPICAL.storeys}
+          flats={TYPICAL.flats}
+          result={r}
+          figures={
+            r ? (
+              <Figures label="What the upgrade does for this block" items={typicalFigures(r)} />
+            ) : typical.error ? (
+              <p className="text-sm text-muted-foreground">
+                The modelled figures did not load. The drawing still shows what changes.{' '}
+                <Button variant="link" className="h-auto p-0 text-sm" onClick={typical.retry}>
+                  Try again
+                </Button>
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground" role="status">
+                Working out the figures for this block...
+              </p>
+            )
+          }
+        />
+        <p className="mt-3">
+          <Link to="/finder" className="font-semibold">
+            Try other upgrades on a real block in the finder
+          </Link>
+        </p>
       </section>
 
       <section aria-labelledby="portals">
