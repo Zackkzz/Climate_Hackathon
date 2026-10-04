@@ -210,7 +210,10 @@ def my_flat(p: Principal) -> dict:
     saving = (g.get("saving_per_year") or 0) / 12
     charge = f["charge_per_month"] if f["charge_status"] != "not_started" else (f["offered_charge"] or g.get("charge_per_month", 0))
     verified = None
+    tenancy = db.q1("SELECT * FROM tenancies WHERE id = ?", (p.tenancy_id,))
     for d in reversed([r["data"] for r in db.q("SELECT * FROM mv_runs WHERE project_id = ? ORDER BY id", (pr["id"],))]):
+        if d["period"]["from"] + "-01" < tenancy["start_date"]:
+            continue
         b = next((b for b in d["by_flat"] if b["flat_id"] == f["id"] and b.get("result")), None)
         if b:
             verified = {"verified_saving_per_month": b["result"].get("verified_saving_per_month"),
@@ -218,7 +221,7 @@ def my_flat(p: Principal) -> dict:
                         "period": d["period"], "source": d["source"],
                         "source_label": L.SOURCE_LABELS.get(d["source"], d["source"])}
             break
-    faults = [L.fault_obj(x) for x in db.q("SELECT * FROM faults WHERE flat_id = ? ORDER BY id DESC", (f["id"],))]
+    faults = L.tenant_faults(p, f["id"])
     return {"flat": S.flat_obj(f, p, pr), "project": {"label": pr["label"], "stage": pr["stage"],
                                                        "stage_label": S.STAGE_LABELS[pr["stage"]]},
             "deal": {"installed": L.installed_items(pr), "charge_per_month": r2(charge or 0),
@@ -246,8 +249,8 @@ def personal_data(p: Principal, fid: int) -> dict:
                                                         "ORDER BY id", (fid, p.tenancy_id))],
                 "data_consents": [L.consent_obj(c) for c in db.q("SELECT * FROM data_consents WHERE tenancy_id = ?",
                                                                  (p.tenancy_id,))],
-                "readings": L.readings_of(fid),
-                "faults": [L.fault_obj(x) for x in db.q("SELECT * FROM faults WHERE flat_id = ?", (fid,))]}
+                "readings": L.readings_of(fid, p.tenancy_id),
+                "faults": L.tenant_faults(p, fid)}
     return {"flat_id": fid, "unit": f["unit"], "meter_id": f["meter_id"],
             "held": "Name and unit of each tenant, tenancy dates, the charge ledger, data consents, meter readings and "
                     "fault reports. No date of birth, contact details, bank details or income are held.",
@@ -263,12 +266,14 @@ def erase(p: Principal, fid: int, body: dict) -> dict:
     f = S.get_flat(fid)
     S.check_flat(p, f, ("manager", "owner"))
     inc = bool(body.get("include_current"))
+    from .privacy import erase_tenancy
     n = 0
     for t in db.q("SELECT * FROM tenancies WHERE flat_id = ?", (fid,)):
         if t["active"] and not inc:
             continue
-        db.update("tenancies", t["id"], tenant_name="Former tenant" if not t["active"] else "Tenant (name erased)",
-                  access_code=None if not t["active"] else t["access_code"])
+        if db.q1("SELECT 1 FROM privacy_holds WHERE tenancy_id = ?", (t["id"],)):
+            raise conflict("This tenancy has a retention hold; review the hold before erasure.")
+        erase_tenancy(t)
         n += 1
     audit.log("personal_data.erase", f["project_id"], {"flat_id": fid, "tenancies": n})
     return {"flat_id": fid, "tenancies_erased": n,
@@ -851,7 +856,6 @@ def delivery_routes(p: Principal) -> list[dict]:
 def controls(p: Principal) -> dict:
     auth.require(p, "government", "manager")
     demo = auth.demo_mode()
-    oidc = bool(os.environ.get("METERWISE_OIDC_ISSUER") and os.environ.get("METERWISE_OIDC_CLIENT_ID"))
     av = audit.verify()
     exempt = db.q("SELECT u.email, u.role FROM users u LEFT JOIN mfa m ON m.user_id = u.id WHERE u.example = 1 AND "
                   "(m.enabled IS NULL OR m.enabled = 0)") if demo else []
@@ -861,7 +865,7 @@ def controls(p: Principal) -> dict:
                       f"are stored as scrypt hashes. An account locks for {auth.LOCK_S // 60} minutes after "
                       f"{auth.LOCK_AFTER} failed sign-ins, and sign-in attempts are rate limited.", True),
         ("mfa", "Staff sign in with a password and a six-digit code from an authenticator app (TOTP).", True),
-        ("sso", "Single sign-on through OpenID Connect " + ("is connected." if oidc else "can be connected to your identity provider."), oidc),
+        ("sso", "OpenID Connect sign-in is not implemented. Staff use password and TOTP.", False),
         ("access_control", "Every request is checked against the person's role and organisation. Access is denied unless allowed.", True),
         ("audit_log", f"Every sign-in, change, export and read of tenant data is recorded in a tamper-evident log "
                       f"({av['entries']} entries, chain {'verified' if av['ok'] else 'failed verification at entry ' + str(av['first_bad_id'])}).", av["ok"]),
@@ -873,13 +877,13 @@ def controls(p: Principal) -> dict:
         ("privacy", "Tenant personal data is limited to name and unit. Meter data is used only with the tenant's separate "
                     "consent, which they can withdraw. Meter references and addresses are masked for roles that do not "
                     "need them. Personal data can be exported or erased on request.", True),
-        ("secrets", "Signing keys come from the server environment, not from code.", True),
+        ("secrets", "Credential encryption is configured separately from SQLite. Independently managed keys are required for production.", not demo),
         ("operations", "Health and readiness checks, request identifiers, a security contact (security.txt) and a request "
                        "log that holds no personal data.", True),
-        ("supply_chain", "Dependencies are pinned and listed in a software bill of materials.", True),
+        ("supply_chain", "The Docker runtime uses a pinned dependency lock. Image scans and an image SBOM require deployment evidence.", False),
     ]
     return {"controls": [{"key": k, "description": d, "on": on} for k, d, on in c],
-            "mfa_enforced": not (demo and bool(exempt)), "accounts_without_mfa": len(exempt),
+            "mfa_enforced": not (demo and bool(exempt)), "accounts_without_mfa": db.q1("SELECT COUNT(*) AS n FROM users u LEFT JOIN mfa m ON m.user_id = u.id WHERE u.role IN ('manager', 'government', 'owner', 'installer', 'funder', 'utility') AND (m.enabled IS NULL OR m.enabled = 0)")["n"],
             "system_date_controls": demo, "retention_years": int(db.get_setting("retention_years", "7") or 7),
             "data_inventory": [
                 {"data": "Tenant name and unit", "where": "tenancies", "who_sees": "manager, owner, the tenant",

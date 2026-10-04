@@ -9,3 +9,4 @@ httpx
 pytest
 shapely
 pyproj
+cryptography

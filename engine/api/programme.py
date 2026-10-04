@@ -123,6 +123,7 @@ def mfa_setup(request: Request, body: dict = Body(default={})) -> dict:
 
 @auth_router.post("/mfa/verify")
 def mfa_verify(request: Request, body: dict = Body(...)) -> dict:
+    auth.rate_check(_client_ip(request))
     p = optional_principal(request)
     return call(p, auth.mfa_verify, p, body.get("ticket"), str(body.get("code") or ""))
 
@@ -323,6 +324,33 @@ def flats(pid: int, p: Principal = Depends(principal)) -> list:
 @pg.post("/flats/{fid}/tenancy-change")
 def tenancy(fid: int, body: dict = Body(...), p: Principal = Depends(principal)) -> dict:
     return call(p, L.tenancy_change, p, fid, body)
+
+
+@pg.post("/flats/{fid}/access-code")
+def rotate_code(fid: int, p: Principal = Depends(principal)) -> dict:
+    def rotate():
+        flat = S.get_flat(fid)
+        S.check_flat(p, flat, ("manager", "owner"))
+        tenancy = S.active_tenancy(fid)
+        if not tenancy:
+            raise ProgError("conflict", "This flat has no current tenancy.")
+        db.update("tenancies", tenancy["id"], access_code=auth.new_access_code())
+        db.ex("UPDATE sessions SET revoked = 1 WHERE tenancy_id = ?", (tenancy["id"],))
+        audit.log("auth.tenant_code_rotated", flat["project_id"], {"flat_id": fid})
+        return S.flat_obj(flat, p)
+    return call(p, rotate)
+
+
+@pg.post("/privacy/retention")
+def retention(body: dict = Body(default={}), p: Principal = Depends(principal)) -> dict:
+    def run():
+        auth.require(p, "manager")
+        from programme import privacy
+        dry_run = body.get("dry_run", True)
+        if not isinstance(dry_run, bool):
+            raise ProgError("validation", "dry_run must be true or false.")
+        return privacy.purge(dry_run)
+    return call(p, run)
 
 
 @pg.get("/flats/{fid}/ledger")
@@ -624,7 +652,7 @@ def p_enquiry(request: Request, body: dict = Body(...)) -> dict:
 SECURITY_TXT = """Contact: https://github.com/Zackkzz/Climate_Hackathon/security/advisories/new
 Expires: 2027-10-04T00:00:00.000Z
 Preferred-Languages: en
-Policy: https://github.com/Zackkzz/Climate_Hackathon/blob/main/SECURITY.md
+Policy: https://github.com/Zackkzz/Climate_Hackathon/blob/main/docs/SECURITY.md
 """
 
 
@@ -690,6 +718,14 @@ def install(app: FastAPI) -> None:
 def startup() -> None:
     """Called once when the server starts: refuse unsafe config, open the database, seed a fresh one."""
     auth.check_startup_secret()
+    from programme import security
+    if not auth.demo_mode():
+        security.cipher()  # validate mounted encryption keys before opening or migrating data
+        if os.environ.get("METERWISE_AUTOSEED", "1") != "0":
+            raise RuntimeError("Production requires METERWISE_AUTOSEED=0.")
     db.connect()
+    if not auth.demo_mode():
+        if db.q1("SELECT 1 FROM users WHERE example = 1 LIMIT 1") or db.q1("SELECT 1 FROM programmes WHERE example = 1 LIMIT 1"):
+            raise RuntimeError("Production refuses example identities and programmes. Use a fresh production database.")
     if os.environ.get("METERWISE_AUTOSEED", "1") != "0":
         SEED.ensure_seeded()

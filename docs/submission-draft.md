@@ -102,4 +102,4 @@ council or housing provider exactly how big a grant each block needs, and which 
 
 ## Tools used and prior work
 
-See [DISCLOSURE.md](../DISCLOSURE.md).
+See [DISCLOSURE.md](DISCLOSURE.md).

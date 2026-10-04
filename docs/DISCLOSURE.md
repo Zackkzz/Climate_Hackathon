@@ -4,9 +4,9 @@ Climate Hack-tion 2026 requires a list of every outside tool, dataset, API and A
 prior work. This file is that list. Detailed tables with links and licences are kept next to the code they belong
 to:
 
-- Engine data sources and Python libraries: [engine/SOURCES.md](engine/SOURCES.md)
-- Pilot dataset sources: [data/pilot/README.md](data/pilot/README.md)
-- Web libraries, map tiles and assets: [web/README.md](web/README.md)
+- Engine data sources and Python libraries: [engine/SOURCES.md](../engine/SOURCES.md)
+- Pilot dataset sources: [data/pilot/README.md](../data/pilot/README.md)
+- Web libraries, map tiles and assets: [web/README.md](../web/README.md)
 
 ## Prior work
 
@@ -65,8 +65,8 @@ The Landsat scene IDs and the full method are in `data/pilot/README.md`.
 
 ## Sources for the policy documents
 
-Linked inline in [docs/policy-australia.md](docs/policy-australia.md),
-[docs/pilot-and-testing.md](docs/pilot-and-testing.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+Linked inline in [docs/policy-australia.md](policy-australia.md),
+[docs/pilot-and-testing.md](pilot-and-testing.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
 
 ## Simulated and example content
 

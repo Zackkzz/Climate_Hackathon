@@ -1,7 +1,9 @@
 // Side-sheet panel for one flat: meter-data consent (separate from upgrade consent) and the tenant's personal data
 // (export as a file, erase the name). Used by the government and property flat sheets.
 import { useState } from 'react'
-import { api } from '@/console/api'
+import { api, http } from '@/console/api'
+import { useUser } from '@/console/auth'
+import type { Flat } from '@/console/types'
 import { consentApi } from '@/console/consent'
 import type { DataConsent } from '@/console/consent'
 import { useRes } from '@/console/useRes'
@@ -22,10 +24,14 @@ const fmt = (d: string | null) => {
 }
 
 export function FlatPrivacy({ flatId, unit, onChanged }: { flatId: number; unit: string; onChanged?: () => void }) {
+  const user = useUser()
+  const canRotate = user?.role === 'owner' || user?.role === 'manager'
   const res = useRes(() => consentApi.get(flatId), [flatId])
   const act = useAction()
   const exp = useAction()
   const erase = useAction()
+  const rotate = useAction()
+  const [newCode, setNewCode] = useState<string | null>(null)
   const [note, setNote] = useState('')
   const [noteErr, setNoteErr] = useState('')
   const [erased, setErased] = useState<string | null>(null)
@@ -53,6 +59,16 @@ export function FlatPrivacy({ flatId, unit, onChanged }: { flatId: number; unit:
 
   return (
     <div className="space-y-4">
+      {canRotate && <section className="border p-3" aria-labelledby={`access-${flatId}`}>
+        <h3 id={`access-${flatId}`} className="mb-2 text-base font-semibold">Tenant access</h3>
+        <p className="mb-2">Issue a new access code if the current code has expired or may have been shared. The previous code and tenant sessions will stop working.</p>
+        <ErrorAlert error={rotate.error} />
+        {newCode && <p role="status" className="my-2 break-all">New code: <strong>{newCode}</strong>. Give it securely to the current tenant.</p>}
+        <Confirm title="Replace the tenant access code?" description="The tenant will need the new code to sign in again." confirmLabel="Replace code" onConfirm={async () => {
+          const result = await rotate.run(() => http.post<Flat>(`/api/programme/flats/${flatId}/access-code`, {}), 'Access code replaced')
+          if (result) { setNewCode(result.access_code ?? null); onChanged?.() }
+        }}><Button size="sm" variant="outline" disabled={rotate.busy}>Replace access code</Button></Confirm>
+      </section>}
       <section aria-labelledby={`dc-${flatId}`} className="border p-3">
         <h3 id={`dc-${flatId}`} className="mb-2 text-base font-semibold">
           Meter-data consent
@@ -124,7 +140,7 @@ export function FlatPrivacy({ flatId, unit, onChanged }: { flatId: number; unit:
             title={`Erase personal data for unit ${unit}?`}
             description={
               <>
-                <p>Names of former tenants become "Former tenant" and their access codes are removed. The current tenant is not changed.</p>
+                <p>Names of former tenants become "Former tenant", their access codes are removed, and personal content in consent, fault and ledger notes is redacted. The current tenant is not changed.</p>
                 <p className="mt-2">The charge ledger stays, because it belongs to the meter and is needed for the funder accounts. This cannot be undone.</p>
               </>
             }

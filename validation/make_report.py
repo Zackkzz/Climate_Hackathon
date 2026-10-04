@@ -1,4 +1,4 @@
-"""Generates validation/REPORT.md from real model outputs compared with published benchmarks.
+"""Generates docs/validation/REPORT.md from real model outputs compared with published benchmarks.
 
 Every pass range is fixed in BENCHMARKS / the check definitions below BEFORE the model is run; the script does not
 tune anything. Run from the project root:
@@ -26,7 +26,7 @@ from meterwise.models import AssessRequest  # noqa: E402
 from meterwise.systems import USAGE_END_USES, EnergyUse  # noqa: E402
 from meterwise.weather import get_weather  # noqa: E402
 
-OUT = Path(__file__).resolve().parent / "REPORT.md"
+OUT = ROOT / "docs" / "validation" / "REPORT.md"
 
 AER_2020 = "https://www.aer.gov.au/system/files/Residential%20energy%20consumption%20benchmarks%20-%209%20December%202020_0.pdf"
 ACIL_2017 = "https://www.aer.gov.au/system/files/ACIL%20Allen%20Energy%20benchmarks%20report%202017%20-%20updated%205%20June%202018.pdf"

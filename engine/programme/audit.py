@@ -12,6 +12,7 @@ from __future__ import annotations
 import contextvars
 import hashlib
 import json
+import logging
 from typing import Any
 
 from . import clock, db
@@ -39,6 +40,8 @@ def log(action: str, project_id: int | None = None, detail: Any = "", by: str | 
     prev = last["hash"] if last else GENESIS
     at = clock.now_iso()
     h = _digest(prev, at, by, role, action, project_id, detail)
+    if action.startswith(("auth.", "personal_data.", "tenancy.", "privacy.")):
+        logging.getLogger("meterwise.security").warning(json.dumps({"event": action, "role": role, "project_id": project_id}))
     db.insert("audit_log", at=at, by=by, role=role, action=action, project_id=project_id, detail=detail,
               prev_hash=prev, hash=h)
 
