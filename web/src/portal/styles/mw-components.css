@@ -158,7 +158,8 @@ main:focus { outline: none; }
 .mw-file-input::file-selector-button { margin-right: 0.75rem; padding: 0.25rem 0.75rem; border: 1px solid var(--nsw-grey-02); background: var(--nsw-off-white); font: inherit; }
 .mw-checkbox { display: inline-flex; position: relative; vertical-align: middle; flex: none; width: 1.5rem; height: 1.5rem; }
 .mw-checkbox .nsw-form__checkbox-input { width: 1.5rem; height: 1.5rem; margin: 0; left: 0; top: 0; }
-.mw-checkbox__box { margin: 0 !important; padding: 0 !important; width: 1.5rem; height: 1.5rem; min-height: 1.5rem; cursor: pointer; }
+.mw-checkbox__box { display: block; margin: 0 !important; padding: 0 !important; width: 1.5rem; height: 1.5rem; min-height: 1.5rem; pointer-events: none; }
+.mw-checkbox .nsw-form__checkbox-input { cursor: pointer; z-index: 1; }
 .mw-check-row { display: flex; align-items: flex-start; gap: 0.5rem; }
 .mw-check-label { font-weight: 400; margin: 0; padding-top: 0.125rem; }
 .nsw-form__helper { display: flex; align-items: flex-start; gap: 0.25rem; }
@@ -243,3 +244,12 @@ html.dialog-active { overflow: hidden; }
 .mw-chart-tip__row { display: flex; align-items: center; gap: 0.5rem; }
 .mw-chart-tip__row > :last-child { margin-left: auto; padding-left: 0.5rem; }
 .mw-chart-tip__swatch { width: 0.625rem; height: 0.625rem; display: inline-block; }
+
+/* lists: the app's own lists are unstyled unless marked (the page chooses bullets with .mw-list-disc) */
+:where(main, .mw-dialog, .nsw-footer) :where(ul, ol) { list-style: none; margin: 0; padding: 0; }
+.mw-list-disc { list-style: disc !important; padding-left: 1.25rem !important; }
+.mw-footer-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+
+/* scroll containers must contain visually hidden (absolutely positioned) text, or it widens the page at 320px */
+.nsw-table, .nsw-overflow-x-auto, .nsw-overflow-auto, .nsw-overflow-y-auto { position: relative; }
+.mw-finder-bar ol { list-style: none; margin: 0; padding: 0; }

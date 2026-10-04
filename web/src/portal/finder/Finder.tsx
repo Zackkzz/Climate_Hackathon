@@ -133,13 +133,13 @@ export default function Finder() {
             })}
           </ol>
         </nav>
-        <div className="mw-ml-auto nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-x-3 nsw-small">
+        <nav aria-label="Finder links" className="mw-ml-auto nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-x-3 nsw-small">
           {USE_MOCK ? <ExampleBadge>Demo data</ExampleBadge> : m?.pilot.is_fixture ? <ExampleBadge>Example data</ExampleBadge> : null}
           <Button variant="link" className="mw-h-auto mw-p-0" onClick={() => setHow(true)}>
             How it works
           </Button>
           <Link to="/signin">Programme sign in</Link>
-        </div>
+        </nav>
       </div>
 
       <main id="main" tabIndex={-1} className="mw-flex-1">

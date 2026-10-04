@@ -136,7 +136,7 @@ export function PortalShell({ portal, groups }: { portal: string; groups: NavGro
       <SessionGuard />
       <SkipLink />
       <SiteHeader end={<UserMenu />} />
-      <div className="nsw-container mw-portal-bar no-print">
+      <section className="nsw-container mw-portal-bar no-print" aria-label="Portal tools">
         <p className="nsw-text-semibold mw-portal-name">{portal}</p>
         <div className="mw-portal-actions">
           <Button variant="outline" size="sm" onClick={() => setFind(true)}>
@@ -146,7 +146,7 @@ export function PortalShell({ portal, groups }: { portal: string; groups: NavGro
             <Icon name={menuOpen ? 'close' : 'menu'} /> Menu
           </Button>
         </div>
-      </div>
+      </section>
       <div className="nsw-container mw-portal-body">
         <nav id="portal-nav" aria-label={`${portal} pages`} className={'mw-portal-nav no-print' + (menuOpen ? ' is-open' : '')}>
           {groups.map((g, i) => (

@@ -6,8 +6,15 @@ export const DEMO_NOTICE =
 
 export function DemoNotice({ where = 'top' }: { where?: 'top' | 'footer' }) {
   return (
-    <aside className={'mw-demo-notice mw-demo-notice--' + where} aria-label="Concept demonstration notice">
-      <p>{DEMO_NOTICE}</p>
-    </aside>
+    // the top strip is a landmark so it is not "content outside landmarks"; the footer copy sits inside the footer landmark
+    where === 'top' ? (
+      <aside className="mw-demo-notice mw-demo-notice--top" aria-label="Concept demonstration notice">
+        <p>{DEMO_NOTICE}</p>
+      </aside>
+    ) : (
+      <div className="mw-demo-notice mw-demo-notice--footer">
+        <p>{DEMO_NOTICE}</p>
+      </div>
+    )
   )
 }

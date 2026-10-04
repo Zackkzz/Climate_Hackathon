@@ -2,8 +2,10 @@
 import type { ComponentProps } from 'react'
 import { cn } from '@/portal/lib/utils'
 
+// The system makes the table itself a scroll container on narrow screens, so the table takes focus (tabIndex 0) and can be
+// scrolled with the arrow keys.
 export function Table({ className, ...props }: ComponentProps<'table'>) {
-  return <table className={cn('nsw-table nsw-table--bordered mw-table', className)} {...props} />
+  return <table tabIndex={0} className={cn('nsw-table mw-table', className)} {...props} />
 }
 export function TableHeader(props: ComponentProps<'thead'>) {
   return <thead {...props} />

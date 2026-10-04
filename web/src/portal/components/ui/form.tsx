@@ -54,7 +54,7 @@ function FormControl({ children }: { children: ReactNode }) {
   const only = Children.only(children)
   if (!isValidElement(only)) return <>{children}</>
   return cloneElement(only as ReactElement<Record<string, unknown>>, {
-    id: formItemId,
+    id: (only.props as { id?: string }).id ?? formItemId,
     'aria-describedby': error ? `${formDescriptionId} ${formMessageId}` : formDescriptionId,
     'aria-invalid': !!error,
   })

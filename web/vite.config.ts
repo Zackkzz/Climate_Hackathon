@@ -35,7 +35,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     proxy: {
-      '/api': { target: 'http://localhost:8001', changeOrigin: true },
+      '/api': { target: 'http://localhost:8011', changeOrigin: true },
     },
   },
   build: { outDir: 'dist', chunkSizeWarningLimit: 1200 },
