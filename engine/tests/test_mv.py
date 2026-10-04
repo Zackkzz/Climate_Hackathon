@@ -65,7 +65,7 @@ def test_scenarios_give_expected_true_up(scenario, position):
         assert tu["refund"] == pytest.approx((charge - tu["new_charge_per_month"]) * 12, abs=0.05)
         # the tenant keeps at least 1 - share of the verified saving
         assert tu["new_charge_per_month"] <= 0.8 * max(v["verified_saving_per_month"], 0) + 0.01
-    assert any("simulated" in f for f in v["flags"])
+    assert any("modelled estimates" in f for f in v["flags"])
 
 
 def test_reduce_charge_when_charge_above_cap_but_below_saving():

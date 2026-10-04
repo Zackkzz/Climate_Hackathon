@@ -327,7 +327,7 @@ def verify(req: AssessRequest, position: str, baseline: list, post: list, charge
 
     # Flags
     if any(r.get("source") == "simulated" for r in baseline + post):
-        flags.append("These readings are simulated, not real meter data.")
+        flags.append("These readings are modelled estimates, not meter data.")
     if r2e < 0.5:
         flags.append(f"Weather explains little of the baseline electricity use (R2 {r2e:.2f}); the result is less certain.")
     if realisation is not None and realisation < 0.75:
