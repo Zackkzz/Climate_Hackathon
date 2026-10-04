@@ -1,14 +1,50 @@
+# Python
 .venv/
+venv/
 __pycache__/
-*.pyc
+*.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Node and web build
 node_modules/
 web/dist/
+*.tsbuildinfo
+npm-debug.log*
+
+# Browser test output
+playwright-report/
+test-results/
+.playwright-mcp/
+
+# Local state: programme database, uploads, caches created at run time
+engine/var/
+*.db
+*.sqlite
+*.sqlite3
+
+# Raw source downloads for the pilot dataset (rebuilt by data/pipeline; large, and some have unclear licences)
 data/raw/
+
+# Secrets and local settings. Real settings never go in the repo.
 .env
 .env.*
+*.pem
+*.key
+# These hold no secrets: they only switch the web app's built-in demo data on, and the npm scripts need them.
+!web/.env.example
+!web/.env.mock
+!web/.env.pmock
+
+# Logs, editors, operating system
 *.log
 .DS_Store
-
-# Programme database (local state)
-engine/var/
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
