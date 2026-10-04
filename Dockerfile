@@ -10,6 +10,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     METERWISE_DB=/app/engine/var/meterwise.db
 WORKDIR /app
+# rasterio's wheel bundles GDAL but links against the system libexpat, which the slim image lacks
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libexpat1 \
+    && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --create-home --uid 10001 meterwise
