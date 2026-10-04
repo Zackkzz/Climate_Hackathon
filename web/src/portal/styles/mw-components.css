@@ -79,6 +79,8 @@ main:focus { outline: none; }
 .mw-header-inner .nsw-header__menu { position: static; order: 3; }
 .mw-header-inner .nsw-header__main { margin: 0.5rem 0; flex: 1; min-width: 0; }
 .mw-header-name { padding: 0; }
+/* the logo (BrandLogo.tsx): sizes come from the system's .nsw-header__waratah rules; the span only carries the image role */
+.mw-header-waratah__img { display: block; }
 .nsw-header__title { font-size: var(--nsw-font-size-lg); font-weight: 700; line-height: 1.2; }
 .nsw-header__title a { color: var(--nsw-brand-dark); text-decoration: none; }
 .nsw-header__description { color: var(--mw-muted); font-size: var(--nsw-font-size-xs); }

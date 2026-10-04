@@ -6,11 +6,23 @@ by side. It is a concept demonstration by a student team. It is not a NSW Govern
 
 ## Branding rules (firm)
 
-1. No NSW Government logo, waratah or "NSW Government" wordmark, and no masthead text "A NSW Government website". The
-   artwork was not looked up or bundled. The header shows a plain "Meterwise" wordmark as the site title, with the
-   descriptor "Rental upgrade programme: concept demonstration".
-2. `components/BrandLogo.tsx` is the one place a logo would go. It renders nothing. It sits where the system puts its
-   logo (`.nsw-header__logo`).
+1. **NSW Government logo: used without permission, concept demonstration only.** At the project owner's request, the
+   header shows the NSW Government logo. The logo is the NSW Government's. It is used here without permission, for this
+   labelled concept demonstration only. NSW Government branding guidelines restrict the logo to NSW Government entities
+   or approved use. **Before any public deployment or reuse, remove the logo or obtain permission.** To remove it: make
+   `components/BrandLogo.tsx` return `null` and delete `assets/nsw-government-logo.svg` (nothing else refers to them).
+2. The artwork is the header component's own SVG (`svg.nsw-header__waratah-gov`, viewBox 0 0 259 280), copied
+   unaltered from `src/components/header/_header.hbs` in the design system repository
+   (https://github.com/NSWGTP/nsw-design-system, `master`, last changed in commit 3ec89ad, 15 September 2026). The npm
+   package does not ship it. Only the template's indentation was removed. It is stored in `src/portal/assets/` and
+   inlined at build time (`?raw` import), so nothing is fetched from another site and the system's own CSS applies:
+   55px high on small screens with the "GOVERNMENT" word hidden, 76px high with the word from 62rem, the system's
+   spacing around it, proportions kept. `BrandLogo.tsx` renders it as `.nsw-header__waratah` before the site name, as
+   the system's header does. The system wraps the logo in a link to the government home page; here it is not a link
+   (the "Meterwise" title beside it is the home link), but an image with the accessible name the system's header gives
+   it, "NSW Government". The header still shows "Meterwise" as the site title, with the descriptor "Rental upgrade
+   programme: concept demonstration". The same header is used on every page, including sign-in and the tenant page.
+   There is no masthead text "A NSW Government website".
 3. Every page carries a full-width notice strip at the very top, above the header: "Concept demonstration by a student
    team for Climate Hack-tion 2026. Not a NSW Government website or service. Organisations, people, meters and readings
    shown are made up." It is always visible, has no close control, and prints. The same text is repeated in the footer.
@@ -65,6 +77,7 @@ rendering. Every behaviour is reimplemented in React with the system's classes a
 | Notice strip (local, `.mw-demo-notice`) | `DemoNotice.tsx`: top of every page and in the footer |
 | Skip link `.nsw-skip` | `Shell.tsx` `SkipLink`, on every layout |
 | Header `.nsw-header` | `Shell.tsx` `SiteHeader`: portals, public pages, tenant page, block finder |
+| Header logo `.nsw-header__waratah` | `BrandLogo.tsx` (in `SiteHeader`; see branding rules 1 and 2) |
 | Main navigation `.nsw-main-nav` | `Shell.tsx` `PublicLayout` |
 | Side navigation `.nsw-side-nav` | `Shell.tsx` `PortalShell` (all portals) |
 | Breadcrumbs `.nsw-breadcrumbs` | `ui/breadcrumb.tsx`, used by `PageHeader` on every portal page |
@@ -109,7 +122,7 @@ notice strip, finder layout, chart tooltip, print rules.
 
 ## Departures from the system, and why
 
-- **Notice strip, `BrandLogo` and header text** replace the system's masthead and logo (branding rules above).
+- **Notice strip** replaces the system's masthead; the **logo** is an image, not a link (branding rules above).
 - **Select is a native `<select>`** (styled `.nsw-form__select`). The system's select enhancement script builds a custom
   list; a native control has better keyboard and screen reader behaviour and works with react-hook-form unchanged. Option
   labels must be plain text.

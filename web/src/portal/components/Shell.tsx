@@ -47,9 +47,7 @@ export function SiteHeader({ menu, end }: { menu?: ReactNode; end?: ReactNode })
         <div className="nsw-header__inner mw-header-inner">
           {menu}
           <div className="nsw-header__main">
-            <div className="nsw-header__logo">
-              <BrandLogo />
-            </div>
+            <BrandLogo />
             <div className="nsw-header__name mw-header-name">
               <div className="nsw-header__title">
                 <Link to="/">{SITE_NAME}</Link>
