@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router'
+import { cleanName } from '@/portal/lib/labels'
 import { utilityApi } from '@/console/api-utility'
 import { useRes } from '@/console/useRes'
 import { money, num } from '@/format'
@@ -29,7 +30,7 @@ export default function Summary() {
           ]
           return (
             <div className="space-y-4">
-              <Panel title="Work to do" description={s.org.name}>
+              <Panel title="Work to do" description={cleanName(s.org.name)}>
                 <ul className="divide-y border">
                   {work.map((w) => (
                     <li key={w.to} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">

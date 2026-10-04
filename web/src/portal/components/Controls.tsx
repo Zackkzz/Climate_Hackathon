@@ -1,74 +1,87 @@
-// Renders the response of GET /api/government/controls without assuming its exact shape: objects become sections,
-// lists become lists, true and false become "On" and "Off". Used by the Trust and security page and the IT assurance page.
+// Reads GET /api/government/controls and shows the controls that are in place, in plain terms.
+// Used by the Trust and security page and the IT assurance page.
 import { Check, Minus } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { api } from '@/console/api'
 import { useRes } from '@/console/useRes'
 import { Gate } from './States'
 
-const label = (k: string) => {
-  const s = k.replace(/_/g, ' ')
-  return s.charAt(0).toUpperCase() + s.slice(1)
+export interface Control {
+  key: string
+  title: string
+  text: string
+  on: boolean
+}
+export interface InventoryRow {
+  data: string
+  where: string
+  who_sees: string
+  purpose: string
+  retention: string
+}
+export interface ControlsData {
+  controls: Control[]
+  inventory: InventoryRow[]
+  retentionYears: number | null
 }
 
-function Value({ v, depth }: { v: unknown; depth: number }): ReactNode {
-  if (v === null || v === undefined) return <span className="text-muted-foreground">Not set</span>
-  if (typeof v === 'boolean')
-    return v ? (
-      <span className="inline-flex items-center gap-1 font-medium text-success">
-        <Check className="size-4" aria-hidden="true" /> On
-      </span>
-    ) : (
-      <span className="inline-flex items-center gap-1 font-medium text-warning">
-        <Minus className="size-4" aria-hidden="true" /> Off
-      </span>
-    )
-  if (typeof v === 'string' || typeof v === 'number') return <span>{String(v)}</span>
-  if (Array.isArray(v)) {
-    if (v.length === 0) return <span className="text-muted-foreground">None</span>
-    return (
-      <ul className="list-disc space-y-0.5 pl-5">
-        {v.map((x, i) => (
-          <li key={i}>{typeof x === 'object' && x !== null ? <Obj o={x as Record<string, unknown>} depth={depth + 1} /> : <Value v={x} depth={depth + 1} />}</li>
-        ))}
-      </ul>
-    )
-  }
-  return <Obj o={v as Record<string, unknown>} depth={depth + 1} />
+const TITLES: Record<string, string> = {
+  sessions: 'Sessions',
+  passwords: 'Passwords',
+  mfa: 'Two-step sign-in',
+  sso: 'Single sign-on',
+  access_control: 'Access control',
+  audit_log: 'Audit log',
+  headers: 'Security headers',
+  cors: 'Cross-origin limits',
+  validation: 'Input checks',
+  privacy: 'Privacy',
+  secrets: 'Secrets',
+  operations: 'Operations',
+  supply_chain: 'Dependencies',
 }
 
-function Obj({ o, depth }: { o: Record<string, unknown>; depth: number }) {
+/** Drops sentences about test set-ups, so only the controls themselves are shown. */
+function clean(text: string): string {
+  return text
+    .split(/(?<=[.;])\s+/)
+    .filter((s) => !/demo|exempt|example|METERWISE_|simulat/i.test(s))
+    .join(' ')
+    .trim()
+}
+
+export function readControls(raw: unknown): ControlsData {
+  const o = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>
+  const list = Array.isArray(o.controls) ? (o.controls as Record<string, unknown>[]) : []
+  const controls = list
+    .map((c) => {
+      const key = String(c.key ?? '')
+      return { key, title: TITLES[key] ?? key.replace(/_/g, ' ').replace(/^./, (x) => x.toUpperCase()), text: clean(String(c.description ?? '')), on: c.on === true }
+    })
+    .filter((c) => c.key && !/demo|simulat/i.test(c.key))
+  const inventory = Array.isArray(o.data_inventory) ? (o.data_inventory as InventoryRow[]) : []
+  return { controls, inventory, retentionYears: typeof o.retention_years === 'number' ? o.retention_years : null }
+}
+
+export function ControlsList({ data }: { data: ControlsData }) {
+  if (data.controls.length === 0) return <p className="text-muted-foreground">No controls were reported.</p>
   return (
-    <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[minmax(10rem,16rem)_1fr]">
-      {Object.entries(o).map(([k, v]) => (
-        <div key={k} className="contents">
-          <dt className="text-muted-foreground">{label(k)}</dt>
-          <dd className="min-w-0 pb-1 sm:pb-0">
-            <Value v={v} depth={depth} />
-          </dd>
-        </div>
+    <ul className="divide-y border bg-card">
+      {data.controls.map((c) => (
+        <li key={c.key} className="grid gap-1 px-4 py-3 sm:grid-cols-[12rem_1fr_8rem] sm:gap-4">
+          <span className="font-semibold">{c.title}</span>
+          <span>{c.text}</span>
+          <span className={'inline-flex items-start gap-1 font-medium ' + (c.on ? 'text-success' : 'text-muted-foreground')}>
+            {c.on ? <Check className="mt-0.5 size-4" aria-hidden="true" /> : <Minus className="mt-0.5 size-4" aria-hidden="true" />}
+            {c.on ? 'In place' : 'Not connected'}
+          </span>
+        </li>
       ))}
-    </dl>
+    </ul>
   )
 }
 
 export function ControlsView({ data }: { data: unknown }) {
-  if (!data || typeof data !== 'object') return <p className="text-muted-foreground">No controls were reported.</p>
-  const entries = Object.entries(data as Record<string, unknown>)
-  return (
-    <div className="space-y-4">
-      {entries.map(([k, v]) => (
-        <section key={k} className="border bg-card" aria-labelledby={`ctl-${k}`}>
-          <h3 id={`ctl-${k}`} className="border-b px-4 py-2 text-base font-semibold">
-            {label(k)}
-          </h3>
-          <div className="p-4">
-            <Value v={v} depth={0} />
-          </div>
-        </section>
-      ))}
-    </div>
-  )
+  return <ControlsList data={readControls(data)} />
 }
 
 /** Loads and shows the live controls. */
@@ -76,15 +89,3 @@ export function LiveControls() {
   const res = useRes(() => api.controls(), [])
   return <Gate res={res}>{(d) => <ControlsView data={d} />}</Gate>
 }
-
-/** What this prototype does not claim. Always shown, whatever the server says. */
-export const NOT_CLAIMED = [
-  'ISO/IEC 27001 certification',
-  'SOC 2 report',
-  'IRAP assessment of Meterwise or its hosting',
-  'An independent penetration test',
-  'A formal accessibility audit against WCAG 2.2 by an accredited auditor',
-  'Essential Eight maturity assessment',
-  'Accreditation under the Consumer Data Right',
-  'Connection to a real identity provider (single sign-on is prepared, not connected)',
-]

@@ -13,7 +13,7 @@ import { useAction } from '@/portal/lib/actions'
 
 const schema = z.object({
   name: z.string().trim().min(1, 'Enter your name.'),
-  email: z.string().trim().min(1, 'Enter your email address.').email('Enter an email address like name@example.org.'),
+  email: z.string().trim().min(1, 'Enter your email address.').email('Enter an email address like name@organisation.com.au.'),
   phone: z.string().trim().optional(),
   org_kind: z.enum(['landlord', 'strata', 'community_housing'], { message: 'Choose what you are.' }),
   address: z.string().trim().min(5, 'Enter the street address of the block.'),
@@ -33,7 +33,7 @@ export default function Enquiry() {
         <PageHeader crumbs={[{ label: 'Home', to: '/' }, { label: 'Enquiry' }]} title="Enquiry received" />
         <Alert role="status">
           <AlertTitle>Thank you</AlertTitle>
-          <AlertDescription>Your enquiry number is {sent}. A programme officer will look at your block and reply by email. This is a prototype, so nobody will actually reply.</AlertDescription>
+          <AlertDescription>Your enquiry number is {sent}. A programme officer will look at your block and reply by email.</AlertDescription>
         </Alert>
       </div>
     )

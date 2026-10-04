@@ -1,7 +1,7 @@
 // The route and navigation tables for each portal. Each page is its own file and loads on demand.
 import { Suspense, lazy } from 'react'
 import { Route, Routes } from 'react-router'
-import { AlertTriangle, BarChart3, Building2, ClipboardCheck, Download, Flame, Gauge, Grid3x3, Inbox, Landmark, ListChecks, Map, PlugZap, Receipt, ScrollText, ShieldCheck, Signpost, Table2, Wallet, Wrench, Zap } from 'lucide-react'
+import { Settings, AlertTriangle, BarChart3, Building2, ClipboardCheck, Download, Flame, Gauge, Grid3x3, Inbox, Landmark, ListChecks, Map, PlugZap, Receipt, ScrollText, ShieldCheck, Signpost, Table2, Wallet, Wrench, Zap } from 'lucide-react'
 import { useUser } from '@/console/auth'
 import { LoadingRows } from '@/portal/components/States'
 import { PortalShell } from '@/portal/components/Shell'
@@ -17,6 +17,7 @@ const L = {
   Reserve: lazy(() => import('./government/Reserve')),
   Faults: lazy(() => import('./government/Faults')),
   Planner: lazy(() => import('./government/Planner')),
+  Admin: lazy(() => import('./government/Admin')),
   ProgrammeOverview: lazy(() => import('./government/ProgrammeOverview')),
   Outcomes: lazy(() => import('./government/Outcomes')),
   Areas: lazy(() => import('./government/Areas')),
@@ -78,6 +79,7 @@ export function Government() {
           ],
         },
         oversight,
+        { label: 'Administration', items: [{ to: '/government/admin', label: 'System date', icon: Settings }] },
       ]
     : [{ ...oversight, label: undefined, items: [{ to: '/government', label: 'Outcomes', icon: BarChart3, end: true }, ...oversight.items.slice(1)] }]
   return (
@@ -93,6 +95,7 @@ export function Government() {
           <Route path="reserve" element={<L.Reserve />} />
           <Route path="faults" element={<L.Faults />} />
           <Route path="planner" element={<L.Planner />} />
+          <Route path="admin" element={<L.Admin />} />
           <Route path="overview" element={<L.ProgrammeOverview />} />
           <Route path="outcomes" element={<L.Outcomes />} />
           <Route path="areas" element={<L.Areas />} />

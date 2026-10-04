@@ -1,5 +1,5 @@
-// Accessibility check: signs in (demo account), visits each path and runs axe with WCAG 2.2 AA rules.
-// Usage: node scripts/axe.mjs <baseUrl> <demoEmail|public|tenant:CODE> <path> [<path>...] [--mobile]
+// Accessibility check: signs in, visits each path and runs axe with WCAG 2.2 AA rules.
+// Usage: node scripts/axe.mjs <baseUrl> <email|public|tenant:CODE> <path> [<path>...] [--mobile]
 // Prints violations of any impact, serious and critical first. Exit code 1 if any serious or critical.
 import { chromium } from 'playwright-core'
 import AxeBuilder from '@axe-core/playwright'
@@ -39,9 +39,9 @@ if (who !== 'public') {
     await page.getByRole('textbox', { name: 'Access code' }).fill(who.slice(7))
     await page.getByRole('button', { name: 'See my flat' }).click()
   } else {
-    // use the form with the demo password for the chosen account
+    // staff sign-in form; the password comes from DEMO_PASSWORD
     await page.getByLabel('Email address').fill(who)
-    await page.getByLabel('Password').fill(process.env.DEMO_PASSWORD ?? 'demo')
+    await page.getByLabel('Password').fill(process.env.DEMO_PASSWORD ?? process.env.E2E_PASSWORD ?? '')
     await page.getByRole('button', { name: 'Sign in', exact: true }).first().click()
   }
   await page.waitForTimeout(1500)

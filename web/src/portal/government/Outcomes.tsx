@@ -12,7 +12,7 @@ import { money, num, num1 } from '@/format'
 import { ChartBox } from '@/portal/components/ChartBox'
 import { Facts, Figures, PageHeader, Panel } from '@/portal/components/PageHeader'
 import { ErrorAlert, Gate } from '@/portal/components/States'
-import { SimulatedBadge, StatusBadge } from '@/portal/components/Status'
+import { StatusBadge } from '@/portal/components/Status'
 import { NumberField, TextField } from '@/portal/components/fields'
 import { Button } from '@/portal/components/ui/button'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/portal/components/ui/chart'
@@ -214,7 +214,7 @@ function Body({ o, reload, canEdit }: { o: OutcomesT; reload: () => void; canEdi
           table={{ columns: [{ label: 'Target' }, { label: 'Actual', numeric: true }, { label: 'Goal', numeric: true }, { label: 'Percent', numeric: true }], rows: rows.map((t) => [t.label, fmtT(t.key, t.actual), fmtT(t.key, t.target), `${t.pct}%`]) }}
         />
 
-        <Panel title="Modelled and measured" description="Measured figures come from the savings check on each project." actions={<SimulatedBadge label="Simulated meters" />}>
+        <Panel title="Modelled and measured" description="Measured figures come from the savings check on each project.">
           <div className="overflow-x-auto" role="region" aria-label="Modelled and measured impact" tabIndex={0}>
             <Table>
               <TableHeader>

@@ -36,9 +36,9 @@ export function ErrorAlert({ error, title = 'That did not work', onRetry }: { er
 
 export function EmptyState({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-start gap-1 border border-dashed bg-card p-6 text-sm">
+    <div className="flex flex-col items-start gap-1 rounded-lg border border-l-4 border-l-mark bg-card p-5">
       <Inbox className="size-5 text-muted-foreground" aria-hidden="true" />
-      <p className="font-medium">{title}</p>
+      <p className="text-lg font-semibold">{title}</p>
       {children && <p className="text-muted-foreground">{children}</p>}
       {action && <div className="mt-2">{action}</div>}
     </div>

@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
+import { cleanName } from '@/portal/lib/labels'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { api } from '@/console/api'
@@ -11,6 +12,7 @@ import { Confirm } from '@/portal/components/Confirm'
 import { ErrorAlert } from '@/portal/components/States'
 import { Facts, Figures, Panel } from '@/portal/components/PageHeader'
 import { STAGE_LABEL, StatusBadge } from '@/portal/components/Status'
+import { StepIndicator } from '@/portal/components/StepIndicator'
 import { NumberField } from '@/portal/components/fields'
 import { Button } from '@/portal/components/ui/button'
 import { Form } from '@/portal/components/ui/form'
@@ -35,7 +37,6 @@ export default function Summary({ p, role, onChange }: TabProps) {
   const form = useForm<z.input<typeof grantSchema>, unknown, z.output<typeof grantSchema>>({ resolver: zodResolver(grantSchema), defaultValues: { grant: s.grant_allocated } })
 
   const history = [...p.stage_history].sort((a, b) => a.at.localeCompare(b.at))
-  const reached = new Set(history.map((h) => h.stage))
 
   const saveGrant = form.handleSubmit(async (v) => {
     const r = await patch.run(() => api.patchProject(p.id, { grant_allocated: v.grant }), 'Grant updated and the deal reassessed')
@@ -106,20 +107,8 @@ export default function Summary({ p, role, onChange }: TabProps) {
           {!next && <p className="mt-3 text-muted-foreground">This project is at the last stage.</p>}
         </Panel>
 
-        <Panel title="Where the project is">
-          <ol className="space-y-1" aria-label="Stages">
-            {STAGES.map((st, i) => {
-              const h = history.filter((x) => x.stage === st).pop()
-              const state = st === p.stage ? 'Current' : i < idx || reached.has(st) ? 'Done' : 'To come'
-              return (
-                <li key={st} className="flex flex-wrap items-baseline gap-x-3 border-b py-1 last:border-0" aria-current={st === p.stage ? 'step' : undefined}>
-                  <span className={'w-28 ' + (st === p.stage ? 'font-semibold' : '')}>{STAGE_LABEL[st]}</span>
-                  <span className="w-16 text-sm text-muted-foreground">{state}</span>
-                  <span className="min-w-0 flex-1 text-sm text-muted-foreground">{h ? `${dateLabelAu(h.at)}${h.by ? ', ' + h.by : ''}${h.note ? '. ' + h.note : ''}` : ''}</span>
-                </li>
-              )
-            })}
-          </ol>
+        <Panel title="Where the project is" className="lg:col-span-2">
+          <StepIndicator current={p.stage} dates={Object.fromEntries(STAGES.map((st) => [st, history.filter((x) => x.stage === st).pop()?.at]).filter(([, d]) => d).map(([st, d]) => [st, dateLabelAu(d as string)])) as Partial<Record<Stage, string>>} />
         </Panel>
       </div>
 
@@ -129,8 +118,8 @@ export default function Summary({ p, role, onChange }: TabProps) {
             items={[
               { label: 'Address', value: p.label },
               { label: 'Flats', value: p.flats },
-              { label: 'Owner', value: p.owner_org?.name },
-              { label: 'Installer', value: p.installer_org?.name ?? 'Not chosen yet' },
+              { label: 'Owner', value: cleanName(p.owner_org?.name) },
+              { label: 'Installer', value: (p.installer_org ? cleanName(p.installer_org.name) : null) ?? 'Not chosen yet' },
               { label: 'In this stage since', value: dateLabelAu(p.stage_since) },
               { label: 'Heat', value: p.heat_band },
             ]}

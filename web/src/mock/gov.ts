@@ -41,7 +41,7 @@ function seedGrants(): Grant[] {
       reason: 'Funding gap after capped charge',
       requested_on: `${base}-0${2 + i}`,
       decided_on: status === 'requested' ? null : `${base}-1${i}`,
-      decided_by: status === 'requested' ? null : 'Robin Sample (state oversight)',
+      decided_by: status === 'requested' ? null : 'Robin Clarke (oversight)',
     })
   })
   return out
@@ -217,30 +217,27 @@ function report(kind: string): string | null {
 }
 
 const CONTROLS = {
-  generated_at: 'now',
-  sessions: { absolute_expiry_hours: 12, idle_expiry_minutes: 30, logout_revokes_token: true, tokens_in_urls: false },
-  authentication: { min_password_length: 14, common_password_check: true, hashing: 'scrypt', lockout_after_failures: 5, lockout_minutes: 15, login_rate_limit_per_ip: true },
-  multi_factor: { totp_for_staff: true, enforced_for: ['manager', 'government', 'utility', 'owner', 'installer', 'funder'], demo_accounts_exempt: true, enrolment_routes: ['/api/auth/mfa/setup', '/api/auth/mfa/verify'] },
-  sso: { oidc_settings_present: true, configured: false, callback_route_status: '501 until configured', note: 'Single sign-on is prepared, not connected to an identity provider.' },
-  access_control: { role_checks_on_every_route: true, default_deny: true, organisation_isolation: true, tenant_names_hidden_from: ['government', 'utility', 'funder', 'installer'] },
-  audit_log: { append_only: true, hash_chained: true, verify_route: '/api/programme/audit-log/verify', records: ['sign-ins', 'sign-in failures', 'reads of tenant data', 'exports', 'every change'] },
-  response_headers: { content_security_policy: true, strict_transport_security: true, x_content_type_options: true, referrer_policy: true, permissions_policy: true, frame_ancestors: 'none', api_cache_control: 'no-store' },
-  input_handling: { validation_on_every_body: true, upload_size_limit: true, row_limit: true, csv_formula_neutralised: true },
-  privacy: { tenant_data_limited_to: ['name', 'unit'], access_request_export: true, erase_to_former_tenant: true, retention_setting: '7 years', meter_data_consent_required: true, meter_ids_masked_for: ['government', 'funder', 'installer'] },
-  data_inventory: [
-    { item: 'Tenant name', purpose: 'Letters and charge records', retention: '7 years, or erased on request' },
-    { item: 'Flat meter identifier', purpose: 'Charge and readings', retention: 'Life of the charge' },
-    { item: 'Monthly meter readings', purpose: 'Measured savings check', retention: 'Life of the charge', note: 'Only with data consent' },
-    { item: 'Staff name and email', purpose: 'Sign-in and audit log', retention: 'While the account is open' },
+  controls: [
+    { key: 'sessions', description: 'Sessions expire after 12 hours, or 30 minutes without activity; sign-out revokes the session.', on: true },
+    { key: 'passwords', description: 'Passwords of at least 14 characters, checked against common passwords and hashed. Lockout after 5 failures for 15 minutes.', on: true },
+    { key: 'mfa', description: 'Two-step sign-in for every staff role.', on: true },
+    { key: 'sso', description: 'OpenID Connect single sign-on is prepared but not connected.', on: false },
+    { key: 'access_control', description: 'Role and organisation checks on every route, deny by default.', on: true },
+    { key: 'audit_log', description: 'Append-only, hash-chained audit log.', on: true },
+    { key: 'headers', description: 'Content security policy, strict transport security and other security headers.', on: true },
+    { key: 'cors', description: 'Cross-origin requests limited to configured origins.', on: true },
+    { key: 'validation', description: 'Every body validated; uploads limited in size and rows; CSV exports neutralise formula injection.', on: true },
+    { key: 'privacy', description: 'Tenant personal data limited to name and unit; export and erase routes; separate, withdrawable consent for meter data.', on: true },
+    { key: 'secrets', description: 'Secrets only from the environment.', on: true },
+    { key: 'operations', description: 'security.txt, health and ready routes, request ids, request log without personal data.', on: true },
+    { key: 'supply_chain', description: 'Dependencies pinned; software bill of materials kept.', on: true },
   ],
-  secrets_and_config: { secrets_from_environment: true, refuses_default_secret_when_demo_off: true, cors_limited: true },
-  operations: { security_txt: true, health_and_ready_routes: true, structured_request_log: true, personal_data_in_logs: false, dependencies_pinned: true, sbom: true },
-  demo_mode: {
-    demo_mode_on: true,
-    demo_exemptions: ['Demo accounts skip the second sign-in step', 'Simulated clock and demo reset are available', 'Demo accounts are listed on the sign-in page'],
-    note: 'A real deployment turns all of this off.',
-  },
-  not_claimed: ['ISO/IEC 27001 certification', 'SOC 2 report', 'IRAP assessment', 'Independent penetration test', 'Formal accessibility audit'],
+  retention_years: 7,
+  data_inventory: [
+    { data: 'Tenant name and unit', where: 'tenancies', who_sees: 'manager, owner, the tenant', purpose: 'Running the tenancy and the charge', retention: 'Term of the charge plus retention period' },
+    { data: 'Monthly meter readings', where: 'readings', who_sees: 'manager, owner, the tenant', purpose: 'Checking savings', retention: 'Term plus retention period' },
+    { data: 'Staff names and emails', where: 'users', who_sees: 'manager', purpose: 'Sign-in and audit', retention: 'While the account is active' },
+  ],
 }
 
 export async function handle(method: string, pathname: string, params: URLSearchParams, body: unknown, token: string | null): Promise<RawReply | null> {

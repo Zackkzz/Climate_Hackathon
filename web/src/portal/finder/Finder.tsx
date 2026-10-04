@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { getBuildings, getMeta, USE_MOCK } from '@/api'
+import { useUser } from '@/console/auth'
+import { AppBar, UserArea } from '@/portal/components/AppBar'
+import { getBuildings, getMeta } from '@/api'
 import { useAssess, useLoad, useShortlist } from '@/hooks'
 import { decodeDeal, encodeDeal, newDeal, parseHash } from '@/state'
 import type { Route, Sheet, Step } from '@/state'
 import type { Deal } from '@/types'
 import { Footer } from '@/portal/components/Footer'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
-import { ExampleBadge } from '@/portal/components/Status'
 import { Button } from '@/portal/components/ui/button'
 import './finder.css'
 import Build from './Build'
@@ -107,6 +108,7 @@ export default function Finder() {
     go('build', d)
   }
 
+  const user = useUser()
   const hasDeal = deal !== null
   const ready2 = !!m && !!buildings.data && ready
 
@@ -115,33 +117,38 @@ export default function Finder() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
         Skip to content
       </a>
-      <header className="no-print sticky top-0 z-30 flex min-h-14 flex-wrap items-center gap-x-4 gap-y-1 border-b bg-card px-3 py-1 sm:px-4">
-        <Link to="/" className="text-lg font-bold text-foreground no-underline">
-          Meterwise
-        </Link>
-        <nav aria-label="Steps" className="order-last flex min-w-0 basis-full items-center sm:order-none sm:basis-auto sm:flex-1">
-          <ol className="flex flex-wrap items-center gap-1">
-            {STEPS.map((s) => {
-              const current = s.key === route.step
-              const disabled = s.key !== 'find' && !hasDeal
-              return (
-                <li key={s.key}>
-                  <Button variant={current ? 'secondary' : 'ghost'} size="sm" disabled={disabled} aria-current={current ? 'step' : undefined} title={disabled ? 'Pick a block first' : undefined} onClick={() => go(s.key)} className="whitespace-nowrap">
-                    {s.n}. {s.label}
-                  </Button>
-                </li>
-              )
-            })}
-          </ol>
-        </nav>
-        <div className="ml-auto flex flex-wrap items-center gap-x-3 text-sm">
-          {USE_MOCK ? <ExampleBadge>Demo data</ExampleBadge> : m?.pilot.is_fixture ? <ExampleBadge>Example data</ExampleBadge> : null}
-          <Button variant="link" className="h-auto p-0" onClick={() => setHow(true)}>
-            How it works
-          </Button>
-          <Link to="/signin">Programme sign in</Link>
-        </div>
-      </header>
+      <AppBar
+        nav={
+          <nav aria-label="Main" className="flex items-center gap-1 text-sm">
+            <button type="button" className="rounded-sm px-2.5 py-1.5 font-medium text-white hover:bg-navy-800" onClick={() => setHow(true)}>
+              How it works
+            </button>
+          </nav>
+        }
+      >
+        {user ? (
+          <UserArea />
+        ) : (
+          <Link to="/signin" className="inline-flex h-9 items-center rounded-sm border border-white/60 px-3 text-sm font-semibold text-white no-underline hover:bg-navy-800">
+            Programme sign in
+          </Link>
+        )}
+      </AppBar>
+      <nav aria-label="Steps" className="no-print border-b bg-card px-3 py-2 sm:px-4">
+        <ol className="flex flex-wrap items-center gap-2">
+          {STEPS.map((s) => {
+            const current = s.key === route.step
+            const disabled = s.key !== 'find' && !hasDeal
+            return (
+              <li key={s.key} className="flex items-center gap-2">
+                <Button variant={current ? 'default' : 'outline'} size="sm" disabled={disabled} aria-current={current ? 'step' : undefined} title={disabled ? 'Pick a block first' : undefined} onClick={() => go(s.key)} className="whitespace-nowrap">
+                  {s.n}. {s.label}
+                </Button>
+              </li>
+            )
+          })}
+        </ol>
+      </nav>
 
       <main id="main" tabIndex={-1} className="flex-1">
         {(meta.error || buildings.error) && (

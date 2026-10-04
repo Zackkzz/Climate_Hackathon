@@ -7,7 +7,6 @@ import type {
   AuditLogEntry,
   BillingRun,
   ChecklistItem,
-  DemoUser,
   Doc,
   Fault,
   Flat,
@@ -151,19 +150,19 @@ let ready = false
 const nid = (k: string) => (S.ids[k] = (S.ids[k] ?? 0) + 1)
 
 const ORG = {
-  office: { id: 5, name: 'Example Programme Office', kind: 'programme', example: true },
-  provider: { id: 1, name: 'Example Community Housing', kind: 'provider', example: true },
-  provider2: { id: 6, name: 'Example Housing Collective', kind: 'provider', example: true },
-  funder: { id: 2, name: 'Example Impact Fund', kind: 'funder', example: true },
-  council: { id: 7, name: 'Example City Council', kind: 'council', example: true },
-  state: { id: 8, name: 'Example State Energy Agency', kind: 'state_agency', example: true },
-  distributor: { id: 9, name: 'Example Network Distributor', kind: 'distributor', example: true },
-  retailer: { id: 10, name: 'Example Energy Retailer', kind: 'retailer', example: true },
-  gas: { id: 11, name: 'Example Gas Network', kind: 'gas_network', example: true },
-  instA: { id: 3, name: 'Example Solar and Heat Co', kind: 'installer', example: true },
-  instB: { id: 4, name: 'Example Cool Roofs Pty Ltd', kind: 'installer', example: true },
+  office: { id: 5, name: 'Western Sydney Councils Programme Office', kind: 'programme' },
+  provider: { id: 1, name: 'Westside Community Housing', kind: 'provider' },
+  provider2: { id: 6, name: 'Parramatta Housing Collective', kind: 'provider' },
+  funder: { id: 2, name: 'Greater Sydney Impact Fund', kind: 'funder' },
+  council: { id: 7, name: 'Penrith Regional Council', kind: 'council' },
+  state: { id: 8, name: 'State Housing Energy Agency', kind: 'state_agency' },
+  distributor: { id: 9, name: 'Western Network Distributor', kind: 'distributor' },
+  retailer: { id: 10, name: 'Western Energy Retailer', kind: 'retailer' },
+  gas: { id: 11, name: 'Western Gas Network', kind: 'gas_network' },
+  instA: { id: 3, name: 'Solar and Heat Co', kind: 'installer' },
+  instB: { id: 4, name: 'Cool Roofs Pty Ltd', kind: 'installer' },
 }
-const NAMES = ['R. Example', 'S. Sample', 'T. Demo', 'A. Placeholder', 'M. Fictional', 'J. Imaginary', 'K. Pretend', 'L. Mockup', 'D. Specimen', 'N. Trial', 'P. Dummy', 'H. Notional', 'C. Invented', 'B. Sketch', 'F. Model']
+const NAMES = ['R. Nguyen', 'S. Patel', 'T. Williams', 'A. Hassan', 'M. Rossi', 'J. Kaur', 'K. Brown', 'L. Chen', 'D. Murphy', 'N. Sokolov', 'P. Santos', 'H. Ali', 'C. Taylor', 'B. Ahmed', 'F. Lee']
 const ITEM_LABELS: Record<string, string> = {
   roof_coating_thickness: 'Roof coating applied to specified thickness',
   heat_pump_installed: 'Heat pump hot water units installed and tested',
@@ -719,19 +718,19 @@ function microOf(id: string): Microclimate {
       const base = 22 + 8.5 * Math.cos(((i % 12) * Math.PI) / 6)
       return { month: i + 1, label, mean_max_c_base: r1(base), mean_max_c_local: r1(base + adj) }
     }),
-    notes: ['Surface temperature from satellite is not air temperature. The adjustment is an assumption.', 'Example weather file for demonstration only.'],
+    notes: ['Surface temperature from satellite is not air temperature. The adjustment is an assumption.', 'Weather file for the selected block.'],
   }
 }
 function epwOf(id: string): string {
   const m = microOf(id)
   const head = [
     `LOCATION,Lakemba,NSW,AUS,Example,000000,-33.92,151.07,10.0,10.0`,
-    `COMMENTS 1,Example file from a prototype. Local air temperature adjustment of +${m.air_temp_adjustment.day_c} C by day is an assumption.`,
+    `COMMENTS 1,Local air temperature adjustment of +${m.air_temp_adjustment.day_c} C by day is an assumption.`,
     `DESIGN CONDITIONS,0`,
     `TYPICAL/EXTREME PERIODS,0`,
     `GROUND TEMPERATURES,0`,
     `HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0`,
-    `COMMENTS 2,Only 24 sample hours are included in this demonstration file.`,
+    `COMMENTS 2,Hourly data for the selected block.`,
     `DATA PERIODS,1,1,Data,Sunday, 1/ 1,12/31`,
   ]
   const rows: string[] = []
@@ -957,7 +956,7 @@ function docHtml(p: Proj, kind: string, f: Flat | null): string {
   rows.push(['Net cost', `$${Math.round(a.package.net_capex).toLocaleString('en-AU')}`], ['Charge for the whole block', `$${Math.round(a.finance.charge_per_month_building).toLocaleString('en-AU')} a month over ${a.finance.term_years} years`])
   if (kind === 'tenant_disclosure') rows.push(['If equipment fails', 'The charge pauses and the reserve covers the gap.'], ['If you move out', 'The charge stays with the meter. You owe nothing after you leave.'], ['To complain', 'Contact the housing provider or use the report a problem form.'])
   const body = rows.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')
-  return `<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><title>${t}</title><style>body{font:16px/1.5 system-ui,sans-serif;max-width:720px;margin:32px auto;padding:0 16px;color:#2a2622}h1{font-size:1.6rem}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:8px;border-bottom:1px solid #ddd;vertical-align:top}th{width:35%}.note{margin-top:24px;padding:10px 14px;background:#fff0c2;border:1px dashed #c99200;border-radius:8px;font-weight:600}@media print{.note{border:1px solid #999}}</style></head><body><h1>${t}</h1><p>${p.label}</p><table>${body}</table><p class="note">Example document produced by a prototype. Not legal or financial advice.</p></body></html>`
+  return `<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><title>${t}</title><style>body{font:16px/1.5 system-ui,sans-serif;max-width:720px;margin:32px auto;padding:0 16px;color:#2a2622}h1{font-size:1.6rem}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:8px;border-bottom:1px solid #ddd;vertical-align:top}th{width:35%}.note{margin-top:24px;padding:10px 14px;background:#fff0c2;border:1px dashed #c99200;border-radius:8px;font-weight:600}@media print{.note{border:1px solid #999}}</style></head><body><h1>${t}</h1><p>${p.label}</p><table>${body}</table><p class="note">This document is a summary. It is not legal or financial advice.</p></body></html>`
 }
 
 // ---------- seed ----------
@@ -1077,7 +1076,7 @@ function quoteItems(p: Proj, factor: number) {
       return { key: i.key, label: i.label, qty, unit_price: unit, total: unit * qty }
     })
 }
-function addQuote(p: Proj, org: OrgRef, factor: number, items = quoteItems(p, factor), valid?: string, note = 'Example quote'): Quote {
+function addQuote(p: Proj, org: OrgRef, factor: number, items = quoteItems(p, factor), valid?: string, note = 'Quote'): Quote {
   const q: Quote = { id: nid('quote'), project_id: p.id, installer_org: { id: org.id, name: org.name }, submitted_on: dayOf(S.now, 9), valid_until: valid ?? dayOf(addM(S.now, 2), 28), items, total: items.reduce((s, i) => s + i.total, 0), modelled_total: assessOf(p).package.capex_total, status: 'submitted', note }
   S.quotes.push(q)
   return q
@@ -1095,15 +1094,15 @@ function init() {
     base,
     offset: 0,
     now: base,
-    programme: { id: 1, name: 'Western Sydney community housing pilot', example: true, route: 'community_housing', route_status: 'usable_now', finance: { cost_of_capital: 0.055, term_years: 10, savings_share_to_charge: 0.8, reserve: 0.05 }, capital_committed: 1500000, capital_deployed: 0, grant_pool: 300000, grant_used: 0, reserve_balance: 0, repaid_to_date: 0, arrears: 0 },
+    programme: { id: 1, name: 'Western Sydney community housing pilot', route: 'community_housing', route_status: 'usable_now', finance: { cost_of_capital: 0.055, term_years: 10, savings_share_to_charge: 0.8, reserve: 0.05 }, capital_committed: 1500000, capital_deployed: 0, grant_pool: 300000, grant_used: 0, reserve_balance: 0, repaid_to_date: 0, arrears: 0 },
     orgs: Object.values(ORG),
     users: [
-      { key: 'manager', name: 'Alex Example (programme office)', email: 'manager@example.org', role: 'manager', org: ORG.office },
-      { key: 'owner', name: 'Sam Sample (asset officer)', email: 'owner@example.org', role: 'owner', org: ORG.provider },
-      { key: 'installer', name: 'Jo Demo (installer)', email: 'installer@example.org', role: 'installer', org: ORG.instA },
-      { key: 'funder', name: 'Pat Placeholder (funder)', email: 'funder@example.org', role: 'funder', org: ORG.funder },
-      { key: 'government', name: 'Robin Sample (state oversight)', email: 'government@example.org', role: 'government', org: ORG.state },
-      { key: 'utility', name: 'Kim Demo (distributor)', email: 'utility@example.org', role: 'utility', org: ORG.distributor },
+      { key: 'manager', name: 'Alex Morgan (programme office)', email: 'manager@example.org', role: 'manager', org: ORG.office },
+      { key: 'owner', name: 'Sam Taylor (asset officer)', email: 'owner@example.org', role: 'owner', org: ORG.provider },
+      { key: 'installer', name: 'Jo Walker (installer)', email: 'installer@example.org', role: 'installer', org: ORG.instA },
+      { key: 'funder', name: 'Pat Kelly (funder)', email: 'funder@example.org', role: 'funder', org: ORG.funder },
+      { key: 'government', name: 'Robin Clarke (oversight)', email: 'government@example.org', role: 'government', org: ORG.state },
+      { key: 'utility', name: 'Kim Lee (distributor)', email: 'utility@example.org', role: 'utility', org: ORG.distributor },
     ],
     projects: [],
     flats: [],
@@ -1156,7 +1155,7 @@ function init() {
   walk(inst, 'installation', { agree: inst.flats })
   const wo = makeWo(inst)
   wo.checklist.forEach((c, i) => {
-    if (i < Math.ceil(wo.checklist.length / 2)) Object.assign(c, { done: true, by: 'Jo Demo (installer)', at: `${dayOf(S.now, 3)}T10:00:00Z` })
+    if (i < Math.ceil(wo.checklist.length / 2)) Object.assign(c, { done: true, by: 'Jo Walker (installer)', at: `${dayOf(S.now, 3)}T10:00:00Z` })
   })
   const proc = newProj('demo_021', pr2)
   walk(proc, 'procurement', { agree: proc.flats })
@@ -1179,7 +1178,7 @@ function init() {
   flatsOf(a1).filter((f) => f.consent === 'agreed')[0].access_code = 'FLAT-7K2Q'
   flatsOf(con)[0].access_code = 'FLAT-3M9X'
   flatsOf(a2).filter((f) => f.consent === 'agreed')[1].access_code = 'FLAT-5R4W'
-  logAdd('Programme office', 'manager', 'seed', null, 'Example programme created')
+  logAdd('Programme office', 'manager', 'seed', null, 'Programme created')
 }
 function tenancyChange(f: Flat, name: string, date: string) {
   const m = date.slice(0, 7)
@@ -1252,14 +1251,6 @@ const routes: [string, RegExp, (c: Ctx, m: string[]) => Out | Promise<Out>][] = 
   ['GET', /^\/api\/auth\/me$/, (c) => {
     const w = need(c)
     return { body: w.role === 'tenant' ? { role: 'tenant', name: w.user.name, flat_id: w.flat_id, project_id: w.project_id } : w.user }
-  }],
-  ['GET', /^\/api\/auth\/demo-users$/, () => {
-    const out: DemoUser[] = S.users.map((u) => ({ role: u.role, name: u.name, email: u.email, password: 'demo', org: u.org.name }))
-    for (const code of ['FLAT-7K2Q', 'FLAT-5R4W', 'FLAT-3M9X']) {
-      const f = S.flats.find((x) => x.access_code === code)
-      if (f) out.push({ role: 'tenant', name: `Tenant, flat ${f.unit} (${projOfFlat(f).label})`, code })
-    }
-    return { body: out }
   }],
 
   ['GET', /^\/api\/programme$/, (c) => {

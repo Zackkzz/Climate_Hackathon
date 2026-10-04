@@ -63,7 +63,7 @@ function LedgerSheet({ flat, open, onClose, showCode, onConsent }: { flat: Flat;
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
         <SheetHeader>
           <SheetTitle>Flat {flat.unit}</SheetTitle>
-          <SheetDescription>Meter {flat.meter_id}</SheetDescription>
+          <SheetDescription>Meter reference {flat.meter_id}</SheetDescription>
         </SheetHeader>
         <div className="space-y-4 px-4 pb-4">
           <Facts
@@ -214,7 +214,7 @@ export default function Flats(props: TabProps) {
         columns={[
           { accessorKey: 'unit', header: 'Unit' },
           { id: 'tenant', header: 'Tenant', accessorFn: (f) => f.tenant_name ?? '-', meta: { csv: (f) => f.tenant_name ?? '' } },
-          { accessorKey: 'meter_id', header: 'Meter', cell: ({ row }) => <span className="font-mono text-sm">{row.original.meter_id}</span> },
+          { accessorKey: 'meter_id', header: 'Meter reference', cell: ({ row }) => <span className="font-mono text-sm">{row.original.meter_id}</span> },
           { id: 'consent', header: 'Upgrade consent', accessorFn: (f) => CONSENT_LABEL[f.consent], cell: ({ row }) => <StatusBadge tone={row.original.consent === 'agreed' ? 'good' : row.original.consent === 'declined' ? 'bad' : 'warn'}>{CONSENT_LABEL[row.original.consent]}</StatusBadge> },
           {
             id: 'data',

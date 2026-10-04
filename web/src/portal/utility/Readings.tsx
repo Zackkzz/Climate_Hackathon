@@ -15,7 +15,7 @@ import { CsvInput, parseWithColumns } from './shared'
 type Rej = ReadingsResult['rejected'][number]
 const columns: ColumnDef<Rej>[] = [
   { accessorKey: 'row', header: 'Row in file', meta: { numeric: true } },
-  { accessorKey: 'meter_id', header: 'Meter id', cell: (c) => <span className="font-mono text-sm">{c.getValue<string>() ?? ''}</span> },
+  { accessorKey: 'meter_id', header: 'Meter reference', cell: (c) => <span className="font-mono text-sm">{c.getValue<string>() ?? ''}</span> },
   { accessorKey: 'reason', header: 'Why it was rejected' },
 ]
 
@@ -36,7 +36,7 @@ export default function Readings() {
       <PageHeader
         crumbs={[{ label: 'Utility', to: '/utility' }, { label: 'Meter readings' }]}
         title="Meter readings"
-        description="Send monthly meter data for the programme's meters. The measured savings checks use it instead of simulated readings."
+        description="Send monthly meter data for the programme's meters. The measured savings checks use it instead of modelled estimates."
       />
       <div className="space-y-4">
         <Panel title="1. Get the template" description="A CSV with the meters whose readings are due.">

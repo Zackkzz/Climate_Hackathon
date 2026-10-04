@@ -10,7 +10,7 @@ import { useRes } from '@/console/useRes'
 import { money } from '@/format'
 import { Confirm } from '@/portal/components/Confirm'
 import { ErrorAlert, Gate } from '@/portal/components/States'
-import { ExampleBadge, StatusBadge } from '@/portal/components/Status'
+import { StatusBadge } from '@/portal/components/Status'
 import { SelectField, TextAreaField } from '@/portal/components/fields'
 import { Button } from '@/portal/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/portal/components/ui/dialog'
@@ -171,9 +171,6 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
         <p className="text-muted-foreground">
           Flat {flat.unit}, {d.project.label}
         </p>
-        <p className="mt-1">
-          <ExampleBadge>Example flat</ExampleBadge>
-        </p>
       </div>
 
       {flat.consent === 'pending' && (
@@ -222,10 +219,10 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
         </p>
         {verified ? (
           <p>
-            Checked against your real meter readings (as of {dateLabel(verified.as_of)}), the saving is <strong>{money(verified.verified_saving_per_month)}</strong> a month. That is {Math.round(verified.realisation_rate * 100)}% of the modelled figure. If it falls short, your charge goes down and you are refunded.
+            Checked against the readings recorded for your flat (as of {dateLabel(verified.as_of)}), the saving is <strong>{money(verified.verified_saving_per_month)}</strong> a month. That is {Math.round(verified.realisation_rate * 100)}% of the modelled figure. If it falls short, your charge goes down and you are refunded.
           </p>
         ) : (
-          <p className="text-muted-foreground">We have not checked this against real readings yet. That happens after about a year of readings.</p>
+          <p className="text-muted-foreground">We have not checked this against readings yet. That happens after about a year of readings.</p>
         )}
       </Section>
 
@@ -320,7 +317,7 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
           </ul>
         )}
         <ErrorAlert error={docs.error} title="We could not open that document" />
-        <p className="text-sm text-muted-foreground">Documents are examples made by a prototype. They are not legal or financial advice.</p>
+        <p className="text-sm text-muted-foreground">Documents summarise your agreement. They are not legal or financial advice.</p>
       </Section>
 
       <DataConsent flatId={flat.id} />

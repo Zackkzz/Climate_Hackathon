@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo, useState } from 'react'
+import { cleanName } from '@/portal/lib/labels'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router'
 import { z } from 'zod'
@@ -94,7 +95,7 @@ export default function NewProject() {
           </Panel>
           <Panel title="2. Choose the housing provider">
             <Gate res={orgs} rows={2}>
-              {(list) => <SelectField control={form.control} name="owner_org_id" label="Provider that owns the block" options={ownerOrgs(list).map((o) => ({ value: String(o.id), label: o.name + (o.example ? ' (example)' : '') }))} />}
+              {(list) => <SelectField control={form.control} name="owner_org_id" label="Provider that owns the block" options={ownerOrgs(list).map((o) => ({ value: String(o.id), label: cleanName(o.name) }))} />}
             </Gate>
           </Panel>
           <ErrorAlert error={act.error} title="We could not start the project" />

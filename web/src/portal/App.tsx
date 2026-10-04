@@ -1,7 +1,8 @@
 import { Suspense, lazy, useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router'
+import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from 'react-router'
 import type { ReactNode } from 'react'
 import { homeFor, useUser } from '@/console/auth'
+import { rolesFor } from '@/portal/lib/access'
 import type { Role } from '@/console/types'
 import { LoadingRows } from '@/portal/components/States'
 import { PortalShell, PublicLayout } from '@/portal/components/Shell'
@@ -21,7 +22,7 @@ function Guard({ roles, children }: { roles: Role[]; children: ReactNode }) {
   const user = useUser()
   const loc = useLocation()
   if (!user) return <Navigate to="/signin" state={{ from: loc.pathname }} replace />
-  if (!roles.includes(user.role)) return <Navigate to={homeFor(user.role)} replace />
+  if (!roles.includes(user.role)) return <PublicLayout><NoAccess /></PublicLayout>
   return <>{children}</>
 }
 
@@ -54,12 +55,12 @@ export default function PortalApp() {
             </Route>
 
             <Route path="finder/*" element={<Finder />} />
-            <Route path="government/*" element={<Guard roles={['manager', 'government']}><Government /></Guard>} />
-            <Route path="utility/*" element={<Guard roles={['utility', 'manager']}><Utility /></Guard>} />
-            <Route path="property/my-flat" element={<Guard roles={['tenant']}><TenantLayout /></Guard>} />
-            <Route path="property/*" element={<Guard roles={['owner']}><Property /></Guard>} />
-            <Route path="installer/*" element={<Guard roles={['installer', 'manager']}><Installer /></Guard>} />
-            <Route path="funder/*" element={<Guard roles={['funder', 'manager']}><Funder /></Guard>} />
+            <Route path="government/*" element={<Guard roles={rolesFor('government')}><Government /></Guard>} />
+            <Route path="utility/*" element={<Guard roles={rolesFor('utility')}><Utility /></Guard>} />
+            <Route path="property/my-flat" element={<Guard roles={rolesFor('my-flat')}><TenantLayout /></Guard>} />
+            <Route path="property/*" element={<Guard roles={rolesFor('property')}><Property /></Guard>} />
+            <Route path="installer/*" element={<Guard roles={rolesFor('installer')}><Installer /></Guard>} />
+            <Route path="funder/*" element={<Guard roles={rolesFor('funder')}><Funder /></Guard>} />
             <Route path="*" element={<PublicLayout><NotFound /></PublicLayout>} />
           </Routes>
         </Suspense>
@@ -70,10 +71,39 @@ export default function PortalApp() {
 }
 
 function NotFound() {
+  const user = useUser()
+  useEffect(() => {
+    document.title = 'Page not found | Meterwise'
+  }, [])
   return (
-    <div>
-      <h1 className="text-xl font-semibold">Page not found</h1>
-      <p className="mt-1 text-muted-foreground">There is no page at this address. Check the address, or go to the <a href="/">front page</a>.</p>
+    <div className="max-w-2xl">
+      <p className="text-sm font-semibold uppercase tracking-wide text-teal">Error 404</p>
+      <h1 className="mt-1">Page not found</h1>
+      <p className="mt-2 text-lg">There is no page at this address. Check the address, or use one of these links.</p>
+      <ul className="mt-4 list-disc space-y-1 pl-5">
+        <li><Link to="/">Go to the front page</Link></li>
+        {user ? <li><Link to={homeFor(user.role)}>Go to your portal</Link></li> : <li><Link to="/signin">Sign in</Link></li>}
+        <li><Link to="/finder">Open the block finder</Link></li>
+      </ul>
+    </div>
+  )
+}
+
+function NoAccess() {
+  const user = useUser()
+  useEffect(() => {
+    document.title = 'No access | Meterwise'
+  }, [])
+  return (
+    <div className="max-w-2xl">
+      <p className="text-sm font-semibold uppercase tracking-wide text-teal">Error 403</p>
+      <h1 className="mt-1">You do not have access to this page</h1>
+      <p className="mt-2 text-lg">Your account does not have permission to open this portal.</p>
+      <ul className="mt-4 list-disc space-y-1 pl-5">
+        {user && <li><Link to={homeFor(user.role)}>Go to your portal</Link></li>}
+        <li><Link to="/signin">Sign in with a different account</Link></li>
+        <li><Link to="/">Go to the front page</Link></li>
+      </ul>
     </div>
   )
 }
