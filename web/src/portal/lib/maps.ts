@@ -24,12 +24,18 @@ let configured = false
 let loading: Promise<MapsLibs> | null = null
 /** Callbacks to run when Google refuses the key (gm_authFailure). Add one per map; remove it on unmount. */
 export const mapsAuthFailures = new Set<() => void>()
+let refused = false
+/** True once Google has refused the key on this page (gm_authFailure); it does not recover without a reload. */
+export const mapsKeyRefused = () => refused
 
 /** Load the Maps JavaScript API once per page. */
 export function loadMaps(): Promise<MapsLibs> {
   if (!configured) {
     configured = true
-    window.gm_authFailure = () => mapsAuthFailures.forEach((f) => f())
+    window.gm_authFailure = () => {
+      refused = true
+      mapsAuthFailures.forEach((f) => f())
+    }
     setOptions({ key: MAPS_KEY, v: 'quarterly', language: 'en-AU', region: 'AU', authReferrerPolicy: 'origin' })
   }
   loading ??= Promise.all([importLibrary('maps'), importLibrary('core')]).catch((e: unknown) => {
