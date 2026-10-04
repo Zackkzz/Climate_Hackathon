@@ -36,14 +36,19 @@ const SECRET_KEY = 'mw.accountsSecret'
  * The server checks the secret (METERWISE_ACCOUNTS_SECRET) and answers 404 to anyone without it.
  */
 function accountsSecret(): string | null {
-  const m = /[#&]accounts=([^&]+)/.exec(window.location.hash)
-  if (m) {
-    const s = decodeURIComponent(m[1])
-    localStorage.setItem(SECRET_KEY, s)
-    window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
-    return s
+  // A malformed link (bad % escape) or blocked storage must never take the sign-in page down: no list, nothing else.
+  try {
+    const m = /[#&]accounts=([^&]+)/.exec(window.location.hash)
+    if (m) {
+      window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
+      const s = decodeURIComponent(m[1])
+      localStorage.setItem(SECRET_KEY, s)
+      return s
+    }
+    return localStorage.getItem(SECRET_KEY)
+  } catch {
+    return null
   }
-  return localStorage.getItem(SECRET_KEY)
 }
 
 const accountKey = (a: ExampleAccount) => a.email ?? a.code ?? a.name
