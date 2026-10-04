@@ -55,7 +55,7 @@ export default function Front() {
         <h1 id="what" className="nsw-h2">
           Upgrades for rented flats, repaid from the bill savings
         </h1>
-        <p className="mw-mt-3 mw-text-lg">Meterwise finds hot blocks of rented flats in Western Sydney and designs an upgrade for each: a cool roof, heat pump hot water and reverse-cycle air conditioning. A capped charge on each flat's meter repays the cost out of the bill savings. Tenants pay nothing upfront and always keep part of the saving.</p>
+        <p className="mw-mt-3 mw-text-lg">Meterwise finds hot blocks of rented flats and designs an upgrade for each: a cool roof, heat pump hot water and reverse-cycle air conditioning. A capped charge on each flat's meter repays the cost out of the bill savings. Tenants pay nothing upfront and always keep part of the saving.</p>
         <div className="mw-mt-4 nsw-display-flex nsw-flex-wrap mw-gap-3">
           <Link to="/signin" className="nsw-button nsw-button--dark">
             Sign in
@@ -69,7 +69,7 @@ export default function Front() {
       <section aria-labelledby="changes">
         <h2 id="changes">What changes in a typical block</h2>
         <p className="mw-mb-3 mw-mt-1 mw-max-w-3xl mw-text-muted">
-          A three-storey block of 12 rented flats in Penrith, with gas hot water, plug-in heaters, no air conditioning and a dark roof. The upgrade adds a cool roof, heat pump hot water and reverse-cycle air conditioning. Every figure is a modelled estimate.
+          An example from the Penrith blocks on the map: three storeys and 12 rented flats, with gas hot water, plug-in heaters, no air conditioning and a dark roof. The upgrade adds a cool roof, heat pump hot water and reverse-cycle air conditioning. Every figure is a modelled estimate.
         </p>
         <BlockUpgrade
           existing={TYPICAL_EXISTING}

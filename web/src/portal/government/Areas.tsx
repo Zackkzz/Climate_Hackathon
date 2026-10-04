@@ -53,7 +53,7 @@ function MapSvg({ pts }: { pts: BuildingPoint[] }) {
   const py = (lat: number) => H - oy - (lat - b.minLat) * scale
   const withProject = pts.filter((p) => p.project_stage).length
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="mw-h-auto nsw-width-100 mw-border mw-bg-white" role="img" aria-label={`Map of ${pts.length} buildings in the pilot area, with the heat band of each. ${withProject} have a project. The same data is in the table.`}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="mw-h-auto nsw-width-100 mw-border mw-bg-white" role="img" aria-label={`Map of ${pts.length} buildings in the building dataset, with the heat band of each. ${withProject} have a project. The same data is in the table.`}>
       <rect x={0} y={0} width={W} height={H} fill="#f6f7f8" />
       {pts.map((p) => {
         const live = p.project_stage && LIVE.includes(p.project_stage)

@@ -155,7 +155,7 @@ function OwnBlockForm({ meta, pin, pickMode, setPickMode, onCancel, onSubmit }: 
           <Button type="button" variant="outline" aria-pressed={pickMode} onClick={() => setPickMode(!pickMode)}>
             <MapPin aria-hidden="true" /> {pickMode ? 'Tap the map...' : pin ? 'Move the spot' : 'Choose the spot on the map'}
           </Button>
-          <p className="nsw-small mw-text-muted">{pin ? 'Spot chosen.' : 'Optional. Without it we use the middle of the pilot area.'}</p>
+          <p className="nsw-small mw-text-muted">{pin ? 'Spot chosen.' : 'Optional. Without it we use the middle of the example blocks in Penrith.'}</p>
           <SpotHeat lat={loc.lat} lon={loc.lon} />
         </div>
         <div className="nsw-display-flex mw-gap-2">
@@ -308,6 +308,7 @@ export default function Find({ meta, buildings, shortlist, onBuild, onBuildOwn }
           <p className="mw-mt-1 nsw-small mw-text-muted">
             Colours show how much hotter the ground gets than the area's middle on hot summer days, measured by satellite. This is surface temperature, not the air inside a flat.
           </p>
+          <p className="mw-mt-1 nsw-small mw-text-muted">The blocks on the map are example data from Penrith. To try a block anywhere in NSW, enter your own block below.</p>
         </header>
         {own ? (
           <OwnBlockForm

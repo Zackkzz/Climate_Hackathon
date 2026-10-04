@@ -31,19 +31,19 @@ const ROLE_LABEL: Record<string, string> = { manager: 'Programme manager', gover
 const SECRET_KEY = 'mw.accountsSecret'
 
 /**
- * The example-account list is hidden behind a secret. Open /signin#accounts=<secret> once: the secret is kept for this
- * browser tab and taken out of the address bar. The part after # never reaches the server, its logs or other sites.
+ * The example-account list is hidden behind a secret. Open /signin#accounts=<secret> once: the secret is kept in this
+ * browser (local storage) and taken out of the address bar. The part after # never reaches the server, its logs or other sites.
  * The server checks the secret (METERWISE_ACCOUNTS_SECRET) and answers 404 to anyone without it.
  */
 function accountsSecret(): string | null {
   const m = /[#&]accounts=([^&]+)/.exec(window.location.hash)
   if (m) {
     const s = decodeURIComponent(m[1])
-    sessionStorage.setItem(SECRET_KEY, s)
+    localStorage.setItem(SECRET_KEY, s)
     window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
     return s
   }
-  return sessionStorage.getItem(SECRET_KEY)
+  return localStorage.getItem(SECRET_KEY)
 }
 
 const accountKey = (a: ExampleAccount) => a.email ?? a.code ?? a.name
