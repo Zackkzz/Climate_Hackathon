@@ -40,7 +40,7 @@ app.add_middleware(
     allow_origins=_origins,
     allow_origin_regex=None if _origins else r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID", "X-Accounts-Secret"],
 )
 programme_api.install(app)
 app.include_router(analysis_router)

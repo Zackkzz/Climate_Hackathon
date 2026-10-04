@@ -116,7 +116,7 @@ def test_security_headers_everywhere(client):
         r = client.get(path)
         h = r.headers
         assert "frame-ancestors 'none'" in h["content-security-policy"]
-        assert "tile.openstreetmap.org" in h["content-security-policy"]
+        assert "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com;" in h["content-security-policy"]
         assert h["x-content-type-options"] == "nosniff" and "max-age" in h["strict-transport-security"]
         assert h["referrer-policy"] and h["permissions-policy"] and h["x-request-id"]
         if path.startswith("/api/"):
@@ -182,6 +182,20 @@ def test_demo_users_route(client, monkeypatch):
     assert all(u["example"] for u in users)
     code = next(u["code"] for u in users if u["role"] == "tenant")
     ok(client.post("/api/auth/tenant", json={"code": code}))
+
+
+def test_demo_users_behind_secret(client, monkeypatch):
+    secret = "a-long-example-secret-1234"
+    monkeypatch.delenv("METERWISE_LIST_ACCOUNTS", raising=False)
+    monkeypatch.setenv("METERWISE_ACCOUNTS_SECRET", secret)
+    assert client.get("/api/auth/demo-users").status_code == 404  # no header
+    assert client.get("/api/auth/demo-users", headers={"X-Accounts-Secret": "wrong"}).status_code == 404
+    assert ok(client.get("/api/auth/demo-users", headers={"X-Accounts-Secret": secret}))
+    monkeypatch.setenv("METERWISE_ACCOUNTS_SECRET", "short")  # under 16 characters never unlocks
+    assert client.get("/api/auth/demo-users", headers={"X-Accounts-Secret": "short"}).status_code == 404
+    monkeypatch.setenv("METERWISE_ACCOUNTS_SECRET", secret)
+    monkeypatch.setenv("METERWISE_DEMO", "0")  # never outside demo mode
+    assert client.get("/api/auth/demo-users", headers={"X-Accounts-Secret": secret}).status_code == 404
 
 
 def test_docs_switch(monkeypatch):

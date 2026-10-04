@@ -1,0 +1,85 @@
+/* The building comparison: new parts fade in, the roof and room colours change gently, and the divider glides when a
+   button moves it. The reduced-motion rule in styles/mw-components.css shortens all of these to nothing. */
+.bc-in { animation: bc-in 0.45s ease-out both; }
+@keyframes bc-in { from { opacity: 0; } to { opacity: 1; } }
+.bc-roof { transition: stroke 0.5s ease; }
+.bc-tint { transition: fill 0.6s ease; }
+.bc-glide { transition: clip-path 0.55s cubic-bezier(0.4, 0, 0.2, 1), left 0.55s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.55s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* Layout of BlockUpgrade on NSW Design System tokens. Sizes follow the width of the panel (container queries), not the
+   window, because the same component sits full width on the front page and in a column on the Build step.
+   Breakpoints: md 28rem, lg 32rem, xl 36rem, 2xl 42rem, 4xl 56rem. */
+.bu-wrap, .bu-compare, .bu-changes { container-type: inline-size; }
+.bu-layout { display: grid; gap: 1rem; }
+@container (min-width: 56rem) {
+  .bu-layout--figures { grid-template-columns: minmax(0, 40rem) minmax(0, 1fr); align-items: start; }
+}
+.bu-figure { width: 100%; max-width: 45rem; margin: 0 auto; }
+.bu-figure > * + * { margin-top: 0.5rem; }
+.bu-caption > * + * { margin-top: 0.5rem; }
+
+/* the drawing and its divider */
+.bu-compare { position: relative; width: 100%; overflow: hidden; cursor: ew-resize; user-select: none; }
+.bu-layer { position: absolute; inset: 0; background: var(--nsw-white); }
+.bu-drawing { display: block; width: 100%; height: 100%; }
+.bu-badge { position: absolute; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 0.125rem; white-space: nowrap; pointer-events: none;
+  border: 1px solid rgba(0, 38, 100, 0.25); border-radius: 2px; background: rgba(255, 255, 255, 0.95); padding: 0.125rem 0.25rem;
+  font-size: 11px; font-weight: 600; line-height: 1; color: var(--nsw-text-dark); }
+.bu-badge__icon.mw-icon { display: none; font-size: 14px; color: #c2410c; }
+.bu-roof-note { position: absolute; top: 2.5rem; display: none; max-width: 18%; text-wrap: balance; pointer-events: none; font-size: var(--nsw-font-size-xs); font-weight: 500; line-height: 1.35; }
+.bu-roof-note--now { left: 1.5%; text-align: left; }
+.bu-roof-note--after { right: 1.5%; text-align: right; }
+.bu-break { position: absolute; transform: translateY(-50%); white-space: nowrap; pointer-events: none; background: var(--nsw-white); padding: 0 0.25rem; font-size: 11px; color: var(--nsw-grey-02); }
+.bu-break__more { display: none; }
+.bu-tag { position: absolute; top: 0.25rem; pointer-events: none; border: 1px solid var(--nsw-grey-03); border-radius: 2px; background: var(--nsw-white); padding: 0 0.25rem; font-size: 11px; font-weight: 600; transition: opacity 0.2s; }
+.bu-tag--now { left: 0.25rem; }
+.bu-tag--after { right: 0.25rem; border-color: var(--nsw-status-success); background: var(--nsw-status-success-bg); color: var(--nsw-status-success); }
+.bu-tag.is-hidden { opacity: 0; }
+.bu-tag__long { display: none; }
+.bu-slider { position: absolute; top: 0; bottom: 0; z-index: 10; width: 2.75rem; transform: translateX(-50%); touch-action: none; outline: none; }
+.bu-slider__line { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%); background: var(--nsw-brand-dark); }
+.bu-slider__knob { position: absolute; left: 50%; display: flex; width: 2.25rem; height: 2.25rem; transform: translate(-50%, -50%); align-items: center; justify-content: center;
+  border: 2px solid var(--nsw-brand-dark); border-radius: 50%; background: var(--nsw-white); color: var(--nsw-brand-dark); }
+.bu-slider:focus-visible .bu-slider__knob { outline: 3px solid var(--nsw-focus); outline-offset: 2px; }
+@container (min-width: 28rem) {
+  .bu-badge__icon.mw-icon { display: block; }
+  .bu-break__more { display: inline; }
+  .bu-tag { top: 0.5rem; padding: 0.125rem 0.375rem; font-size: var(--nsw-font-size-xs); }
+  .bu-tag--now { left: 0.5rem; }
+  .bu-tag--after { right: 0.5rem; }
+  .bu-tag__short { display: none; }
+  .bu-tag__long { display: inline; }
+}
+@container (min-width: 32rem) {
+  .bu-badge { padding: 0.125rem 0.375rem; font-size: 13px; }
+  .bu-break { font-size: var(--nsw-font-size-xs); }
+  .bu-tag { font-size: var(--nsw-font-size-sm); }
+}
+@container (min-width: 36rem) {
+  .bu-roof-note { display: block; }
+}
+
+/* the key and the list of changes */
+.bu-key { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; list-style: none; margin: 0; padding: 0; font-size: var(--nsw-font-size-xs); color: var(--nsw-grey-02); }
+.bu-key li { display: inline-flex; align-items: center; gap: 0.375rem; }
+.bu-glyph { width: 2.25rem; height: 2.25rem; flex-shrink: 0; }
+.bu-changes__head { display: none; border-bottom: 1px solid var(--nsw-grey-03); padding-bottom: 0.375rem; font-size: var(--nsw-font-size-xs); font-weight: 600; color: var(--nsw-grey-02); }
+.bu-changes ul { list-style: none; margin: 0; padding: 0; }
+.bu-row { display: grid; gap: 0.25rem 1.25rem; border-bottom: 1px solid var(--nsw-grey-03); padding: 0.75rem 0; }
+.bu-row:last-child { border-bottom: 0; }
+.bu-row__item { display: flex; align-items: flex-start; gap: 0.625rem; }
+.bu-row__item > div { min-width: 0; }
+.bu-row__title { margin: 0; font-size: var(--nsw-font-size-sm); font-weight: 600; }
+.bu-row__note, .bu-row__now, .bu-row__after { font-size: var(--nsw-font-size-xs); }
+.bu-row__note { margin: 0; color: var(--nsw-grey-02); }
+.bu-row__now p, .bu-row__after p { margin: 0; }
+.bu-row__energy { margin-top: 0.125rem !important; color: var(--nsw-grey-02); }
+.bu-row__after:not(.is-changed) { color: var(--nsw-grey-02); }
+.bu-row__after.is-changed { border-left: 2px solid var(--nsw-status-success); padding-left: 0.625rem; }
+.bu-row__after.is-changed .bu-row__energy { font-weight: 600; color: var(--nsw-status-success); }
+.bu-row__label { font-weight: 600; }
+@container (min-width: 42rem) {
+  .bu-changes__head, .bu-row { grid-template-columns: 11rem 1fr 1fr; column-gap: 1.25rem; }
+  .bu-changes__head { display: grid; }
+  .bu-row__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}

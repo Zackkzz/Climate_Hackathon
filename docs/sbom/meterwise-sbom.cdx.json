@@ -4,7 +4,7 @@
  "serialNumber": "urn:uuid:3c1bb676-c66c-4126-b964-dbb0456d3475",
  "version": 1,
  "metadata": {
-  "timestamp": "2026-10-03T23:33:36+00:00",
+  "timestamp": "2026-10-04T04:24:56+00:00",
   "component": {
    "type": "application",
    "name": "meterwise",
@@ -1158,6 +1158,19 @@
   },
   {
    "type": "library",
+   "name": "@googlemaps/js-api-loader",
+   "version": "2.1.3",
+   "purl": "pkg:npm/%40googlemaps/js-api-loader@2.1.3",
+   "licenses": [
+    {
+     "license": {
+      "name": "Apache-2.0"
+     }
+    }
+   ]
+  },
+  {
+   "type": "library",
    "name": "@hookform/resolvers",
    "version": "5.9.1",
    "purl": "pkg:npm/%40hookform/resolvers@5.9.1",
@@ -1226,123 +1239,6 @@
    "name": "@jridgewell/trace-mapping",
    "version": "0.3.31",
    "purl": "pkg:npm/%40jridgewell/trace-mapping@0.3.31",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@mapbox/jsonlint-lines-primitives",
-   "version": "2.0.3",
-   "purl": "pkg:npm/%40mapbox/jsonlint-lines-primitives@2.0.3",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@mapbox/point-geometry",
-   "version": "1.1.0",
-   "purl": "pkg:npm/%40mapbox/point-geometry@1.1.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "ISC"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@mapbox/tiny-sdf",
-   "version": "2.2.0",
-   "purl": "pkg:npm/%40mapbox/tiny-sdf@2.2.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "BSD-2-Clause"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@mapbox/unitbezier",
-   "version": "1.0.0",
-   "purl": "pkg:npm/%40mapbox/unitbezier@1.0.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "BSD-2-Clause"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@mapbox/vector-tile",
-   "version": "3.0.0",
-   "purl": "pkg:npm/%40mapbox/vector-tile@3.0.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "BSD-3-Clause"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@maplibre/geojson-vt",
-   "version": "6.1.1",
-   "purl": "pkg:npm/%40maplibre/geojson-vt@6.1.1",
-   "licenses": [
-    {
-     "license": {
-      "name": "ISC"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@maplibre/maplibre-gl-style-spec",
-   "version": "26.4.4",
-   "purl": "pkg:npm/%40maplibre/maplibre-gl-style-spec@26.4.4",
-   "licenses": [
-    {
-     "license": {
-      "name": "ISC"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@maplibre/mlt",
-   "version": "1.3.0",
-   "purl": "pkg:npm/%40maplibre/mlt@1.3.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "(MIT OR Apache-2.0)"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "@maplibre/vt-pbf",
-   "version": "4.3.2",
-   "purl": "pkg:npm/%40maplibre/vt-pbf@4.3.2",
    "licenses": [
     {
      "license": {
@@ -2419,6 +2315,19 @@
   },
   {
    "type": "library",
+   "name": "@types/google.maps",
+   "version": "3.66.5",
+   "purl": "pkg:npm/%40types/google.maps@3.66.5",
+   "licenses": [
+    {
+     "license": {
+      "name": "MIT"
+     }
+    }
+   ]
+  },
+  {
+   "type": "library",
    "name": "lightningcss",
    "version": "1.32.0",
    "purl": "pkg:npm/lightningcss@1.32.0",
@@ -2900,19 +2809,6 @@
   },
   {
    "type": "library",
-   "name": "@types/geojson",
-   "version": "7946.0.16",
-   "purl": "pkg:npm/%40types/geojson@7946.0.16",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
    "name": "@types/node",
    "version": "26.6.4",
    "purl": "pkg:npm/%40types/node@26.6.4",
@@ -3286,19 +3182,6 @@
   },
   {
    "type": "library",
-   "name": "bidi-js",
-   "version": "1.1.0",
-   "purl": "pkg:npm/bidi-js@1.1.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
    "name": "class-variance-authority",
    "version": "0.7.1",
    "purl": "pkg:npm/class-variance-authority@0.7.1",
@@ -3572,19 +3455,6 @@
   },
   {
    "type": "library",
-   "name": "earcut",
-   "version": "3.2.4",
-   "purl": "pkg:npm/earcut@3.2.4",
-   "licenses": [
-    {
-     "license": {
-      "name": "ISC"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
    "name": "enhanced-resolve",
    "version": "5.26.0",
    "purl": "pkg:npm/enhanced-resolve@5.26.0",
@@ -3663,19 +3533,6 @@
   },
   {
    "type": "library",
-   "name": "gl-matrix",
-   "version": "3.4.4",
-   "purl": "pkg:npm/gl-matrix@3.4.4",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
    "name": "graceful-fs",
    "version": "4.2.11",
    "purl": "pkg:npm/graceful-fs@4.2.11",
@@ -3722,32 +3579,6 @@
     {
      "license": {
       "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "json-stringify-pretty-compact",
-   "version": "4.0.0",
-   "purl": "pkg:npm/json-stringify-pretty-compact@4.0.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "kdbush",
-   "version": "4.1.0",
-   "purl": "pkg:npm/kdbush@4.1.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "ISC"
      }
     }
    ]
@@ -3936,45 +3767,6 @@
   },
   {
    "type": "library",
-   "name": "maplibre-gl",
-   "version": "6.11.2",
-   "purl": "pkg:npm/maplibre-gl@6.11.2",
-   "licenses": [
-    {
-     "license": {
-      "name": "BSD-3-Clause"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "minimist",
-   "version": "1.2.8",
-   "purl": "pkg:npm/minimist@1.2.8",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "murmurhash-js",
-   "version": "1.0.0",
-   "purl": "pkg:npm/murmurhash-js@1.0.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
    "name": "nanoid",
    "version": "3.3.19",
    "purl": "pkg:npm/nanoid@3.3.19",
@@ -3995,19 +3787,6 @@
     {
      "license": {
       "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "pbf",
-   "version": "5.1.2",
-   "purl": "pkg:npm/pbf@5.1.2",
-   "licenses": [
-    {
-     "license": {
-      "name": "BSD-3-Clause"
      }
     }
    ]
@@ -4061,45 +3840,6 @@
     {
      "license": {
       "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "potpack",
-   "version": "2.1.0",
-   "purl": "pkg:npm/potpack@2.1.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "ISC"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "protocol-buffers-schema",
-   "version": "3.6.1",
-   "purl": "pkg:npm/protocol-buffers-schema@3.6.1",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "quickselect",
-   "version": "3.0.0",
-   "purl": "pkg:npm/quickselect@3.0.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "ISC"
      }
     }
    ]
@@ -4314,35 +4054,9 @@
   },
   {
    "type": "library",
-   "name": "require-from-string",
-   "version": "2.0.2",
-   "purl": "pkg:npm/require-from-string@2.0.2",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
    "name": "reselect",
    "version": "5.2.0",
    "purl": "pkg:npm/reselect@5.2.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "resolve-protobuf-schema",
-   "version": "2.1.0",
-   "purl": "pkg:npm/resolve-protobuf-schema@2.1.0",
    "licenses": [
     {
      "license": {
@@ -4464,19 +4178,6 @@
     {
      "license": {
       "name": "MIT"
-     }
-    }
-   ]
-  },
-  {
-   "type": "library",
-   "name": "tinyqueue",
-   "version": "3.0.0",
-   "purl": "pkg:npm/tinyqueue@3.0.0",
-   "licenses": [
-    {
-     "license": {
-      "name": "ISC"
      }
     }
    ]

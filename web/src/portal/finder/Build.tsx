@@ -7,6 +7,7 @@ import type { GroupSel } from '@/verdict'
 import { dealToRequest } from '@/state'
 import type { AssessResponse, BuildingCollection, Deal, Existing, Finance, Meta, Package, PackageKey, Tariff } from '@/types'
 import { PACKAGE_KEYS } from '@/types'
+import { BlockUpgrade } from '@/portal/components/BlockUpgrade'
 import { ChartBox, LegendKey } from '@/portal/components/ChartBox'
 import { Figures, Panel } from '@/portal/components/PageHeader'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
@@ -233,7 +234,7 @@ function Verdict({ r }: { r: AssessResponse }) {
   const v = makeVerdict(r)
   return (
     <Alert variant={v.tone === 'bad' ? 'destructive' : 'default'} role="status" className={v.tone === 'good' ? 'mw-border-success-50 mw-bg-success-bg' : v.tone === 'warn' ? 'mw-border-warning-50 mw-bg-warning-bg' : ''}>
-      <AlertTitle className="">{v.headline}</AlertTitle>
+      <AlertTitle>{v.headline}</AlertTitle>
       <AlertDescription>
         <p>{v.detail}</p>
         {v.hints.length > 0 && (
@@ -669,6 +670,15 @@ export default function Build({ deal, meta, buildings, assess, shortlist, onChan
             </div>
             {assess.error && <ErrorAlert error={`${assess.error} The numbers below are from your last successful update.`} onRetry={assess.retry} title="We could not update" />}
             <Verdict r={r} />
+            <BlockUpgrade
+              existing={deal.existing}
+              pkg={deal.package}
+              storeys={ownDeal.storeys ?? base.storeys}
+              flats={ownDeal.flats ?? base.flats}
+              result={r}
+              title="What changes in the building"
+              description="The block now and with the upgrade. Switch upgrades on and off to see it change."
+            />
             <Warnings r={r} />
             <StatFigures r={r} />
             <Panel title="Each group of flats" description="Monthly figures, estimated">

@@ -170,6 +170,10 @@ export interface Comfort {
   /** Optional: describes the period the whole-period hours cover. */
   period_label?: string
   basis?: string
+  /** Optional: the same hours with the flat's heating and cooling used as assumed. */
+  hours_above_30c_baseline_as_used?: number
+  hours_above_30c_upgraded_as_used?: number
+  as_used_basis?: string
 }
 
 export interface FlatGroup {
@@ -240,6 +244,9 @@ export interface Impact {
   gas_mj_per_year_avoided: number
   energy_reduction_pct: number
   peak_cooling_kw_change: number
+  /** Optional: the block's emissions a year before and after. */
+  co2e_t_per_year_baseline?: number
+  co2e_t_per_year_upgraded?: number
 }
 
 export interface MonthRow {

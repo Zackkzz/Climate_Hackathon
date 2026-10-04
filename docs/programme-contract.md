@@ -24,8 +24,10 @@ time plus a stored offset in months, so the demo can run years of billing in sec
 - `POST /api/auth/login` `{"email","password"}` -> `{"token", "user": {"id","name","email","role","org": {"id","name","kind"}}}`
 - `POST /api/auth/tenant` `{"code"}` -> `{"token", "flat_id", "project_id"}`
 - `GET /api/auth/me` -> the same `user` object, or `{"role": "tenant", "flat_id", "project_id"}`
-- `GET /api/auth/demo-users` -> `[{"role","name","email","password","org"}]` plus a few tenant codes. Only when
-  `METERWISE_DEMO=1` (default). The sign-in page shows these so a judge can enter as any role.
+- `GET /api/auth/demo-users` -> `[{"role","name","email","password","org"}]` plus a few tenant codes. Only in demo
+  mode (`METERWISE_DEMO=1`), and only with `METERWISE_LIST_ACCOUNTS=1` or a request header `X-Accounts-Secret` that
+  matches `METERWISE_ACCOUNTS_SECRET` (16 or more characters); otherwise 404. The sign-in page shows them in a dropdown
+  after `/signin#accounts=<secret>` is opened, so a judge can enter as any role.
 - Bearer token in `Authorization`. Passwords hashed. Every organisation and person in the seed is fictional and has
   `"example": true`.
 

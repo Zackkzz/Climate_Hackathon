@@ -172,7 +172,7 @@ function TenantSheet({ r, active }: { r: AssessResponse; active: boolean }) {
         if (!c?.period_label) return null
         return (
           <p>
-            Across {c.period_label}, a top-floor flat is estimated to spend {num(c.hours_above_30c_baseline)} hours above 30°C without air conditioning, falling to {num(c.hours_above_30c_upgraded)} with the upgrade.
+            Over the whole year, with no air conditioning running, a top-floor flat is estimated to spend {num(c.hours_above_30c_baseline)} hours above 30°C, falling to {num(c.hours_above_30c_upgraded)} with the upgrade.
           </p>
         )
       })()}

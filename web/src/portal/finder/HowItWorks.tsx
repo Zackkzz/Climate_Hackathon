@@ -101,11 +101,11 @@ export default function HowItWorks({ meta, onClose }: { meta: Meta; onClose: () 
               </li>
             ))}
             <li>
-              Map tiles ©{' '}
-              <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
-                OpenStreetMap contributors
-              </a>{' '}
-              (ODbL), drawn with MapLibre GL JS (BSD-3-Clause).
+              Base map © Google, shown with the Google Maps JavaScript API under the{' '}
+              <a href="https://maps.google.com/help/terms_maps.html" target="_blank" rel="noreferrer">
+                Google Maps/Google Earth Additional Terms of Service
+              </a>
+              .
             </li>
             <li>Interface built with React, Vite and the NSW Design System (MIT licence, used as a style library only, with no NSW Government branding). Typeface Public Sans (SIL Open Font Licence). Icons are Material Icons (SIL Open Font Licence, bundled by Fontsource).</li>
           </ul>

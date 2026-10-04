@@ -6,7 +6,7 @@ to:
 
 - Engine data sources and Python libraries: [engine/SOURCES.md](engine/SOURCES.md)
 - Pilot dataset sources: [data/pilot/README.md](data/pilot/README.md)
-- Web libraries, map tiles and assets: [web/README.md](web/README.md)
+- Web libraries, the map and assets: [web/README.md](web/README.md)
 
 ## Prior work
 
@@ -46,7 +46,7 @@ The team directed the work, chose the idea and is responsible for the submission
 | UNSW Cool Roofs Cost Benefit Analysis (2022) | Cool roof costs; validation | Public report |
 | National Construction Code, YourHome, Energy Rating | Building fabric and equipment efficiency | Public |
 | Pay As You Save programme rules and field reviews (EEI, Clean Energy Works, Berkeley Lab) | Finance rules | Public |
-| OpenStreetMap standard tile layer | Basemap tiles | ODbL data; OSM tile usage policy; attribution shown on the map |
+| Google Maps Platform (Maps JavaScript API) | Base map in the block finder | Google Maps Platform Terms of Service; Google's logo and attribution shown on the map |
 | NSW Cyber Security Policy 2026-27, OLG Cyber Security Guidelines for Local Government, NSW Design Standards | The security, privacy and accessibility controls | Public; see `docs/research-gov-it-standards.md` for what was read directly and what came from search summaries |
 
 The Landsat scene IDs and the full method are in `data/pilot/README.md`.
@@ -55,13 +55,16 @@ The Landsat scene IDs and the full method are in `data/pilot/README.md`.
 
 - **Backend:** Python, FastAPI, Uvicorn, Pydantic, NumPy, SciPy, Requests, pytest, and for the data pipeline
   Shapely, pyproj, rasterio, pystac-client, planetary-computer and matplotlib.
-- **Frontend:** React, Vite, TypeScript, MapLibre GL JS, Tailwind CSS, shadcn/ui components (built on Radix UI),
-  TanStack Table, React Hook Form, Zod, Recharts, React Router, cmdk, sonner, react-day-picker, date-fns and
-  Lucide icons. Public Sans typeface, bundled locally (SIL Open Font Licence). Colour ramp from ColorBrewer.
-  Nothing is loaded from a CDN.
+- **Frontend:** React, Vite, TypeScript, Google Maps JavaScript API (loaded with `@googlemaps/js-api-loader`),
+  Tailwind CSS, shadcn/ui components (built on Radix UI), TanStack Table, React Hook Form, Zod, Recharts, React
+  Router, cmdk, sonner, react-day-picker, date-fns and Lucide icons. Public Sans typeface, bundled locally (SIL Open
+  Font Licence). Colour ramp from ColorBrewer. Nothing is loaded from a CDN; the Google map's code comes from Google
+  when the block finder opens.
 - **Programme system:** Python standard library only (sqlite3, hashlib, hmac) on top of FastAPI.
 - **Checks:** axe-core through Playwright for accessibility; a Playwright end-to-end script (`web/scripts/e2e.mjs`).
-- **Development tools:** Git, Node.js, Playwright (browser checks).
+- **Development tools:** Git, Node.js, Playwright (browser checks), Google Cloud CLI.
+- **Cloud services:** Google Cloud project `meterwise-platform` for the map: Maps JavaScript API, a restricted API key
+  and Cloud Quotas (daily map-load cap).
 
 ## Sources for the policy documents
 
