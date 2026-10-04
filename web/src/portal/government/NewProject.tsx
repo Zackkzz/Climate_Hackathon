@@ -40,11 +40,11 @@ export default function NewProject() {
   const pickedFeature = buildings.data?.features.find((f) => f.properties.id === picked)
 
   return (
-    <div className="max-w-3xl">
+    <div className="mw-max-w-3xl">
       <PageHeader crumbs={[{ label: 'Government', to: '/government' }, { label: 'Projects', to: '/government/projects' }, { label: 'Start a project' }]} title="Start a project" description="Pick a pilot building. The project starts at the screened stage, with flats made from the open-data estimate. Nothing is charged to anyone at this stage." />
       <Form {...form}>
         <form
-          className="space-y-4"
+          className="mw-space-y-4"
           noValidate
           onSubmit={form.handleSubmit(async (v) => {
             const r = await act.run(() => api.createProject(v.building_id, Number(v.owner_org_id)), 'Project started')
@@ -62,22 +62,22 @@ export default function NewProject() {
                       <FormLabel htmlFor="bq">Search by address</FormLabel>
                       <Input id="bq" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Street or suburb" />
                       {pickedFeature && (
-                        <p role="status" className="font-medium text-success">
+                        <p role="status" className="nsw-text-medium mw-text-success">
                           Selected: {pickedFeature.properties.label}, about {pickedFeature.properties.flats_est} flats
                         </p>
                       )}
-                      {picked && !pickedFeature && <p className="text-warning">Building {picked} was not found in the pilot area.</p>}
+                      {picked && !pickedFeature && <p className="mw-text-warning">Building {picked} was not found in the pilot area.</p>}
                       {matches.length === 0 ? (
-                        <p className="text-muted-foreground">No building matches that address.</p>
+                        <p className="mw-text-muted">No building matches that address.</p>
                       ) : (
-                        <ul className="divide-y border" aria-label="Matching buildings">
+                        <ul className="mw-divide-y mw-border" aria-label="Matching buildings">
                           {matches.map((f) => {
                             const on = picked === f.properties.id
                             return (
                               <li key={f.properties.id}>
-                                <button type="button" aria-pressed={on} onClick={() => form.setValue('building_id', f.properties.id, { shouldValidate: true })} className={'flex min-h-9 w-full flex-col items-start px-3 py-1.5 text-left hover:bg-muted ' + (on ? 'bg-accent' : '')}>
-                                  <span className="font-medium">{f.properties.label}{on ? ' (selected)' : ''}</span>
-                                  <span className="text-sm text-muted-foreground">
+                                <button type="button" aria-pressed={on} onClick={() => form.setValue('building_id', f.properties.id, { shouldValidate: true })} className={'nsw-display-flex mw-min-h-9 nsw-width-100 nsw-flex-column nsw-align-items-start mw-px-3 mw-py-1_5 nsw-text-left mw-hover-tint ' + (on ? 'mw-bg-accent' : '')}>
+                                  <span className="nsw-text-medium">{f.properties.label}{on ? ' (selected)' : ''}</span>
+                                  <span className="nsw-small mw-text-muted">
                                     About {f.properties.flats_est} flats. {HEAT[f.properties.heat_band] ?? f.properties.heat_band}. Screening score {f.properties.quick_score}.
                                   </span>
                                 </button>

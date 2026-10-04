@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from '@/portal/components/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -78,40 +78,40 @@ function QuoteDialog({ tender, onClose, onDone }: { tender: Tender; onClose: () 
   })
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="mw-sm-max-w-3xl">
         <DialogHeader>
           <DialogTitle>Quote for {tender.project.label}</DialogTitle>
           <DialogDescription>Prices start at the modelled unit prices. Change them to your own. The quote is open until the date you set.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
-            <div className="overflow-x-auto" role="region" aria-label="Quote lines" tabIndex={0}>
-              <table className="w-full min-w-[34rem] text-sm">
+          <form className="mw-space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
+            <div className="nsw-overflow-x-auto" role="region" aria-label="Quote lines" tabIndex={0}>
+              <table className="nsw-width-100 mw-min-w-34rem nsw-small">
                 <thead>
-                  <tr className="text-left">
-                    <th className="p-1 font-semibold">Item</th>
-                    <th className="p-1 font-semibold">Quantity</th>
-                    <th className="p-1 font-semibold">Unit price ($)</th>
-                    <th className="p-1 text-right font-semibold">Line total</th>
-                    <th className="p-1">
+                  <tr className="nsw-text-left">
+                    <th className="mw-p-1 nsw-text-semibold">Item</th>
+                    <th className="mw-p-1 nsw-text-semibold">Quantity</th>
+                    <th className="mw-p-1 nsw-text-semibold">Unit price ($)</th>
+                    <th className="mw-p-1 nsw-text-right nsw-text-semibold">Line total</th>
+                    <th className="mw-p-1">
                       <span className="sr-only">Remove</span>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {fields.map((f, i) => (
-                    <tr key={f.id} className="align-top">
-                      <td className="p-1">
+                    <tr key={f.id} className="mw-align-top">
+                      <td className="mw-p-1">
                         <TextField control={form.control} name={`items.${i}.label`} label={`Item ${i + 1} name`} />
                       </td>
-                      <td className="w-24 p-1">
+                      <td className="mw-w-24 mw-p-1">
                         <NumberField control={form.control} name={`items.${i}.qty`} label={`Item ${i + 1} quantity`} min={1} />
                       </td>
-                      <td className="w-32 p-1">
+                      <td className="mw-w-32 mw-p-1">
                         <NumberField control={form.control} name={`items.${i}.unit_price`} label={`Item ${i + 1} unit price`} min={0} />
                       </td>
-                      <td className="p-1 pt-8 text-right tabular-nums">{money((Number(watched[i]?.qty) || 0) * (Number(watched[i]?.unit_price) || 0))}</td>
-                      <td className="p-1 pt-6">
+                      <td className="mw-p-1 mw-pt-8 nsw-text-right mw-tabular">{money((Number(watched[i]?.qty) || 0) * (Number(watched[i]?.unit_price) || 0))}</td>
+                      <td className="mw-p-1 mw-pt-6">
                         <Button type="button" variant="ghost" size="icon" onClick={() => remove(i)} aria-label={`Remove item ${i + 1}`}>
                           <Trash2 aria-hidden="true" />
                         </Button>
@@ -121,33 +121,33 @@ function QuoteDialog({ tender, onClose, onDone }: { tender: Tender; onClose: () 
                 </tbody>
               </table>
             </div>
-            {form.formState.errors.items?.message && <p role="alert" className="text-destructive">{form.formState.errors.items.message}</p>}
+            {form.formState.errors.items?.message && <p role="alert" className="mw-text-danger">{form.formState.errors.items.message}</p>}
             <Button type="button" variant="outline" size="sm" onClick={() => append({ key: 'other', label: 'Other work', qty: 1, unit_price: 0 })}>
               <Plus aria-hidden="true" /> Add a line
             </Button>
-            <dl className="grid grid-cols-3 gap-px border bg-border text-sm" aria-label="Quote totals">
-              <div className="bg-card p-2">
-                <dt className="text-muted-foreground">Your total</dt>
-                <dd className="text-lg font-semibold tabular-nums">{money(total)}</dd>
+            <dl className="nsw-display-grid mw-grid-cols-3 mw-gap-px mw-border mw-bg-border nsw-small" aria-label="Quote totals">
+              <div className="mw-bg-white mw-p-2">
+                <dt className="mw-text-muted">Your total</dt>
+                <dd className="mw-text-lg nsw-text-semibold mw-tabular">{money(total)}</dd>
               </div>
-              <div className="bg-card p-2">
-                <dt className="text-muted-foreground">Modelled cost</dt>
-                <dd className="text-lg font-semibold tabular-nums">{money(modelled)}</dd>
+              <div className="mw-bg-white mw-p-2">
+                <dt className="mw-text-muted">Modelled cost</dt>
+                <dd className="mw-text-lg nsw-text-semibold mw-tabular">{money(modelled)}</dd>
               </div>
-              <div className="bg-card p-2">
-                <dt className="text-muted-foreground">Difference</dt>
-                <dd className={'text-lg font-semibold tabular-nums ' + (diff > 0 ? 'text-warning' : 'text-success')}>
+              <div className="mw-bg-white mw-p-2">
+                <dt className="mw-text-muted">Difference</dt>
+                <dd className={'mw-text-lg nsw-text-semibold mw-tabular ' + (diff > 0 ? 'mw-text-warning' : 'mw-text-success')}>
                   {diff > 0 ? '+' : diff < 0 ? '-' : ''}
                   {money(Math.abs(diff))} {diff > 0 ? 'over' : diff < 0 ? 'under' : ''}
                 </dd>
               </div>
             </dl>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="nsw-display-grid mw-gap-3 mw-sm-grid-cols-2">
               <DateField control={form.control} name="valid_until" label="Quote valid until" />
             </div>
             <TextAreaField control={form.control} name="note" label="Note (optional)" />
             <ErrorAlert error={act.error} title="We could not submit the quote" />
-            <DialogFooter className="gap-2">
+            <DialogFooter className="mw-gap-2">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
@@ -169,13 +169,13 @@ function Tenders({ d, reload }: { d: Loaded; reload: () => void }) {
   const mine = (id: number) => d.projects.find((p) => p.id === id)?.quotes.some((q) => q.status === 'submitted' || q.status === 'accepted')
   const cols = useMemo<ColumnDef<Tender>[]>(
     () => [
-      { id: 'label', header: 'Block', accessorFn: (t) => t.project.label, cell: ({ row }) => <span className="font-medium">{row.original.project.label}</span> },
+      { id: 'label', header: 'Block', accessorFn: (t) => t.project.label, cell: ({ row }) => <span className="nsw-text-medium">{row.original.project.label}</span> },
       { id: 'flats', header: 'Flats', accessorFn: (t) => t.project.flats, meta: { numeric: true } },
       { id: 'items', header: 'Work', accessorFn: (t) => t.items.map((i) => `${i.qty} x ${i.label}`).join('; '), cell: ({ row }) => (
-        <ul className="space-y-0.5">
+        <ul className="mw-space-y-0_5">
           {row.original.items.map((i) => (
             <li key={i.key}>
-              {i.qty} x {i.label} <span className="text-muted-foreground">at {money(i.modelled_unit_price)} modelled</span>
+              {i.qty} x {i.label} <span className="mw-text-muted">at {money(i.modelled_unit_price)} modelled</span>
             </li>
           ))}
         </ul>
@@ -191,7 +191,7 @@ function Tenders({ d, reload }: { d: Loaded; reload: () => void }) {
             ))}
           </ul>
         ) : (
-          <span className="text-muted-foreground">Not set</span>
+          <span className="mw-text-muted">Not set</span>
         )
       ) },
       { id: 'closes', header: 'Closes', accessorFn: (t) => t.closes_on, cell: ({ getValue }) => dateLabel(getValue<string>()) },
@@ -238,18 +238,18 @@ function WorkOrders({ d, reload }: { d: Loaded; reload: () => void }) {
   const user = useUser()
   if (orders.length === 0) return <EmptyState title="No work orders">When a quote is accepted and the work is scheduled, the work order shows here.</EmptyState>
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       <ErrorAlert error={act.error} />
       {orders.map((p) => {
         const wo = p.work_order!
         const done = wo.checklist.filter((c) => c.done).length
         return (
           <Panel key={wo.id} title={p.label} description={`Starts ${dateLabel(wo.scheduled_start)}. Warranty ${wo.warranty_years} years. ${done} of ${wo.checklist.length} items done.`} actions={<StageBadge stage={p.stage} />}>
-            <ul className="space-y-1" aria-label={`Checklist for ${p.label}`}>
+            <ul className="mw-space-y-1" aria-label={`Checklist for ${p.label}`}>
               {wo.checklist.map((c) => {
                 const id = `wo${wo.id}-${c.key}`
                 return (
-                  <li key={c.key} className="flex items-start gap-2">
+                  <li key={c.key} className="nsw-display-flex nsw-align-items-start mw-gap-2">
                     <Checkbox
                       id={id}
                       checked={c.done}
@@ -258,11 +258,11 @@ function WorkOrders({ d, reload }: { d: Loaded; reload: () => void }) {
                         const r = await act.run(() => api.tick(wo.id, c.key, !!v), v ? 'Item ticked off' : 'Item unticked')
                         if (r) reload()
                       }}
-                      className="mt-1"
+                      className="mw-mt-1"
                     />
-                    <label htmlFor={id} className="min-w-0">
+                    <label htmlFor={id} className="mw-min-w-0">
                       {c.label}
-                      {c.done && c.by && <span className="block text-sm text-muted-foreground">Done by {c.by}{c.at ? ` on ${dateLabel(c.at)}` : ''}</span>}
+                      {c.done && c.by && <span className="nsw-display-block nsw-small mw-text-muted">Done by {c.by}{c.at ? ` on ${dateLabel(c.at)}` : ''}</span>}
                     </label>
                   </li>
                 )
@@ -305,14 +305,14 @@ function FaultTickets({ d, reload }: { d: Loaded; reload: () => void }) {
             <DialogTitle>Resolve the fault</DialogTitle>
             <DialogDescription>{target ? `${itemLabel(target.item)}: ${target.description}` : ''} The tenant's charge starts again next month.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-1">
-            <label htmlFor="fault-note" className="text-sm font-medium">
+          <div className="mw-space-y-1">
+            <label htmlFor="fault-note" className="nsw-small nsw-text-medium">
               What was done
             </label>
             <Input id="fault-note" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
           <ErrorAlert error={act.error} />
-          <DialogFooter className="gap-2">
+          <DialogFooter className="mw-gap-2">
             <Button variant="outline" onClick={() => setTarget(null)}>
               Cancel
             </Button>
@@ -350,22 +350,22 @@ export default function Installer() {
           const open = d.faults.filter((f) => f.status === 'open').length
           return (
             <Tabs value={tab} onValueChange={setTab}>
-              <TabsList className="h-auto flex-wrap justify-start">
+              <TabsList className="mw-h-auto nsw-flex-wrap nsw-justify-content-start">
                 <TabsTrigger value="tenders">Tenders ({d.tenders.length})</TabsTrigger>
                 <TabsTrigger value="quotes">My quotes</TabsTrigger>
                 <TabsTrigger value="work">Work orders ({d.projects.filter((p) => p.work_order).length})</TabsTrigger>
                 <TabsTrigger value="faults">Fault tickets ({open} open)</TabsTrigger>
               </TabsList>
-              <TabsContent value="tenders" className="mt-3">
+              <TabsContent value="tenders" className="mw-mt-3">
                 <Tenders d={d} reload={res.reload} />
               </TabsContent>
-              <TabsContent value="quotes" className="mt-3">
+              <TabsContent value="quotes" className="mw-mt-3">
                 <MyQuotes d={d} />
               </TabsContent>
-              <TabsContent value="work" className="mt-3">
+              <TabsContent value="work" className="mw-mt-3">
                 <WorkOrders d={d} reload={res.reload} />
               </TabsContent>
-              <TabsContent value="faults" className="mt-3">
+              <TabsContent value="faults" className="mw-mt-3">
                 <FaultTickets d={d} reload={res.reload} />
               </TabsContent>
             </Tabs>

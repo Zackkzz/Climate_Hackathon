@@ -4,12 +4,13 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from meterwise import buildings as B
+from meterwise import heat as H
 from meterwise.credits import all_credits
 from meterwise import params as P
 from meterwise.assess import DISCLAIMER, AssessError, assess
@@ -124,6 +125,17 @@ def building(building_id: str) -> dict[str, Any]:
     if f is None:
         raise AssessError(f"No building with id '{building_id}' was found.", 404)
     return B.public_feature(f)
+
+
+@app.get("/api/heat")
+def heat(lat: float = Query(..., ge=-90, le=90), lon: float = Query(..., ge=-180, le=180)) -> dict[str, Any]:
+    """Satellite heat for a spot on the map (slow the first time for each 1 km tile, then cached)."""
+    try:
+        h = H.heat_at(lat, lon)
+    except H.HeatUnavailable as e:
+        raise AssessError(str(e), 503)
+    h["heat_band"] = B.band_for(h["heat_anomaly_c"], B.load().anomaly_quintiles)
+    return h
 
 
 @app.post("/api/assess", response_model=AssessResponse, response_model_exclude_none=False)

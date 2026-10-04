@@ -1,14 +1,19 @@
-"""Shared test fixtures. Tests never use the network: weather comes from the cached file in data/cache."""
+"""Shared test fixtures. Tests never use the network: weather comes from the cached file in data/cache, and satellite
+heat lookups use an empty temporary cache (so a machine's own engine/var/heat never changes results)."""
 import os
+import tempfile
+from pathlib import Path
 
 os.environ["METERWISE_OFFLINE"] = "1"
 
 import pytest  # noqa: E402
 
+from meterwise import heat as H  # noqa: E402
 from meterwise.models import AssessRequest  # noqa: E402
 from meterwise.weather import get_weather  # noqa: E402
 
 PILOT_LAT, PILOT_LON = -33.92, 151.07
+H.HEAT_CACHE_DIR = Path(tempfile.mkdtemp(prefix="meterwise-heat-"))
 
 
 @pytest.fixture(scope="session")

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Download } from 'lucide-react'
+import { Download } from '@/portal/components/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -21,7 +21,7 @@ import { ConfirmDialog, CsvInput, parseWithColumns } from './shared'
 const monthSchema = z.object({ month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Choose a month, like 2027-03.') })
 type Mismatch = RemittanceResult['mismatches'][number]
 const cols: ColumnDef<Mismatch>[] = [
-  { accessorKey: 'meter_id', header: 'Meter reference', cell: (c) => <span className="font-mono text-sm">{c.getValue<string>()}</span> },
+  { accessorKey: 'meter_id', header: 'Meter reference', cell: (c) => <span className="mw-mono nsw-small">{c.getValue<string>()}</span> },
   { accessorKey: 'expected', header: 'Charge due', cell: (c) => (c.getValue<number | undefined>() === undefined ? '-' : money(c.getValue<number>())), meta: { numeric: true, csv: (r) => r.expected ?? '' } },
   { accessorKey: 'received', header: 'Received', cell: (c) => (c.getValue<number | undefined>() === undefined ? '-' : money(c.getValue<number>())), meta: { numeric: true, csv: (r) => r.received ?? '' } },
   { accessorKey: 'reason', header: 'Problem' },
@@ -67,24 +67,24 @@ export default function Charges() {
         title="Charges and remittance"
         description="Download the monthly charge file for on-bill collection. Then tell us what you collected and passed on."
       />
-      <div className="space-y-4">
+      <div className="mw-space-y-4">
         <Panel title="Charge file" description="One row per meter: meter reference, amount, status and whether the charge is paused. Paused charges are listed at $0.">
           <Form {...fileForm}>
             <form
-              className="flex flex-wrap items-end gap-3"
+              className="nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-3"
               noValidate
               onSubmit={fileForm.handleSubmit(async (v) => {
                 const t = await dl.run(() => utilityApi.chargeFile(v.month))
                 if (t !== undefined) saveText(`charge-file-${v.month}.csv`, t)
               })}
             >
-              <TextField control={fileForm.control} name="month" label="Month" type="month" className="w-48" />
+              <TextField control={fileForm.control} name="month" label="Month" type="month" className="mw-w-48" />
               <Button type="submit" variant="outline" disabled={dl.busy}>
                 <Download aria-hidden="true" /> Download charge file
               </Button>
             </form>
           </Form>
-          <div className="mt-2">
+          <div className="mw-mt-2">
             <ErrorAlert error={dl.error} />
           </div>
         </Panel>
@@ -92,18 +92,18 @@ export default function Charges() {
         <Panel title="Remittance" description="What you collected and passed on for the month. It is posted as payments on each flat's ledger.">
           <Form {...remForm}>
             <form
-              className="space-y-3"
+              className="mw-space-y-3"
               noValidate
               onSubmit={remForm.handleSubmit((v) => {
                 if (!canPost) return
                 setConfirm(v.month)
               })}
             >
-              <TextField control={remForm.control} name="month" label="Month collected for" type="month" className="w-48" />
-              <p className="text-sm text-muted-foreground">Columns: meter_id, amount. Up to 5,000 rows.</p>
+              <TextField control={remForm.control} name="month" label="Month collected for" type="month" className="mw-w-48" />
+              <p className="nsw-small mw-text-muted">Columns: meter_id, amount. Up to 5,000 rows.</p>
               <CsvInput value={text} onChange={(t) => { setText(t); setResult(null) }} parsed={parsed} label="Remittance" previewCols={['meter_id', 'amount']} />
               {canPost && bad > 0 && (
-                <p className="text-warning" role="status">
+                <p className="mw-text-warning" role="status">
                   {bad} row{bad === 1 ? ' has' : 's have'} an amount that is not a number. {bad === 1 ? 'It' : 'They'} will be listed as problems.
                 </p>
               )}

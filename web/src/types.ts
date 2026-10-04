@@ -110,6 +110,20 @@ export interface BuildingCollection {
   features: BuildingFeature[]
 }
 
+// ---- satellite heat for a spot on the map (GET /api/heat) ----
+export interface HeatLookup {
+  heat_anomaly_c: number
+  heat_band: HeatBand
+  site_lst_c: number
+  area_median_lst_c: number
+  scene_count: number
+  first_date: string
+  last_date: string
+  window_km: number
+  site_radius_m: number
+  source: string
+}
+
 // ---- assess request ----
 
 export interface BuildingInput {

@@ -19,13 +19,13 @@ const config = {
 /** Swatches that match the bar patterns, so the legend does not depend on colour. */
 function PatternKey() {
   return (
-    <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm" aria-label="Key">
+    <ul className="nsw-display-flex nsw-flex-wrap mw-gap-x-5 mw-gap-y-1 nsw-small" aria-label="Key">
       {[
         { id: 'k-solid', label: 'Before (solid)', fill: '#0b4f7c' },
         { id: 'k-hatch', label: 'After, with the package (diagonal stripes)', fill: 'url(#pat-hatch)' },
         { id: 'k-dots', label: 'After, without the cool roof (dots)', fill: 'url(#pat-dots)' },
       ].map((k) => (
-        <li key={k.id} className="inline-flex items-center gap-1.5">
+        <li key={k.id} className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
           <svg width="22" height="14" aria-hidden="true">
             <Defs />
             <rect x="0.5" y="0.5" width="21" height="13" fill={k.fill} stroke="#0b4f7c" />
@@ -76,8 +76,8 @@ function Body({ n }: { n: NI }) {
   const data = n.by_project.map((p) => ({ name: short(p.label), before: p.peak_kw_before, after: p.peak_kw_after, without: p.peak_kw_after_without_roof ?? p.peak_kw_before }))
   const fc = n.forecast.map((f) => ({ name: f.month, kw: f.added_peak_kw }))
   return (
-    <div className="space-y-4">
-      <p className="text-muted-foreground">
+    <div className="mw-space-y-4">
+      <p className="mw-text-muted">
         {n.area}, as at {n.as_of}.
       </p>
       <Figures
@@ -97,9 +97,9 @@ function Body({ n }: { n: NI }) {
         legend={<PatternKey />}
         chart={
           n.by_project.length === 0 ? (
-            <p className="text-muted-foreground">No project has reached installation yet.</p>
+            <p className="mw-text-muted">No project has reached installation yet.</p>
           ) : (
-            <ChartContainer config={config} className="aspect-auto w-full" style={{ height: Math.max(200, data.length * 96 + 40) }}>
+            <ChartContainer config={config} className="mw-aspect-auto nsw-width-100" style={{ height: Math.max(200, data.length * 96 + 40) }}>
               <BarChart data={data} layout="vertical" margin={{ left: 8, right: 48, top: 8, bottom: 8 }} accessibilityLayer>
                 <Defs />
                 <CartesianGrid horizontal={false} />
@@ -127,7 +127,7 @@ function Body({ n }: { n: NI }) {
         title="Forecast: change in peak demand as projects commission"
         description="A negative number means the peak falls."
         chart={
-          <ChartContainer config={{ kw: { label: 'Change in peak (kW)', color: '#0b4f7c' } }} className="aspect-auto h-64 w-full">
+          <ChartContainer config={{ kw: { label: 'Change in peak (kW)', color: '#0b4f7c' } }} className="mw-aspect-auto mw-h-64 nsw-width-100">
             <BarChart data={fc} margin={{ top: 20, right: 8, left: 8, bottom: 8 }} accessibilityLayer>
               <CartesianGrid vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 13 }} />
@@ -144,14 +144,14 @@ function Body({ n }: { n: NI }) {
         }}
       />
       <Panel title="Buildings">
-        <div className="overflow-x-auto border" role="region" aria-label="Buildings and their commissioning dates" tabIndex={0}>
+        <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Buildings and their commissioning dates" tabIndex={0}>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Building</TableHead>
                 <TableHead>Stage</TableHead>
                 <TableHead>Commissioned</TableHead>
-                <TableHead className="text-right">Gas avoided (GJ a year)</TableHead>
+                <TableHead className="nsw-text-right">Gas avoided (GJ a year)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -160,14 +160,14 @@ function Body({ n }: { n: NI }) {
                   <TableCell>{p.label}</TableCell>
                   <TableCell>{p.stage}</TableCell>
                   <TableCell>{p.commissioned_on ?? 'Not yet'}</TableCell>
-                  <TableCell className="text-right tabular-nums">{num(p.gas_mj_avoided_per_year / 1000)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{num(p.gas_mj_avoided_per_year / 1000)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
       </Panel>
-      <p className="text-sm text-muted-foreground">Basis: {n.basis}</p>
+      <p className="nsw-small mw-text-muted">Basis: {n.basis}</p>
     </div>
   )
 }

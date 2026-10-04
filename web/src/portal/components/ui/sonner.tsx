@@ -1,37 +1,38 @@
-"use client"
+// Short messages after an action. Rendered as in-page alerts in a polite live region at the bottom of the screen.
+// `toast.success` and `toast.error` keep the call shape the pages already use.
+import { useEffect, useState } from 'react'
+import { Alert, AlertDescription } from './alert'
 
-import {
-  CircleCheckIcon,
-  InfoIcon,
-  Loader2Icon,
-  OctagonXIcon,
-  TriangleAlertIcon,
-} from "lucide-react"
-import { Toaster as Sonner, type ToasterProps } from "sonner"
+type Item = { id: number; kind: 'success' | 'error'; text: string }
+let items: Item[] = []
+let n = 0
+const subs = new Set<() => void>()
+const emit = () => subs.forEach((f) => f())
+function push(kind: Item['kind'], text: string) {
+  const id = ++n
+  items = [...items, { id, kind, text }]
+  emit()
+  window.setTimeout(() => {
+    items = items.filter((i) => i.id !== id)
+    emit()
+  }, 8000)
+}
+export const toast = { success: (t: string) => push('success', t), error: (t: string) => push('error', t) }
 
-const Toaster = ({ ...props }: ToasterProps) => {
+export function Toaster(_props: { position?: string }) {
+  const [, force] = useState(0)
+  useEffect(() => {
+    const f = () => force((x) => x + 1)
+    subs.add(f)
+    return () => void subs.delete(f)
+  }, [])
   return (
-    <Sonner
-      theme="light"
-      className="toaster group"
-      icons={{
-        success: <CircleCheckIcon className="size-4" />,
-        info: <InfoIcon className="size-4" />,
-        warning: <TriangleAlertIcon className="size-4" />,
-        error: <OctagonXIcon className="size-4" />,
-        loading: <Loader2Icon className="size-4 animate-spin" />,
-      }}
-      style={
-        {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-          "--border-radius": "var(--radius)",
-        } as React.CSSProperties
-      }
-      {...props}
-    />
+    <div className="mw-toasts no-print" role="status" aria-live="polite">
+      {items.map((i) => (
+        <Alert key={i.id} variant={i.kind === 'error' ? 'destructive' : 'success'} className="mw-toast">
+          <AlertDescription>{i.text}</AlertDescription>
+        </Alert>
+      ))}
+    </div>
   )
 }
-
-export { Toaster }

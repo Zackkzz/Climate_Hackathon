@@ -32,7 +32,7 @@ export default function Installation({ p, role, onChange }: TabProps) {
         {accepted && canManage(role) && (
           <Form {...form}>
             <form
-              className="max-w-sm space-y-3"
+              className="mw-max-w-sm mw-space-y-3"
               noValidate
               onSubmit={form.handleSubmit(async (v) => {
                 const r = await create.run(() => api.createWorkOrder(p.id, v.scheduled_start), 'Work order created')
@@ -48,7 +48,7 @@ export default function Installation({ p, role, onChange }: TabProps) {
             </form>
           </Form>
         )}
-        {accepted && !canManage(role) && <p className="text-muted-foreground">The programme office will create the work order.</p>}
+        {accepted && !canManage(role) && <p className="mw-text-muted">The programme office will create the work order.</p>}
       </Panel>
     )
   }
@@ -61,7 +61,7 @@ export default function Installation({ p, role, onChange }: TabProps) {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+    <div className="nsw-display-grid mw-gap-4 mw-lg-cols-2fr-3fr">
       <Panel title="Work order">
         <Facts
           items={[
@@ -73,19 +73,19 @@ export default function Installation({ p, role, onChange }: TabProps) {
         />
       </Panel>
       <Panel title="Commissioning checklist" description="Every item must be done before the project can be marked commissioned.">
-        <p className="font-semibold tabular-nums" role="status">
+        <p className="nsw-text-semibold mw-tabular" role="status">
           {done} of {all} done
         </p>
-        <Progress value={all ? (done / all) * 100 : 0} className="my-2 h-3" aria-label={`${done} of ${all} checklist items done`} />
+        <Progress value={all ? (done / all) * 100 : 0} className="mw-my-2 mw-h-3" aria-label={`${done} of ${all} checklist items done`} />
         <ErrorAlert error={tick.error} />
-        <ul className="divide-y border">
+        <ul className="mw-divide-y mw-border">
           {wo.checklist.map((c) => (
-            <li key={c.key} className="flex items-start gap-3 p-2">
-              <Checkbox id={`ck-${c.key}`} checked={c.done} disabled={tick.busy} onCheckedChange={(v) => void toggle(c.key, !!v)} className="mt-1" />
-              <label htmlFor={`ck-${c.key}`} className="min-w-0 flex-1">
+            <li key={c.key} className="nsw-display-flex nsw-align-items-start mw-gap-3 mw-p-2">
+              <Checkbox id={`ck-${c.key}`} checked={c.done} disabled={tick.busy} onCheckedChange={(v) => void toggle(c.key, !!v)} className="mw-mt-1" />
+              <label htmlFor={`ck-${c.key}`} className="mw-min-w-0 mw-flex-1">
                 {c.label}
                 {c.done && c.at && (
-                  <span className="block text-sm text-muted-foreground">
+                  <span className="nsw-display-block nsw-small mw-text-muted">
                     Done {dateLabelAu(c.at)}
                     {c.by ? ` by ${c.by}` : ''}
                   </span>

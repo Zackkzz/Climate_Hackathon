@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal } from '@/portal/components/icons'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -60,12 +60,12 @@ function LedgerSheet({ flat, open, onClose, showCode, onConsent }: { flat: Flat;
   const [reveal, setReveal] = useState(false)
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+      <SheetContent className="nsw-width-100 nsw-overflow-y-auto mw-sm-max-w-xl">
         <SheetHeader>
           <SheetTitle>Flat {flat.unit}</SheetTitle>
           <SheetDescription>Meter reference {flat.meter_id}</SheetDescription>
         </SheetHeader>
-        <div className="space-y-4 px-4 pb-4">
+        <div className="mw-space-y-4 mw-px-4 mw-pb-4">
           <Facts
             items={[
               { label: 'Tenant', value: flat.tenant_name ?? '-' },
@@ -78,7 +78,7 @@ function LedgerSheet({ flat, open, onClose, showCode, onConsent }: { flat: Flat;
                     {
                       label: 'Tenant access code',
                       value: reveal ? (
-                        <span className="font-mono font-semibold">{flat.access_code}</span>
+                        <span className="mw-mono nsw-text-semibold">{flat.access_code}</span>
                       ) : (
                         <Button variant="outline" size="sm" onClick={() => setReveal(true)}>
                           Show access code
@@ -89,7 +89,7 @@ function LedgerSheet({ flat, open, onClose, showCode, onConsent }: { flat: Flat;
                 : []),
             ]}
           />
-          <h3 className="text-base font-semibold">Ledger</h3>
+          <h3 className="nsw-text-semibold">Ledger</h3>
           <Gate res={res} rows={4}>
             {(rows) => (
               <DataTable<LedgerEntry>
@@ -103,7 +103,7 @@ function LedgerSheet({ flat, open, onClose, showCode, onConsent }: { flat: Flat;
                 searchPlaceholder="Search the ledger"
                 columns={[
                   { id: 'month', header: 'Month', accessorFn: (r) => monthLabelAu(r.month), meta: { csv: (r) => r.month } },
-                  { id: 'kind', header: 'What', accessorFn: (r) => KIND[r.kind] ?? r.kind, cell: ({ row }) => <>{KIND[row.original.kind] ?? row.original.kind}{row.original.note && <div className="text-sm text-muted-foreground">{row.original.note}</div>}</> },
+                  { id: 'kind', header: 'What', accessorFn: (r) => KIND[r.kind] ?? r.kind, cell: ({ row }) => <>{KIND[row.original.kind] ?? row.original.kind}{row.original.note && <div className="nsw-small mw-text-muted">{row.original.note}</div>}</> },
                   { accessorKey: 'amount', header: 'Amount', cell: ({ row }) => money(row.original.amount), meta: { numeric: true } },
                   { accessorKey: 'balance_after', header: 'Balance', cell: ({ row }) => money(row.original.balance_after), meta: { numeric: true } },
                 ]}
@@ -140,7 +140,7 @@ function PaymentDialog({ flat, onClose, onDone }: { flat: Flat; onClose: () => v
           <DialogDescription>Balance owing now {money(flat.balance_owing)}. This adds a payment to the flat's ledger.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
+          <form className="mw-space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
             <NumberField control={form.control} name="amount" label="Amount (dollars)" step={0.01} min={0} />
             <TextField control={form.control} name="month" label="Month paid for" placeholder="YYYY-MM" />
             <ErrorAlert error={act.error} title="We could not record the payment" />
@@ -176,7 +176,7 @@ function TenancyDialog({ flat, onClose, onDone }: { flat: Flat; onClose: () => v
           <DialogDescription>The charge stays with the meter. The old tenant's balance is settled, and a new access code and disclosure document are made for the new tenant.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
+          <form className="mw-space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
             <TextField control={form.control} name="new_tenant_name" label="New tenant's name" autoComplete="off" />
             <DateField control={form.control} name="date" label="Move-in date" />
             <ErrorAlert error={act.error} title="We could not change the tenancy" />
@@ -214,7 +214,7 @@ export default function Flats(props: TabProps) {
         columns={[
           { accessorKey: 'unit', header: 'Unit' },
           { id: 'tenant', header: 'Tenant', accessorFn: (f) => f.tenant_name ?? '-', meta: { csv: (f) => f.tenant_name ?? '' } },
-          { accessorKey: 'meter_id', header: 'Meter reference', cell: ({ row }) => <span className="font-mono text-sm">{row.original.meter_id}</span> },
+          { accessorKey: 'meter_id', header: 'Meter reference', cell: ({ row }) => <span className="mw-mono nsw-small">{row.original.meter_id}</span> },
           { id: 'consent', header: 'Upgrade consent', accessorFn: (f) => CONSENT_LABEL[f.consent], cell: ({ row }) => <StatusBadge tone={row.original.consent === 'agreed' ? 'good' : row.original.consent === 'declined' ? 'bad' : 'warn'}>{CONSENT_LABEL[row.original.consent]}</StatusBadge> },
           {
             id: 'data',
@@ -222,8 +222,8 @@ export default function Flats(props: TabProps) {
             accessorFn: (f) => (consents[f.id] === undefined ? 'Loading' : consents[f.id] === null ? 'Unknown' : consents[f.id]?.given ? 'Given' : 'Not given'),
             cell: ({ row }) => {
               const c = consents[row.original.id]
-              if (c === undefined) return <span className="text-muted-foreground">Loading</span>
-              if (c === null) return <span className="text-muted-foreground">Not available</span>
+              if (c === undefined) return <span className="mw-text-muted">Loading</span>
+              if (c === null) return <span className="mw-text-muted">Not available</span>
               return c.given ? <StatusBadge tone="good">{c.expires_on ? `Given, ends ${dateLabelAu(c.expires_on)}` : 'Given'}</StatusBadge> : <StatusBadge tone="warn">Not given</StatusBadge>
             },
           },

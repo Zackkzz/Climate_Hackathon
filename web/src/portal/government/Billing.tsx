@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Download } from 'lucide-react'
+import { Download } from '@/portal/components/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -68,8 +68,8 @@ export default function Billing() {
       <PageHeader crumbs={[{ label: 'Government', to: '/government' }, { label: 'Billing' }]} title="Billing" description="Each month the programme works out the charge on every flat's meter. A paused charge is not billed. Running a month twice changes nothing the second time." />
       <Panel title="Choose a month" description={clock.data ? `The programme month is ${monthName(clock.data.month)}.` : undefined}>
         <Form {...form}>
-          <form className="flex flex-wrap items-end gap-3" noValidate onSubmit={(e) => e.preventDefault()}>
-            <TextField control={form.control} name="month" label="Month" type="month" className="w-48" />
+          <form className="nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-3" noValidate onSubmit={(e) => e.preventDefault()}>
+            <TextField control={form.control} name="month" label="Month" type="month" className="mw-w-48" />
             <Confirm title={`Run billing for ${month && /^\d{4}-\d{2}$/.test(month) ? monthName(month) : 'this month'}?`} description={<p>This bills every active flat for the month and moves part of the charges into the reserve. It cannot be undone, but running the same month again does nothing.</p>} confirmLabel="Run billing" onConfirm={doRun}>
               <Button type="button" disabled={run.busy}>
                 {run.busy ? 'Running' : 'Run billing for this month'}
@@ -80,12 +80,12 @@ export default function Billing() {
             </Button>
           </form>
         </Form>
-        <div className="mt-3 space-y-2">
+        <div className="mw-mt-3 mw-space-y-2">
           <ErrorAlert error={run.error} title="Billing did not run" />
           <ErrorAlert error={exp.error} title="We could not make the file" />
         </div>
       </Panel>
-      <div className="mt-4">
+      <div className="mw-mt-4">
         {last && (
           <Figures
             label={`Result for ${monthName(last.month)}`}
@@ -98,7 +98,7 @@ export default function Billing() {
             ]}
           />
         )}
-        <h2 className="mb-2 text-base font-semibold">Runs this session</h2>
+        <h2 className="mw-mb-2 nsw-text-semibold">Runs this session</h2>
         <DataTable columns={columns} data={runs} caption="Billing runs" getRowId={(r) => r.month} csvName="billing-runs" searchPlaceholder="Search runs" emptyTitle="No billing runs yet" emptyText="Run billing for a month and the result shows here." />
       </div>
     </div>

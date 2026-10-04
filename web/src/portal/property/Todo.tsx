@@ -46,7 +46,7 @@ export default function Todo() {
       <Gate res={res}>
         {(s) => (
           <>
-            <Panel title={`Tasks (${s.actions.length})`} className="mb-4">
+            <Panel title={`Tasks (${s.actions.length})`} className="mw-mb-4">
               <DataTable
                 columns={cols}
                 data={s.actions}

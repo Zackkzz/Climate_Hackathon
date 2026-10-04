@@ -1,6 +1,6 @@
 import { useId, useState } from 'react'
 import type { ReactNode } from 'react'
-import { Table2, BarChart3 } from 'lucide-react'
+import { Table2, BarChart3 } from '@/portal/components/icons'
 import { Button } from '@/portal/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/portal/components/ui/table'
 import { Panel } from './PageHeader'
@@ -23,19 +23,19 @@ export function ChartBox({ title, description, chart, table, legend }: { title: 
       description={description}
       actions={
         <Button variant="outline" size="sm" aria-pressed={asTable} aria-controls={id} onClick={() => setAsTable((v) => !v)}>
-          {asTable ? <BarChart3 aria-hidden="true" /> : <Table2 aria-hidden="true" />}
+          {asTable ? <BarChart3 /> : <Table2 />}
           {asTable ? 'Show as chart' : 'Show as table'}
         </Button>
       }
     >
       <div id={id}>
         {asTable ? (
-          <div className="max-h-96 overflow-auto border" role="region" aria-label={`${title}, as a table`} tabIndex={0}>
+          <div className="mw-max-h-96 nsw-overflow-auto mw-border" role="region" aria-label={`${title}, as a table`} tabIndex={0}>
             <Table>
               <TableHeader>
                 <TableRow>
                   {table.columns.map((c, i) => (
-                    <TableHead key={i} className={c.numeric ? 'text-right' : ''}>
+                    <TableHead key={i} className={c.numeric ? 'nsw-text-right' : ''}>
                       {c.label}
                     </TableHead>
                   ))}
@@ -45,7 +45,7 @@ export function ChartBox({ title, description, chart, table, legend }: { title: 
                 {table.rows.map((r, i) => (
                   <TableRow key={i}>
                     {r.map((v, j) => (
-                      <TableCell key={j} className={table.columns[j]?.numeric ? 'text-right tabular-nums' : ''}>
+                      <TableCell key={j} className={table.columns[j]?.numeric ? 'nsw-text-right mw-tabular' : ''}>
                         {v}
                       </TableCell>
                     ))}
@@ -57,7 +57,7 @@ export function ChartBox({ title, description, chart, table, legend }: { title: 
         ) : (
           <>
             {chart}
-            {legend && <div className="mt-2 flex flex-wrap gap-4 text-sm">{legend}</div>}
+            {legend && <div className="mw-mt-2 nsw-display-flex nsw-flex-wrap mw-gap-4 nsw-small">{legend}</div>}
           </>
         )}
       </div>
@@ -68,7 +68,7 @@ export function ChartBox({ title, description, chart, table, legend }: { title: 
 /** A legend entry with a pattern swatch as well as colour. */
 export function LegendKey({ label, color, dashed }: { label: string; color: string; dashed?: boolean }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
+    <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1">
       <svg width="22" height="10" aria-hidden="true">
         <line x1="0" y1="5" x2="22" y2="5" stroke={color} strokeWidth="3" strokeDasharray={dashed ? '4 3' : undefined} />
       </svg>

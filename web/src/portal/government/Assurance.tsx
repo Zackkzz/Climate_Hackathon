@@ -43,7 +43,7 @@ function derive(data: unknown): Row[] {
     { n: 14, control: 'WCAG 2.2 AA in the web app', where: 'Web app', status: 'Built to it', tone: 'good', evidence: 'Automated axe checks and keyboard walkthroughs on each release. See the accessibility statement for known limitations.' },
     { n: 15, control: 'No third-party scripts, fonts or trackers', where: 'Web app', status: 'In place', tone: 'good', evidence: 'Fonts and icons are bundled. The only outside request is map tiles in the block finder.' },
     { n: 16, control: 'Session timeout warning, tokens in memory and session storage only', where: 'Web app', status: 'In place', tone: 'good', evidence: 'A warning shows 5 minutes before sign-out, with a way to extend. Tokens are never put in addresses.' },
-    { n: 17, control: 'Privacy notice, accessibility statement and terms in every footer', where: 'Web app', status: 'In place', tone: 'good', evidence: 'Footer links on every page, plus Trust and security.' },
+    { n: 17, control: 'Privacy notice, accessibility statement and terms pages', where: 'Web app', status: 'In place', tone: 'good', evidence: 'Public pages at /privacy, /accessibility and /terms, plus Trust and security.' },
   ]
 }
 
@@ -80,10 +80,10 @@ function Body({ data }: { data: unknown }) {
     { accessorKey: 'evidence', header: 'Evidence', meta: { label: 'Evidence' } },
   ]
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       <DataTable columns={cols} data={rows} caption="Controls and their status" csvName="it-assurance-controls" searchPlaceholder="Search controls" pageSize={25} getRowId={(r) => String(r.n)} />
       <section aria-labelledby="raw-h">
-        <h2 id="raw-h" className="mb-2 text-base font-semibold">
+        <h2 id="raw-h" className="mw-mb-2 nsw-text-semibold">
           Controls as reported by the server
         </h2>
         <ControlsView data={data} />

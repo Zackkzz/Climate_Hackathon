@@ -294,7 +294,7 @@ export function mockAssess(req: AssessRequest): AssessResponse {
       heat_band: null,
     }
     b.heat_band = bandForAnomaly(b.heat_anomaly_c)
-    warnings.push('Heat for a block you entered yourself is a pilot-area estimate, not measured at your block.')
+    warnings.push('No satellite heat value is available in the built-in demo data, so this heat level is made up.')
   }
   if (b.flats < 1 || b.storeys < 1) throw new MockApiError(400, 'A block needs at least one flat and one storey.')
 

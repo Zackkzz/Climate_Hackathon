@@ -163,8 +163,8 @@ await step('Create a project from a pilot building (screen)', async () => {
   await page.goto(`${BASE}/government/projects/new?b=${encodeURIComponent(target.id)}`)
   await page.getByRole('button', { name: /start the project|start project/i }).waitFor({ timeout: 15000 })
   await settle()
-  await page.getByRole('combobox', { name: /Provider that owns the block/ }).click()
-  await page.getByRole('option').first().click()
+  // NSW Design System variant: selects are native <select> elements
+  await page.getByRole('combobox', { name: /Provider that owns the block/ }).selectOption({ index: 1 })
   await page.getByRole('button', { name: /start the project|start project/i }).click()
   await page.waitForURL(/\/government\/projects\/\d+/, { timeout: 20000 })
   pid = Number(page.url().match(/projects\/(\d+)/)[1])
@@ -208,8 +208,7 @@ await step('Save a site audit (screen)', async () => {
   const flats = await f.getByLabel('Flats', { exact: true }).inputValue()
   await f.getByLabel('Flats', { exact: true }).fill(String(Number(flats) + 1))
   for (const [label, option] of [['Roof condition', 'Sound'], ['Roof colour now', 'Dark'], ['Hot water layout', 'A unit in each flat']]) {
-    await f.getByRole('combobox', { name: label }).click()
-    await page.getByRole('option', { name: option, exact: true }).click()
+    await f.getByRole('combobox', { name: label }).selectOption({ label: option })
   }
   await f.getByLabel('Switchboard rating (amps)').fill('63')
   await f.getByRole('button', { name: /save/i }).click()
@@ -448,7 +447,8 @@ await step('Manager records meter-data consent on a flat sheet with a note (scre
   const sheet = page.getByRole('dialog').first()
   await sheet.getByLabel(/How did the tenant give consent/).fill('Signed form on 3 March')
   await sheet.getByRole('button', { name: 'Record consent' }).click()
-  await sheet.getByText('Given', { exact: true }).first().waitFor({ timeout: 8000 })
+  // status labels carry an icon ligature as text (hidden from assistive technology), so match the end of the text
+  await sheet.getByText(/Given$/).first().waitFor({ timeout: 8000 })
   const c = await call(mgr, 'GET', `/api/programme/flats/${other.id}/data-consent`)
   must(c.active, 'not active on the server')
 })
@@ -586,8 +586,7 @@ await step('Landlord enquiry submitted on the public form (screen)', async () =>
   await ep.goto(BASE + '/enquiry')
   await ep.getByLabel('Your name').fill('E2E Landlord')
   await ep.getByLabel('Email address').fill('e2e@organisation.com.au')
-  await ep.getByRole('combobox', { name: /You are a/ }).click()
-  await ep.getByRole('option', { name: 'Landlord' }).click()
+  await ep.getByRole('combobox', { name: /You are a/ }).selectOption({ label: 'Landlord' })
   await ep.getByLabel('Address of the block').fill('12 Station Street, Penrith')
   await ep.getByLabel('Number of flats').fill('8')
   await ep.getByRole('button', { name: 'Send enquiry' }).click()

@@ -35,23 +35,23 @@ export default function Admin() {
       <PageHeader crumbs={[{ label: 'Government', to: '/government' }, { label: 'Administration' }, { label: 'System date' }]} title="System date" description="The date the programme works to. Billing, payments and meter readings are processed month by month from it." />
       {clock.data === null && !clock.error && <LoadingRows rows={2} />}
       {forbidden && (
-        <p className="border bg-card p-4" role="status">
+        <p className="mw-border mw-bg-white mw-p-4" role="status">
           {clock.error && /not available|forbidden|cannot use|access/i.test(clock.error) ? 'Changing the system date is not available on this system.' : <ErrorAlert error={clock.error} onRetry={clock.reload} title="We could not load the system date" />}
         </p>
       )}
       {clock.data && (
         <Panel title="Move the system date forward">
-          <p className="mb-3">
+          <p className="mw-mb-3">
             The system month is <strong>{monthName(clock.data.month)}</strong>.
           </p>
-          <p className="mb-3 text-muted-foreground">Moves the system date forward and runs billing, payments and readings for each month. It cannot be moved back.</p>
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="scn" className="text-sm font-medium">
+          <p className="mw-mb-3 mw-text-muted">Moves the system date forward and runs billing, payments and readings for each month. It cannot be moved back.</p>
+          <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-3">
+            <div className="nsw-display-flex nsw-flex-column mw-gap-1_5">
+              <label htmlFor="scn" className="nsw-small nsw-text-medium">
                 How the equipment performs
               </label>
               <Select value={scenario} onValueChange={(v) => setScenario(v as Scenario)}>
-                <SelectTrigger id="scn" className="w-52">
+                <SelectTrigger id="scn" className="mw-w-52">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -87,15 +87,15 @@ export default function Admin() {
             </Confirm>
           </div>
           {act.busy && (
-            <p role="status" className="mt-2 text-muted-foreground">
+            <p role="status" className="mw-mt-2 mw-text-muted">
               Working through the months
             </p>
           )}
-          <div className="mt-2">
+          <div className="mw-mt-2">
             {act.error instanceof ProgError && act.error.status === 403 ? <p role="alert">Changing the system date is not available on this system.</p> : <ErrorAlert error={act.error} title="The system date did not move" />}
           </div>
           {last && (
-            <p role="status" className="mt-2">
+            <p role="status" className="mw-mt-2">
               {last}
             </p>
           )}

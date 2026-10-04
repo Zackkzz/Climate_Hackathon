@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
 import type { ColumnDef, RowSelectionState, SortingState, VisibilityState } from '@tanstack/react-table'
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Columns3, Download } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, Download } from '@/portal/components/icons'
 import { Button } from '@/portal/components/ui/button'
 import { Checkbox } from '@/portal/components/ui/checkbox'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/portal/components/ui/dropdown-menu'
 import { Input } from '@/portal/components/ui/input'
+import { Pagination } from '@/portal/components/ui/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/portal/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/portal/components/ui/table'
 import { saveText, toCsv } from '@/portal/lib/csv'
@@ -66,7 +67,8 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
       meta: { label: 'Select' },
       header: ({ table }) => (
         <Checkbox
-          checked={table.getIsAllPageRowsSelected() ? true : table.getIsSomePageRowsSelected() ? 'indeterminate' : false}
+          checked={table.getIsAllPageRowsSelected()}
+          aria-checked={table.getIsAllPageRowsSelected() ? true : table.getIsSomePageRowsSelected() ? 'mixed' : false}
           onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
           aria-label="Select all rows on this page"
         />
@@ -121,19 +123,19 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap items-end gap-2" role="search" aria-label={`Filter ${caption}`}>
-        <div className="min-w-[12rem] max-w-sm flex-1">
-          <label htmlFor={`dt-${caption}`} className="sr-only">
+    <div className="mw-space-y-2">
+      <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-2" role="search" aria-label={`Filter ${caption}`}>
+        <div className="mw-grow-search">
+          <label htmlFor={`dt-${caption}`} className="sr-only nsw-form__label">
             {searchPlaceholder}
           </label>
-          <Input id={`dt-${caption}`} type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={searchPlaceholder} className="h-9" />
+          <Input id={`dt-${caption}`} type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={searchPlaceholder} />
         </div>
         {filters}
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="mw-ml-auto nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-2">
           {selectable && selectedRows.length > 0 && (
             <>
-              <span className="text-sm" role="status">
+              <span className="nsw-small" role="status">
                 {selectedRows.length} selected
               </span>
               {bulkActions?.(selectedRows, () => table.resetRowSelection())}
@@ -142,7 +144,7 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <Columns3 aria-hidden="true" /> Columns
+                <Columns3 /> Columns
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -160,7 +162,7 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
           </DropdownMenu>
           {csvName && (
             <Button variant="outline" size="sm" onClick={exportCsv} disabled={total === 0}>
-              <Download aria-hidden="true" /> Export CSV
+              <Download /> Export CSV
             </Button>
           )}
         </div>
@@ -169,7 +171,7 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
       {loading ? (
         <LoadingRows label={`Loading ${caption}`} />
       ) : (
-        <div className="overflow-x-auto border bg-card" role="region" aria-label={caption} tabIndex={0}>
+        <div className="nsw-overflow-x-auto mw-border mw-bg-white" role="region" aria-label={caption} tabIndex={0}>
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((hg) => (
@@ -178,11 +180,11 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
                     const sorted = h.column.getIsSorted()
                     const numeric = h.column.columnDef.meta?.numeric
                     return (
-                      <TableHead key={h.id} className={numeric ? 'text-right' : ''} aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : h.column.getCanSort() ? 'none' : undefined}>
+                      <TableHead key={h.id} className={numeric ? 'nsw-text-right' : ''} aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : h.column.getCanSort() ? 'none' : undefined}>
                         {h.isPlaceholder ? null : h.column.getCanSort() ? (
-                          <Button variant="ghost" size="sm" className={'-mx-2 h-7 px-2 font-semibold ' + (numeric ? 'flex-row-reverse' : '')} onClick={h.column.getToggleSortingHandler()}>
+                          <Button variant="ghost" size="sm" className={'mw-sort-button ' + (numeric ? 'mw-sort-button--num' : '')} onClick={h.column.getToggleSortingHandler()}>
                             {flexRender(h.column.columnDef.header, h.getContext())}
-                            {sorted === 'asc' ? <ArrowUp aria-hidden="true" /> : sorted === 'desc' ? <ArrowDown aria-hidden="true" /> : <ArrowUpDown aria-hidden="true" className="opacity-50" />}
+                            {sorted === 'asc' ? <ArrowUp /> : sorted === 'desc' ? <ArrowDown /> : <ArrowUpDown className="mw-faint" />}
                           </Button>
                         ) : (
                           flexRender(h.column.columnDef.header, h.getContext())
@@ -196,7 +198,7 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
             <TableBody>
               {table.getRowModel().rows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={table.getVisibleLeafColumns().length} className="p-0">
+                  <TableCell colSpan={table.getVisibleLeafColumns().length} className="mw-p-0">
                     <EmptyState title={filter ? 'No rows match your search' : emptyTitle}>{filter ? 'Try a shorter search, or clear the filters.' : emptyText}</EmptyState>
                   </TableCell>
                 </TableRow>
@@ -204,7 +206,7 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
                 table.getRowModel().rows.map((r) => (
                   <TableRow key={r.id} data-state={r.getIsSelected() ? 'selected' : undefined}>
                     {r.getVisibleCells().map((c) => (
-                      <TableCell key={c.id} className={c.column.columnDef.meta?.numeric ? 'text-right tabular-nums' : ''}>
+                      <TableCell key={c.id} className={c.column.columnDef.meta?.numeric ? 'nsw-text-right mw-tabular' : ''}>
                         {flexRender(c.column.columnDef.cell, c.getContext())}
                       </TableCell>
                     ))}
@@ -216,17 +218,17 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+      <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center nsw-justify-content-between mw-gap-2 nsw-small">
         <p role="status" aria-live="polite">
           {total === 0 ? 'No rows' : `Showing ${from} to ${to} of ${total} row${total === 1 ? '' : 's'}`}
           {filter && data.length !== total ? ` (filtered from ${data.length})` : ''}
         </p>
-        <div className="flex items-center gap-2">
-          <label htmlFor={`ps-${caption}`} className="text-muted-foreground">
+        <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-2">
+          <label htmlFor={`ps-${caption}`} className="mw-text-muted">
             Rows per page
           </label>
           <Select value={String(pg.pageSize)} onValueChange={(v) => table.setPageSize(Number(v))}>
-            <SelectTrigger id={`ps-${caption}`} size="sm" className="w-[5rem]">
+            <SelectTrigger id={`ps-${caption}`} className="mw-select-auto">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -237,17 +239,9 @@ export function DataTable<T>({ columns, data, caption, getRowId, searchPlacehold
               ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} aria-label="Previous page">
-            <ChevronLeft aria-hidden="true" />
-          </Button>
-          <span>
-            Page {total === 0 ? 0 : pg.pageIndex + 1} of {table.getPageCount()}
-          </span>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} aria-label="Next page">
-            <ChevronRight aria-hidden="true" />
-          </Button>
         </div>
       </div>
+      {table.getPageCount() > 1 && <Pagination page={pg.pageIndex + 1} count={table.getPageCount()} onPage={(p) => table.setPageIndex(p - 1)} label={`${caption}, pages`} />}
     </div>
   )
 }

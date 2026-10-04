@@ -46,10 +46,10 @@ function TopUp({ onDone }: { onDone: () => void }) {
   })
   return (
     <Form {...form}>
-      <form className="mb-4 space-y-3 border bg-card p-4" noValidate onSubmit={(e) => e.preventDefault()} aria-label="Top up the reserve">
-        <h2 className="text-base font-semibold">Top up the reserve</h2>
-        <p className="text-muted-foreground">Move money from the grant pool into the reserve, for example to cover a shortfall.</p>
-        <div className="grid gap-3 sm:grid-cols-2">
+      <form className="mw-mb-4 mw-space-y-3 mw-border mw-bg-white mw-p-4" noValidate onSubmit={(e) => e.preventDefault()} aria-label="Top up the reserve">
+        <h2 className="nsw-text-semibold">Top up the reserve</h2>
+        <p className="mw-text-muted">Move money from the grant pool into the reserve, for example to cover a shortfall.</p>
+        <div className="nsw-display-grid mw-gap-3 mw-sm-grid-cols-2">
           <NumberField control={form.control} name="amount" label="Amount ($)" min={0} step={100} />
           <TextField control={form.control} name="note" label="Note (optional)" />
         </div>
@@ -77,7 +77,7 @@ export default function Reserve() {
   const columns = useMemo<ColumnDef<ReserveEntry>[]>(
     () => [
       { accessorKey: 'month', header: 'Month' },
-      { id: 'kind', header: 'What', accessorFn: (e) => KIND[e.kind] ?? e.kind, cell: ({ row }) => <span>{KIND[row.original.kind] ?? row.original.kind}{row.original.note && <span className="block text-sm text-muted-foreground">{row.original.note}</span>}</span> },
+      { id: 'kind', header: 'What', accessorFn: (e) => KIND[e.kind] ?? e.kind, cell: ({ row }) => <span>{KIND[row.original.kind] ?? row.original.kind}{row.original.note && <span className="nsw-display-block nsw-small mw-text-muted">{row.original.note}</span>}</span> },
       { id: 'project', header: 'Project', accessorFn: (e) => e.project_id ?? '', cell: ({ row }) => (row.original.project_id ? <Link to={`/government/projects/${row.original.project_id}`}>Project {row.original.project_id}</Link> : 'None'), meta: { csv: (e: ReserveEntry) => e.project_id ?? '' } },
       { id: 'amount', header: 'Amount', accessorFn: signed, cell: ({ getValue }) => money(getValue<number>()), meta: { numeric: true } },
       { accessorKey: 'balance_after', header: 'Balance', cell: ({ row }) => money(row.original.balance_after), meta: { numeric: true, csv: (e: ReserveEntry) => e.balance_after } },
@@ -97,15 +97,15 @@ export default function Reserve() {
             <>
               <TopUp onDone={res.reload} />
               <Figures label="Reserve" items={[{ label: 'Balance', value: money(r.balance) }, { label: 'Entries', value: num(r.entries.length) }, { label: 'Paid out so far', value: money(paid) }]} />
-              <div className="mb-4">
+              <div className="mw-mb-4">
                 <ChartBox
                   title="Reserve balance over time"
                   description="The balance at the end of each month."
                   chart={
                     series.length === 0 ? (
-                      <p className="text-muted-foreground">Nothing has gone in or out of the reserve yet.</p>
+                      <p className="mw-text-muted">Nothing has gone in or out of the reserve yet.</p>
                     ) : (
-                      <ChartContainer config={{ balance: { label: 'Balance', color: 'var(--chart-1)' } }} className="h-64 w-full" role="img" aria-label={`Reserve balance by month. Latest balance ${money(series[series.length - 1].balance)}.`}>
+                      <ChartContainer config={{ balance: { label: 'Balance', color: 'var(--chart-1)' } }} className="mw-h-64 nsw-width-100" role="img" aria-label={`Reserve balance by month. Latest balance ${money(series[series.length - 1].balance)}.`}>
                         <LineChart data={series} margin={{ left: 8, right: 16, top: 16 }}>
                           <CartesianGrid vertical={false} />
                           <XAxis dataKey="month" tickMargin={6} />

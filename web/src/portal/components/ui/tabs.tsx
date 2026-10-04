@@ -1,88 +1,79 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/portal/lib/utils"
-import { Tabs as TabsPrimitive } from "radix-ui"
+// NSW Design System tabs (.nsw-tabs). Implemented in React, not with the package's tabs script, so that tab state lives
+// in the component and the panels mount and unmount with it. WAI-ARIA tabs pattern: role=tablist, role=tab with
+// aria-selected and aria-controls, role=tabpanel with aria-labelledby, roving tabindex, Left/Right/Home/End keys.
+import { createContext, useContext, useId, useRef } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
+import { cn } from '@/portal/lib/utils'
 
-function Tabs({
-  className,
-  orientation = "horizontal",
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Root>) {
+const Ctx = createContext<{ value: string; set: (v: string) => void; base: string } | null>(null)
+const tabId = (base: string, v: string) => `${base}-tab-${v}`
+const panelId = (base: string, v: string) => `${base}-panel-${v}`
+
+export function Tabs({ value, onValueChange, children, className }: { value: string; onValueChange: (v: string) => void; children: ReactNode; className?: string }) {
+  const base = useId().replace(/:/g, '')
   return (
-    <TabsPrimitive.Root
-      data-slot="tabs"
-      data-orientation={orientation}
-      orientation={orientation}
-      className={cn(
-        "group/tabs flex gap-2 data-[orientation=horizontal]:flex-col",
-        className
-      )}
-      {...props}
-    />
+    <Ctx.Provider value={{ value, set: onValueChange, base }}>
+      <div className={cn('nsw-tabs', className)}>{children}</div>
+    </Ctx.Provider>
   )
 }
 
-const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-[orientation=horizontal]/tabs:h-9 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col data-[variant=line]:rounded-none",
-  {
-    variants: {
-      variant: {
-        default: "bg-muted",
-        line: "gap-1 bg-transparent",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
+export function TabsList({ children, className, ...rest }: { children: ReactNode; className?: string; 'aria-label'?: string }) {
+  const ref = useRef<HTMLUListElement>(null)
+  const onKey = (e: KeyboardEvent) => {
+    const tabs = Array.from(ref.current?.querySelectorAll<HTMLElement>('[role=tab]') ?? [])
+    const i = tabs.findIndex((t) => t === document.activeElement)
+    if (i < 0) return
+    let n = -1
+    if (e.key === 'ArrowRight') n = (i + 1) % tabs.length
+    else if (e.key === 'ArrowLeft') n = (i - 1 + tabs.length) % tabs.length
+    else if (e.key === 'Home') n = 0
+    else if (e.key === 'End') n = tabs.length - 1
+    if (n >= 0) {
+      e.preventDefault()
+      tabs[n].focus()
+      tabs[n].click()
+    }
   }
-)
-
-function TabsList({
-  className,
-  variant = "default",
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.List> &
-  VariantProps<typeof tabsListVariants>) {
   return (
-    <TabsPrimitive.List
-      data-slot="tabs-list"
-      data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
-      {...props}
-    />
+    <div className={cn('nsw-tabs__list-wrapper mw-tabs-wrapper', className)}>
+      <ul ref={ref} className="nsw-tabs__list" role="tablist" onKeyDown={onKey} {...rest}>
+        {children}
+      </ul>
+    </div>
   )
 }
 
-function TabsTrigger({
-  className,
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+export function TabsTrigger({ value, children, className, id, ...rest }: { value: string; children: ReactNode; className?: string; id?: string; 'aria-controls'?: string }) {
+  const c = useContext(Ctx)!
+  const active = c.value === value
   return (
-    <TabsPrimitive.Trigger
-      data-slot="tabs-trigger"
-      className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-sm border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap text-foreground/80 transition-all group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 group-data-[variant=default]/tabs-list:data-[state=active]:shadow-sm group-data-[variant=line]/tabs-list:data-[state=active]:shadow-none dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:border-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
-        "data-[state=active]:bg-background data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 dark:data-[state=active]:text-foreground",
-        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",
-        className
-      )}
-      {...props}
-    />
+    <li role="presentation">
+      <a
+        href={`#${panelId(c.base, value)}`}
+        role="tab"
+        id={id ?? tabId(c.base, value)}
+        aria-selected={active}
+        aria-controls={rest['aria-controls'] ?? panelId(c.base, value)}
+        tabIndex={active ? 0 : -1}
+        className={cn(active && 'active', className)}
+        onClick={(e) => {
+          e.preventDefault()
+          c.set(value)
+        }}
+      >
+        {children}
+      </a>
+    </li>
   )
 }
 
-function TabsContent({
-  className,
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+export function TabsContent({ value, children, className }: { value: string; children: ReactNode; className?: string }) {
+  const c = useContext(Ctx)!
+  if (c.value !== value) return null
   return (
-    <TabsPrimitive.Content
-      data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
-      {...props}
-    />
+    <div id={panelId(c.base, value)} role="tabpanel" aria-labelledby={tabId(c.base, value)} tabIndex={0} className={cn('nsw-tabs__content nsw-tabs__content--flush', className)}>
+      {children}
+    </div>
   )
 }
-
-export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }

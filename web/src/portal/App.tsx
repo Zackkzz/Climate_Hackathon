@@ -42,7 +42,7 @@ export default function PortalApp() {
     <BrowserRouter>
       <TooltipProvider delayDuration={200}>
         <Titles />
-        <Suspense fallback={<div className="p-6"><LoadingRows label="Loading the page" /></div>}>
+        <Suspense fallback={<div className="mw-p-6"><LoadingRows label="Loading the page" /></div>}>
           <Routes>
             <Route element={<PublicLayout />}>
               <Route index element={<Front />} />
@@ -76,11 +76,11 @@ function NotFound() {
     document.title = 'Page not found | Meterwise'
   }, [])
   return (
-    <div className="max-w-2xl">
-      <p className="text-sm font-semibold uppercase tracking-wide text-teal">Error 404</p>
-      <h1 className="mt-1">Page not found</h1>
-      <p className="mt-2 text-lg">There is no page at this address. Check the address, or use one of these links.</p>
-      <ul className="mt-4 list-disc space-y-1 pl-5">
+    <div className="mw-max-w-2xl">
+      <p className="nsw-small nsw-text-semibold mw-uppercase mw-tracking-wide mw-text-teal">Error 404</p>
+      <h1 className="mw-mt-1">Page not found</h1>
+      <p className="mw-mt-2 mw-text-lg">There is no page at this address. Check the address, or use one of these links.</p>
+      <ul className="mw-mt-4 mw-list-disc mw-space-y-1 mw-pl-5">
         <li><Link to="/">Go to the front page</Link></li>
         {user ? <li><Link to={homeFor(user.role)}>Go to your portal</Link></li> : <li><Link to="/signin">Sign in</Link></li>}
         <li><Link to="/finder">Open the block finder</Link></li>
@@ -95,11 +95,11 @@ function NoAccess() {
     document.title = 'No access | Meterwise'
   }, [])
   return (
-    <div className="max-w-2xl">
-      <p className="text-sm font-semibold uppercase tracking-wide text-teal">Error 403</p>
-      <h1 className="mt-1">You do not have access to this page</h1>
-      <p className="mt-2 text-lg">Your account does not have permission to open this portal.</p>
-      <ul className="mt-4 list-disc space-y-1 pl-5">
+    <div className="mw-max-w-2xl">
+      <p className="nsw-small nsw-text-semibold mw-uppercase mw-tracking-wide mw-text-teal">Error 403</p>
+      <h1 className="mw-mt-1">You do not have access to this page</h1>
+      <p className="mw-mt-2 mw-text-lg">Your account does not have permission to open this portal.</p>
+      <ul className="mw-mt-4 mw-list-disc mw-space-y-1 mw-pl-5">
         {user && <li><Link to={homeFor(user.role)}>Go to your portal</Link></li>}
         <li><Link to="/signin">Sign in with a different account</Link></li>
         <li><Link to="/">Go to the front page</Link></li>

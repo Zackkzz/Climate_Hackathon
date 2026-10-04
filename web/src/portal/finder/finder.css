@@ -1,55 +1,55 @@
-/* Finder-specific styles on the portal tokens: offer sheets, print rules, map bits. */
+/* Finder-specific styles on the NSW Design System tokens: offer sheets, print rules, map bits. */
 @import "maplibre-gl/dist/maplibre-gl.css";
 
-.sheet { background: #fff; border: 1px solid var(--border); padding: 28px 32px; max-width: 820px; margin: 0 auto; line-height: 1.45; }
-.sheet-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 14px; }
+.sheet { background: #fff; border: 1px solid var(--mw-line); padding: 28px 32px; max-width: 820px; margin: 0 auto; line-height: 1.45; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--nsw-brand-dark); padding-bottom: 8px; margin-bottom: 14px; }
 .sheet-brand { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; }
-.sheet-date { color: var(--muted-foreground); font-size: 0.875rem; }
+.sheet-date { color: var(--mw-muted); font-size: 0.875rem; }
 .sheet-title { font-size: 1.5rem; line-height: 1.2; font-weight: 600; margin: 0 0 4px; }
-.sheet-sub { color: var(--muted-foreground); margin: 0 0 14px; }
-.sheet h3 { font-size: 1.05rem; font-weight: 600; margin: 16px 0 4px; color: var(--accent-foreground); }
+.sheet-sub { color: var(--mw-muted); margin: 0 0 14px; }
+.sheet h3 { font-size: 1.05rem; font-weight: 600; margin: 16px 0 4px; color: var(--nsw-brand-dark); }
 .sheet p { margin: 0 0 6px; }
-.sheet-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.sheet-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--mw-line); border: 1px solid var(--mw-line); }
 .sheet-stats.four { grid-template-columns: repeat(4, 1fr); }
-.sheet-stats > div { background: var(--muted); padding: 10px 12px; }
+.sheet-stats > div { background: var(--nsw-off-white); padding: 10px 12px; }
 .s-num { font-size: 1.5rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.s-num.good { color: var(--success); }
-.s-num.warn { color: var(--warning); }
-.s-lab { font-size: 0.875rem; color: var(--muted-foreground); line-height: 1.25; }
+.s-num.good { color: var(--nsw-palette-green-01); }
+.s-num.warn { color: var(--nsw-palette-orange-01); }
+.s-lab { font-size: 0.875rem; color: var(--mw-muted); line-height: 1.25; }
 .sheet-list { margin: 4px 0; padding-left: 20px; list-style: disc; }
 .sheet-list li { margin-bottom: 3px; }
 .sheet-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 6px 0; }
-.sheet-table th, .sheet-table td { padding: 5px 6px; border-bottom: 1px solid var(--border); text-align: left; }
-.sheet-table thead th { color: var(--muted-foreground); font-size: 0.8rem; }
+.sheet-table th, .sheet-table td { padding: 5px 6px; border-bottom: 1px solid var(--mw-line); text-align: left; }
+.sheet-table thead th { color: var(--mw-muted); font-size: 0.8rem; }
 .sheet-table .r { text-align: right; font-variant-numeric: tabular-nums; }
-.sheet-table tfoot th, .sheet-table tfoot td { border-top: 2px solid var(--foreground); font-weight: 700; border-bottom: 0; }
-.sheet-foot { border-top: 1px solid var(--border); margin-top: 16px; padding-top: 8px; font-size: 0.8rem; color: var(--muted-foreground); }
-.sheet-callout { margin: 12px 0 4px; padding: 8px 12px; border-left: 4px solid var(--warning); background: var(--warning-bg); color: var(--warning); font-size: 0.95rem; }
-.chart-note { font-size: 0.8rem; color: var(--muted-foreground); margin: 0; }
+.sheet-table tfoot th, .sheet-table tfoot td { border-top: 2px solid var(--nsw-text-dark); font-weight: 700; border-bottom: 0; }
+.sheet-foot { border-top: 1px solid var(--mw-line); margin-top: 16px; padding-top: 8px; font-size: 0.8rem; color: var(--mw-muted); }
+.sheet-callout { margin: 12px 0 4px; padding: 8px 12px; border-left: 4px solid var(--nsw-status-warning); background: var(--nsw-status-warning-bg); color: var(--nsw-text-dark); font-size: 0.95rem; }
+.chart-note { font-size: 0.8rem; color: var(--mw-muted); margin: 0; }
 
 /* bars drawn with patterns as well as colour */
 .bars { display: grid; gap: 6px; margin: 8px 0; }
 .bar-row { display: grid; grid-template-columns: 5.5rem 1fr; gap: 8px; align-items: center; }
-.bar-track { display: flex; height: 32px; background: var(--muted); }
+.bar-track { display: flex; height: 32px; background: var(--nsw-off-white); }
 .bar-seg { display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; overflow: hidden; white-space: nowrap; }
-.bar-seg.old { background: var(--n-300); color: var(--foreground); }
-.bar-seg.energy { background: var(--primary); color: #fff; }
-.bar-seg.charge { background: repeating-linear-gradient(45deg, #fff 0 4px, var(--navy-100) 4px 8px); color: var(--foreground); border: 1px solid var(--primary); }
-.bar-seg.keep { background: var(--success-bg); color: var(--success); border: 1px dashed var(--success); }
+.bar-seg.old { background: #cfd4d9; color: var(--nsw-text-dark); }
+.bar-seg.energy { background: var(--nsw-brand-dark); color: #fff; }
+.bar-seg.charge { background: repeating-linear-gradient(45deg, #fff 0 4px, #d9e4ee 4px 8px); color: var(--nsw-text-dark); border: 1px solid var(--nsw-brand-dark); }
+.bar-seg.keep { background: var(--nsw-status-success-bg); color: var(--nsw-palette-green-01); border: 1px dashed var(--nsw-status-success); }
 .bar-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.85rem; list-style: none; padding: 0; margin: 0; }
 .sw { display: inline-block; width: 14px; height: 10px; margin-right: 4px; vertical-align: middle; }
-.sw.old { background: var(--n-300); }
-.sw.energy { background: var(--primary); }
-.sw.charge { background: repeating-linear-gradient(45deg, #fff 0 3px, var(--navy-100) 3px 6px); border: 1px solid var(--primary); }
-.sw.keep { background: var(--success-bg); border: 1px dashed var(--success); }
+.sw.old { background: #cfd4d9; }
+.sw.energy { background: var(--nsw-brand-dark); }
+.sw.charge { background: repeating-linear-gradient(45deg, #fff 0 3px, #d9e4ee 3px 6px); border: 1px solid var(--nsw-brand-dark); }
+.sw.keep { background: var(--nsw-status-success-bg); border: 1px dashed var(--nsw-status-success); }
 
 /* the map */
 .map-wrap { position: relative; width: 100%; height: 100%; min-height: 320px; }
 .map-canvas { position: absolute; inset: 0; }
-.map-attrib { position: absolute; right: 0; bottom: 0; background: rgba(255,255,255,0.9); padding: 2px 8px; font-size: 12px; color: var(--foreground); }
-.map-attrib a { color: var(--link); }
-.map-banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 6px 12px; font-weight: 600; }
-.hover-pop .maplibregl-popup-content { padding: 4px 8px; border-radius: 2px; font-size: 0.85rem; font-weight: 600; font-family: var(--font-sans); }
+.map-attrib { position: absolute; right: 0; bottom: 0; background: rgba(255,255,255,0.9); padding: 2px 8px; font-size: 12px; color: #1b1f23; }
+.map-attrib a { color: #0b4f7c; }
+.map-banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--nsw-brand-dark); color: #fff; padding: 6px 12px; font-weight: 600; }
+.hover-pop .maplibregl-popup-content { padding: 4px 8px; border-radius: 2px; font-size: 0.85rem; font-weight: 600; font-family: var(--nsw-font-family); }
 .map-pin svg { display: block; }
 
 @media print {
@@ -69,3 +69,9 @@
   .sheet-table { font-size: 0.8rem; } .sheet-table th, .sheet-table td { padding: 4px 3px; overflow-wrap: anywhere; }
   .bar-row { grid-template-columns: 3.5rem 1fr; }
 }
+
+/* the "How it works" dialog content */
+.how h3 { font-size: 1rem; font-weight: 700; margin: 0 0 0.25rem; }
+.how ul { list-style: disc; padding-left: 1.25rem; }
+.how ol { list-style: decimal; padding-left: 1.25rem; }
+.how li { margin-bottom: 0.25rem; }

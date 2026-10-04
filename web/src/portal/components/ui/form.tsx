@@ -1,165 +1,82 @@
-import * as React from "react"
-import { cn } from "@/portal/lib/utils"
-import type { Label as LabelPrimitive } from "radix-ui"
-import { Slot } from "radix-ui"
-import {
-  Controller,
-  FormProvider,
-  useFormContext,
-  useFormState,
-  type ControllerProps,
-  type FieldPath,
-  type FieldValues,
-} from "react-hook-form"
-
-import { Label } from "@/portal/components/ui/label"
+// Form field wiring on the NSW Design System form classes (.nsw-form__group, __label, __helper, __helper--error).
+// react-hook-form stays as the form engine; these components give each field its label, helper text and error message
+// and connect them with ids and aria-describedby.
+import { Children, cloneElement, createContext, isValidElement, useContext, useId } from 'react'
+import type { ComponentProps, ReactElement, ReactNode } from 'react'
+import { Controller, FormProvider, useFormContext, useFormState } from 'react-hook-form'
+import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form'
+import { cn } from '@/portal/lib/utils'
 
 const Form = FormProvider
 
-type FormFieldContextValue<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
-  name: TName
-}
+const FieldCtx = createContext<{ name: string } | null>(null)
+const ItemCtx = createContext<{ id: string } | null>(null)
 
-const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue
-)
-
-const FormField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-  ...props
-}: ControllerProps<TFieldValues, TName>) => {
+function FormField<TFieldValues extends FieldValues = FieldValues, TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>>(props: ControllerProps<TFieldValues, TName>) {
   return (
-    <FormFieldContext.Provider value={{ name: props.name }}>
+    <FieldCtx.Provider value={{ name: props.name }}>
       <Controller {...props} />
-    </FormFieldContext.Provider>
+    </FieldCtx.Provider>
   )
 }
 
-const useFormField = () => {
-  const fieldContext = React.useContext(FormFieldContext)
-  const itemContext = React.useContext(FormItemContext)
+function useFormField() {
+  const field = useContext(FieldCtx)
+  const item = useContext(ItemCtx)
   const { getFieldState } = useFormContext()
-  const formState = useFormState({ name: fieldContext.name })
-  const fieldState = getFieldState(fieldContext.name, formState)
-
-  if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>")
-  }
-
-  const { id } = itemContext
-
-  return {
-    id,
-    name: fieldContext.name,
-    formItemId: `${id}-form-item`,
-    formDescriptionId: `${id}-form-item-description`,
-    formMessageId: `${id}-form-item-message`,
-    ...fieldState,
-  }
+  const formState = useFormState({ name: field?.name })
+  const state = field ? getFieldState(field.name, formState) : { error: undefined }
+  const id = item?.id ?? 'x'
+  return { id, error: state.error, formItemId: `${id}-item`, formDescriptionId: `${id}-desc`, formMessageId: `${id}-msg` }
 }
 
-type FormItemContextValue = {
-  id: string
-}
-
-const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue
-)
-
-function FormItem({ className, ...props }: React.ComponentProps<"div">) {
-  const id = React.useId()
-
+function FormItem({ className, ...props }: ComponentProps<'div'>) {
+  const id = useId()
   return (
-    <FormItemContext.Provider value={{ id }}>
-      <div
-        data-slot="form-item"
-        className={cn("grid gap-2", className)}
-        {...props}
-      />
-    </FormItemContext.Provider>
+    <ItemCtx.Provider value={{ id }}>
+      <div className={cn('nsw-form__group', className)} {...props} />
+    </ItemCtx.Provider>
   )
 }
 
-function FormLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
-  const { error, formItemId } = useFormField()
-
+function FormLabel({ className, children, ...props }: ComponentProps<'label'>) {
+  const { formItemId } = useFormField()
   return (
-    <Label
-      data-slot="form-label"
-      data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
-      htmlFor={formItemId}
-      {...props}
-    />
+    <label className={cn('nsw-form__label', className)} htmlFor={formItemId} {...props}>
+      {children}
+    </label>
   )
 }
 
-function FormControl({ ...props }: React.ComponentProps<typeof Slot.Root>) {
+/** Gives its single child the field id and the aria attributes that point at the helper and error text. */
+function FormControl({ children }: { children: ReactNode }) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
-
-  return (
-    <Slot.Root
-      data-slot="form-control"
-      id={formItemId}
-      aria-describedby={
-        !error
-          ? `${formDescriptionId}`
-          : `${formDescriptionId} ${formMessageId}`
-      }
-      aria-invalid={!!error}
-      {...props}
-    />
-  )
+  const only = Children.only(children)
+  if (!isValidElement(only)) return <>{children}</>
+  return cloneElement(only as ReactElement<Record<string, unknown>>, {
+    id: (only.props as { id?: string }).id ?? formItemId,
+    'aria-describedby': error ? `${formDescriptionId} ${formMessageId}` : formDescriptionId,
+    'aria-invalid': !!error,
+  })
 }
 
-function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
+function FormDescription({ className, ...props }: ComponentProps<'span'>) {
   const { formDescriptionId } = useFormField()
-
-  return (
-    <p
-      data-slot="form-description"
-      id={formDescriptionId}
-      className={cn("text-sm text-muted-foreground", className)}
-      {...props}
-    />
-  )
+  return <span id={formDescriptionId} className={cn('nsw-form__helper', className)} {...props} />
 }
 
-function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
+function FormMessage({ className, children }: ComponentProps<'span'>) {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message ?? "") : props.children
-
-  if (!body) {
-    return null
-  }
-
+  const body = error ? String(error.message ?? '') : children
+  if (!body) return null
   return (
-    <p
-      data-slot="form-message"
-      id={formMessageId}
-      className={cn("text-sm text-destructive", className)}
-      {...props}
-    >
+    <span id={formMessageId} role={error ? 'alert' : undefined} className={cn('nsw-form__helper nsw-form__helper--error', className)}>
+      <span className="material-icons nsw-material-icons mw-icon" aria-hidden="true">
+        cancel
+      </span>
       {body}
-    </p>
+    </span>
   )
 }
 
-export {
-  useFormField,
-  Form,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-  FormField,
-}
+export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, useFormField }

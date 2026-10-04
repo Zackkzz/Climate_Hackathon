@@ -41,20 +41,18 @@ export const TABS: { key: string; label: string; roles: Role[]; C: (p: TabProps)
 /** The tab strip as links, so each tab has its own address. `base` is the project's address, for example /government/projects/7. */
 export function TabNav({ base, current, role }: { base: string; current: string; role: Role }) {
   return (
-    <nav aria-label="Project sections" className="mb-4 overflow-x-auto border-b">
-      <ul className="flex min-w-max gap-1">
-        {TABS.filter((t) => t.roles.includes(role)).map((t) => (
-          <li key={t.key}>
-            <Link
-              to={t.key === 'summary' ? base : `${base}/${t.key}`}
-              aria-current={current === t.key ? 'page' : undefined}
-              className={cn('inline-flex min-h-9 items-center border-b-2 px-3 py-1.5 no-underline', current === t.key ? 'border-primary font-semibold text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground')}
-            >
-              {t.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <nav aria-label="Project sections" className="nsw-tabs mw-mb-4">
+      <div className="nsw-tabs__list-wrapper mw-tabs-wrapper">
+        <ul className="nsw-tabs__list">
+          {TABS.filter((t) => t.roles.includes(role)).map((t) => (
+            <li key={t.key}>
+              <Link to={t.key === 'summary' ? base : `${base}/${t.key}`} aria-current={current === t.key ? 'page' : undefined} className={cn(current === t.key && 'active')}>
+                {t.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   )
 }
@@ -84,7 +82,7 @@ export default function ProjectPage() {
   const p = res.data
   return (
     <>
-      <PageHeader crumbs={crumbs} title={<span className="inline-flex flex-wrap items-center gap-2">{p.label} <StageBadge stage={p.stage} /></span>} description={`${p.flats} flats. ${p.owner_org?.name ?? ''}`} />
+      <PageHeader crumbs={crumbs} title={<span className="nsw-display-inline-flex nsw-flex-wrap nsw-align-items-center mw-gap-2">{p.label} <StageBadge stage={p.stage} /></span>} description={`${p.flats} flats. ${p.owner_org?.name ?? ''}`} />
       <TabNav base={`/government/projects/${p.id}`} current={tab} role={role} />
       {res.error && <ErrorAlert error={res.error} onRetry={res.reload} title="We could not refresh this project" />}
       {t ? <t.C p={p} role={role} onChange={res.set} /> : <EmptyState title="That section is not available">Choose a section from the tabs above.</EmptyState>}

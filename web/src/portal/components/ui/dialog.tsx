@@ -1,158 +1,225 @@
-"use client"
+// NSW Design System dialog (.nsw-dialog, __wrapper, __container, __top, __title, __close, __content), implemented in React
+// rather than with the package's dialog script. It provides what the script does and what WCAG needs: it is rendered into
+// document.body, marks the page behind it inert, moves focus in, traps Tab and Shift+Tab, closes on Escape (not for
+// alert dialogs that need an answer), locks page scroll and returns focus to the element that opened it.
+//
+// Exports: Dialog family, AlertDialog family (role="alertdialog", closes only through its buttons) and the Sheet family
+// (a dialog fixed to the right edge, for ledgers and details).
+import { Children, cloneElement, createContext, isValidElement, useCallback, useContext, useEffect, useId, useRef, useState } from 'react'
+import type { ReactElement, ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { cn } from '@/portal/lib/utils'
+import { buttonClass } from './button'
+import type { ButtonVariant } from './button'
 
-import * as React from "react"
-import { cn } from "@/portal/lib/utils"
-import { XIcon } from "lucide-react"
-import { Dialog as DialogPrimitive } from "radix-ui"
-
-import { Button } from "@/portal/components/ui/button"
-
-function Dialog({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+interface Ctx {
+  open: boolean
+  setOpen: (o: boolean) => void
+  titleId: string
+  descId: string
+  alert: boolean
 }
+const DialogCtx = createContext<Ctx | null>(null)
+const useDlg = () => useContext(DialogCtx)!
 
-function DialogTrigger({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
-}
-
-function DialogPortal({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
-}
-
-function DialogClose({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Close>) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
-}
-
-function DialogOverlay({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
-  return (
-    <DialogPrimitive.Overlay
-      data-slot="dialog-overlay"
-      className={cn(
-        "fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
-        className
-      )}
-      {...props}
-    />
+function Root({ open, onOpenChange, alert, children }: { open?: boolean; onOpenChange?: (o: boolean) => void; alert: boolean; children: ReactNode }) {
+  const [inner, setInner] = useState(false)
+  const controlled = open !== undefined
+  const isOpen = controlled ? open : inner
+  const setOpen = useCallback(
+    (o: boolean) => {
+      if (!controlled) setInner(o)
+      onOpenChange?.(o)
+    },
+    [controlled, onOpenChange],
   )
+  const id = useId().replace(/:/g, '')
+  return <DialogCtx.Provider value={{ open: isOpen, setOpen, titleId: `${id}-t`, descId: `${id}-d`, alert }}>{children}</DialogCtx.Provider>
 }
 
-function DialogContent({
-  className,
-  children,
-  showCloseButton = true,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
-}) {
-  return (
-    <DialogPortal data-slot="dialog-portal">
-      <DialogOverlay />
-      <DialogPrimitive.Content
-        data-slot="dialog-content"
-        className={cn(
-          "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
-          className
-        )}
-        {...props}
+export function Dialog(p: { open?: boolean; onOpenChange?: (o: boolean) => void; children: ReactNode }) {
+  return <Root {...p} alert={false} />
+}
+export function AlertDialog(p: { open?: boolean; onOpenChange?: (o: boolean) => void; children: ReactNode }) {
+  return <Root {...p} alert />
+}
+
+/** The element that opens the dialog. Pass the button as the single child. */
+function Trigger({ children }: { asChild?: boolean; children: ReactNode }) {
+  const c = useDlg()
+  const only = Children.only(children) as ReactElement<{ onClick?: (e: unknown) => void }>
+  if (!isValidElement(only)) return <>{children}</>
+  return cloneElement(only, {
+    onClick: (e: unknown) => {
+      only.props.onClick?.(e)
+      c.setOpen(true)
+    },
+    'aria-haspopup': 'dialog',
+  } as object)
+}
+export const DialogTrigger = Trigger
+export const AlertDialogTrigger = Trigger
+
+const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
+
+function Overlay({ className, side, children }: { className?: string; side?: boolean; children: ReactNode }) {
+  const c = useDlg()
+  const box = useRef<HTMLDivElement>(null)
+  const closeRef = useRef(c.setOpen)
+  closeRef.current = c.setOpen
+
+  useEffect(() => {
+    if (!c.open) return
+    const opener = document.activeElement as HTMLElement | null
+    const root = document.getElementById('root')
+    root?.setAttribute('inert', '')
+    document.documentElement.classList.add('dialog-active')
+    // focus: the first field if there is one, else the dialog itself (so the title is read first)
+    const first = box.current?.querySelector<HTMLElement>('input:not([type=hidden]),select,textarea')
+    ;(first ?? box.current)?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !c.alert) {
+        e.stopPropagation()
+        closeRef.current(false)
+      } else if (e.key === 'Tab' && box.current) {
+        const els = Array.from(box.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((x) => x.offsetParent !== null || x === document.activeElement)
+        if (!els.length) {
+          e.preventDefault()
+          return
+        }
+        const a = els[0]
+        const z = els[els.length - 1]
+        if (e.shiftKey && (document.activeElement === a || document.activeElement === box.current)) {
+          e.preventDefault()
+          z.focus()
+        } else if (!e.shiftKey && document.activeElement === z) {
+          e.preventDefault()
+          a.focus()
+        }
+      }
+    }
+    document.addEventListener('keydown', onKey, true)
+    return () => {
+      document.removeEventListener('keydown', onKey, true)
+      root?.removeAttribute('inert')
+      document.documentElement.classList.remove('dialog-active')
+      if (opener && document.contains(opener)) opener.focus()
+    }
+  }, [c.open, c.alert])
+
+  if (!c.open) return null
+  return createPortal(
+    <div className={cn('nsw-dialog active mw-dialog', side && 'mw-dialog--side')} onMouseDown={(e) => e.target === e.currentTarget && !c.alert && c.setOpen(false)}>
+      <div
+        ref={box}
+        role={c.alert ? 'alertdialog' : 'dialog'}
+        aria-modal="true"
+        aria-labelledby={c.titleId}
+        aria-describedby={c.descId}
+        tabIndex={-1}
+        className={cn('nsw-dialog__wrapper', className)}
       >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="dialog-close"
-            className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-          >
-            <XIcon />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
-    </DialogPortal>
+        <div className="nsw-dialog__container">
+          <div className="nsw-dialog__content mw-dialog__body">{children}</div>
+        </div>
+      </div>
+    </div>,
+    document.body,
   )
 }
 
-function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="dialog-header"
-      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
-      {...props}
-    />
-  )
+export function DialogContent({ className, children }: { className?: string; children: ReactNode }) {
+  return <Overlay className={className}>{children}</Overlay>
 }
-
-function DialogFooter({
-  className,
-  showCloseButton = false,
-  children,
-  ...props
-}: React.ComponentProps<"div"> & {
-  showCloseButton?: boolean
-}) {
+export function AlertDialogContent({ className, children }: { className?: string; children: ReactNode }) {
+  return <Overlay className={className}>{children}</Overlay>
+}
+export function SheetContent({ className, children }: { className?: string; children: ReactNode }) {
   return (
-    <div
-      data-slot="dialog-footer"
-      className={cn(
-        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-        className
-      )}
-      {...props}
-    >
+    <Overlay side className={className}>
       {children}
-      {showCloseButton && (
-        <DialogPrimitive.Close asChild>
-          <Button variant="outline">Close</Button>
-        </DialogPrimitive.Close>
+    </Overlay>
+  )
+}
+
+export function DialogHeader({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn('mw-dialog__head', className)}>{children}</div>
+}
+export const AlertDialogHeader = DialogHeader
+export const SheetHeader = DialogHeader
+
+/** The dialog title, in the system's top bar with a close button (not shown for alert dialogs). */
+export function DialogTitle({ children }: { children: ReactNode }) {
+  const c = useDlg()
+  return (
+    <div className="nsw-dialog__top">
+      <h2 id={c.titleId} className="nsw-dialog__title nsw-h3">
+        {children}
+      </h2>
+      {!c.alert && (
+        <div className="nsw-dialog__close">
+          <button type="button" className="nsw-icon-button" aria-label="Close" onClick={() => c.setOpen(false)}>
+            <span className="material-icons nsw-material-icons" aria-hidden="true">
+              close
+            </span>
+          </button>
+        </div>
       )}
     </div>
   )
 }
+export const AlertDialogTitle = DialogTitle
+export const SheetTitle = DialogTitle
 
-function DialogTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+export function DialogDescription({ children }: { asChild?: boolean; children: ReactNode }) {
+  const c = useDlg()
   return (
-    <DialogPrimitive.Title
-      data-slot="dialog-title"
-      className={cn("text-lg leading-none font-semibold", className)}
-      {...props}
-    />
+    <div id={c.descId} className="mw-dialog__desc">
+      {children}
+    </div>
+  )
+}
+export const AlertDialogDescription = DialogDescription
+export const SheetDescription = DialogDescription
+
+export function DialogFooter({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn('mw-dialog__foot', className)}>{children}</div>
+}
+export const AlertDialogFooter = DialogFooter
+
+type BtnProps = { children: ReactNode; onClick?: () => void; className?: string; variant?: ButtonVariant; disabled?: boolean }
+/** Cancel button: closes the dialog. */
+export function AlertDialogCancel({ children, onClick, className }: BtnProps) {
+  const c = useDlg()
+  return (
+    <button
+      type="button"
+      className={buttonClass('outline', 'default', className)}
+      onClick={() => {
+        onClick?.()
+        c.setOpen(false)
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+/** Confirm button: runs its handler and closes the dialog. */
+export function AlertDialogAction({ children, onClick, className, disabled }: BtnProps) {
+  const c = useDlg()
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      className={buttonClass('default', 'default', className)}
+      onClick={() => {
+        onClick?.()
+        c.setOpen(false)
+      }}
+    >
+      {children}
+    </button>
   )
 }
 
-function DialogDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Description>) {
-  return (
-    <DialogPrimitive.Description
-      data-slot="dialog-description"
-      className={cn("text-sm text-muted-foreground", className)}
-      {...props}
-    />
-  )
-}
-
-export {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-}
+export { Dialog as Sheet }
