@@ -28,12 +28,12 @@ export default function Summary() {
             { n: s.open.readings_overdue_meters, to: '/utility/readings', label: 'Meters with readings overdue', none: 'Every active meter has a recent reading.' },
           ]
           return (
-            <div className="space-y-4">
+            <div className="mw-space-y-4">
               <Panel title="Work to do" description={s.org.name}>
-                <ul className="divide-y border">
+                <ul className="mw-divide-y mw-border">
                   {work.map((w) => (
-                    <li key={w.to} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
-                      <span className="flex items-center gap-3">
+                    <li key={w.to} className="nsw-display-flex nsw-flex-wrap nsw-align-items-center nsw-justify-content-between mw-gap-2 mw-px-3 mw-py-2">
+                      <span className="nsw-display-flex nsw-align-items-center mw-gap-3">
                         {w.n > 0 ? <StatusBadge tone="warn">{num(w.n)} to do</StatusBadge> : <StatusBadge tone="good">Up to date</StatusBadge>}
                         <span>{w.n > 0 ? w.label : w.none}</span>
                       </span>
@@ -44,7 +44,7 @@ export default function Summary() {
               </Panel>
 
               <div>
-                <h2 className="mb-2 text-base font-semibold">Billing for {monthName(s.billing.month)}</h2>
+                <h2 className="mw-mb-2 nsw-text-semibold">Billing for {monthName(s.billing.month)}</h2>
                 <Figures
                   label="Billing for the month"
                   items={[
@@ -54,13 +54,13 @@ export default function Summary() {
                     { label: 'Outstanding', value: money(s.billing.outstanding), tone: s.billing.outstanding > 0 ? 'warn' : undefined, note: 'Owed across all flats' },
                   ]}
                 />
-                <p className="text-sm">
+                <p className="nsw-small">
                   <Link to="/utility/charges">Charge file and remittance</Link>
                 </p>
               </div>
 
               <div>
-                <h2 className="mb-2 text-base font-semibold">Meters</h2>
+                <h2 className="mw-mb-2 nsw-text-semibold">Meters</h2>
                 <Figures
                   label="Meters"
                   items={[
@@ -69,7 +69,7 @@ export default function Summary() {
                     { label: 'Charges paused', value: num(s.meters.paused), tone: s.meters.paused > 0 ? 'warn' : undefined },
                   ]}
                 />
-                <p className="text-sm">
+                <p className="nsw-small">
                   <Link to="/utility/meters">See every meter</Link>
                 </p>
               </div>
@@ -83,7 +83,7 @@ export default function Summary() {
                     { label: 'Switchboard upgrades likely', value: num(s.network.switchboard_upgrades_likely) },
                   ]}
                 />
-                <p className="mt-2 text-sm">
+                <p className="mw-mt-2 nsw-small">
                   <Link to="/utility/network">Network impact in full</Link>
                 </p>
               </Panel>

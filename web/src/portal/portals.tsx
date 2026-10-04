@@ -1,7 +1,7 @@
 // The route and navigation tables for each portal. Each page is its own file and loads on demand.
 import { Suspense, lazy } from 'react'
 import { Route, Routes } from 'react-router'
-import { AlertTriangle, BarChart3, Building2, ClipboardCheck, Download, Flame, Gauge, Grid3x3, Inbox, Landmark, ListChecks, Map, PlugZap, Receipt, ScrollText, ShieldCheck, Signpost, Table2, Wallet, Wrench, Zap } from 'lucide-react'
+import { AlertTriangle, BarChart3, Building2, ClipboardCheck, Download, Flame, Gauge, Grid3x3, Inbox, Landmark, ListChecks, Map, PlugZap, Receipt, ScrollText, ShieldCheck, Signpost, Table2, Wallet, Wrench, Zap } from '@/portal/components/icons'
 import { useUser } from '@/console/auth'
 import { LoadingRows } from '@/portal/components/States'
 import { PortalShell } from '@/portal/components/Shell'

@@ -5,7 +5,9 @@ import { useAssess, useLoad, useShortlist } from '@/hooks'
 import { decodeDeal, encodeDeal, newDeal, parseHash } from '@/state'
 import type { Route, Sheet, Step } from '@/state'
 import type { Deal } from '@/types'
+import { DemoNotice } from '@/portal/components/DemoNotice'
 import { Footer } from '@/portal/components/Footer'
+import { SiteHeader, SkipLink } from '@/portal/components/Shell'
 import { ErrorAlert, LoadingRows } from '@/portal/components/States'
 import { ExampleBadge } from '@/portal/components/Status'
 import { Button } from '@/portal/components/ui/button'
@@ -111,22 +113,19 @@ export default function Finder() {
   const ready2 = !!m && !!buildings.data && ready
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
-        Skip to content
-      </a>
-      <header className="no-print sticky top-0 z-30 flex min-h-14 flex-wrap items-center gap-x-4 gap-y-1 border-b bg-card px-3 py-1 sm:px-4">
-        <Link to="/" className="text-lg font-bold text-foreground no-underline">
-          Meterwise
-        </Link>
-        <nav aria-label="Steps" className="order-last flex min-w-0 basis-full items-center sm:order-none sm:basis-auto sm:flex-1">
-          <ol className="flex flex-wrap items-center gap-1">
+    <div className="nsw-display-flex mw-min-h-svh nsw-flex-column">
+      <DemoNotice />
+      <SkipLink />
+      <SiteHeader />
+      <div className="no-print mw-finder-bar nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-x-4 mw-gap-y-1 mw-border-b nsw-fill-white mw-px-3 mw-py-1 mw-sm-px-4">
+        <nav aria-label="Steps" className="mw-order-last nsw-display-flex mw-min-w-0 mw-basis-full nsw-align-items-center mw-sm-order-none mw-sm-basis-auto mw-sm-flex-1">
+          <ol className="nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-1">
             {STEPS.map((s) => {
               const current = s.key === route.step
               const disabled = s.key !== 'find' && !hasDeal
               return (
                 <li key={s.key}>
-                  <Button variant={current ? 'secondary' : 'ghost'} size="sm" disabled={disabled} aria-current={current ? 'step' : undefined} title={disabled ? 'Pick a block first' : undefined} onClick={() => go(s.key)} className="whitespace-nowrap">
+                  <Button variant={current ? 'secondary' : 'ghost'} size="sm" disabled={disabled} aria-current={current ? 'step' : undefined} title={disabled ? 'Pick a block first' : undefined} onClick={() => go(s.key)} className="nsw-text-nowrap">
                     {s.n}. {s.label}
                   </Button>
                 </li>
@@ -134,18 +133,18 @@ export default function Finder() {
             })}
           </ol>
         </nav>
-        <div className="ml-auto flex flex-wrap items-center gap-x-3 text-sm">
+        <div className="mw-ml-auto nsw-display-flex nsw-flex-wrap nsw-align-items-center mw-gap-x-3 nsw-small">
           {USE_MOCK ? <ExampleBadge>Demo data</ExampleBadge> : m?.pilot.is_fixture ? <ExampleBadge>Example data</ExampleBadge> : null}
-          <Button variant="link" className="h-auto p-0" onClick={() => setHow(true)}>
+          <Button variant="link" className="mw-h-auto mw-p-0" onClick={() => setHow(true)}>
             How it works
           </Button>
           <Link to="/signin">Programme sign in</Link>
         </div>
-      </header>
+      </div>
 
-      <main id="main" tabIndex={-1} className="flex-1">
+      <main id="main" tabIndex={-1} className="mw-flex-1">
         {(meta.error || buildings.error) && (
-          <div className="mx-auto max-w-xl p-6">
+          <div className="mw-mx-auto mw-max-w-xl mw-p-6">
             <ErrorAlert
               error={meta.error ?? buildings.error}
               title="We could not load the map data"
@@ -157,7 +156,7 @@ export default function Finder() {
           </div>
         )}
         {!meta.error && !buildings.error && !ready2 && (
-          <div className="mx-auto max-w-xl p-6">
+          <div className="mw-mx-auto mw-max-w-xl mw-p-6">
             <LoadingRows rows={4} label="Loading Meterwise" />
           </div>
         )}
@@ -169,7 +168,7 @@ export default function Finder() {
           </>
         )}
       {route.step !== 'find' && (
-        <p className="no-print mx-auto max-w-4xl px-4 pt-4 text-sm text-muted-foreground">
+        <p className="no-print mw-mx-auto mw-max-w-4xl mw-px-4 mw-pt-4 nsw-small mw-text-muted">
           Meterwise is a screening tool, not engineering or financial advice. Every figure is a modelled estimate, not a quote. Heat is satellite surface temperature, not the air inside a flat.
         </p>
       )}

@@ -52,15 +52,15 @@ function Body({ d }: { d: Loaded }) {
 
   const cols = useMemo<ColumnDef<{ p: Project; run: MvRun | null }>[]>(
     () => [
-      { id: 'label', header: 'Block', accessorFn: (r) => r.p.label, cell: ({ row }) => <span className="font-medium">{row.original.p.label}</span> },
+      { id: 'label', header: 'Block', accessorFn: (r) => r.p.label, cell: ({ row }) => <span className="nsw-text-medium">{row.original.p.label}</span> },
       { id: 'stage', header: 'Stage', accessorFn: (r) => STAGE_LABEL[r.p.stage], cell: ({ row }) => <StageBadge stage={row.original.p.stage} /> },
       { id: 'flats', header: 'Flats', accessorFn: (r) => r.p.flats, meta: { numeric: true } },
       { id: 'capex', header: 'Net cost', accessorFn: (r) => r.p.summary.net_capex, cell: ({ getValue }) => money(getValue<number>()), meta: { numeric: true } },
       { id: 'gap', header: 'Funding gap', accessorFn: (r) => r.p.summary.funding_gap, cell: ({ getValue }) => money(getValue<number>()), meta: { numeric: true } },
       { id: 'charge', header: 'Charges a month', accessorFn: (r) => r.p.summary.charge_per_month_building, cell: ({ getValue }) => money(getValue<number>()), meta: { numeric: true } },
-      { id: 'mod', header: 'Modelled saving a month', accessorFn: (r) => r.run?.modelled_saving_per_month ?? null, cell: ({ getValue }) => (getValue<number | null>() === null ? <span className="text-muted-foreground">Not yet</span> : money(getValue<number>())), meta: { numeric: true } },
-      { id: 'ver', header: 'Measured saving a month', accessorFn: (r) => r.run?.verified_saving_per_month ?? null, cell: ({ getValue }) => (getValue<number | null>() === null ? <span className="text-muted-foreground">Not yet</span> : money(getValue<number>())), meta: { numeric: true } },
-      { id: 'rate', header: 'Share of modelled saving', accessorFn: (r) => (r.run ? Math.round(r.run.realisation_rate * 100) : null), cell: ({ getValue }) => (getValue<number | null>() === null ? <span className="text-muted-foreground">Not yet</span> : `${getValue<number>()}%`), meta: { numeric: true, csv: (r) => (r.run ? Math.round(r.run.realisation_rate * 100) : '') } },
+      { id: 'mod', header: 'Modelled saving a month', accessorFn: (r) => r.run?.modelled_saving_per_month ?? null, cell: ({ getValue }) => (getValue<number | null>() === null ? <span className="mw-text-muted">Not yet</span> : money(getValue<number>())), meta: { numeric: true } },
+      { id: 'ver', header: 'Measured saving a month', accessorFn: (r) => r.run?.verified_saving_per_month ?? null, cell: ({ getValue }) => (getValue<number | null>() === null ? <span className="mw-text-muted">Not yet</span> : money(getValue<number>())), meta: { numeric: true } },
+      { id: 'rate', header: 'Share of modelled saving', accessorFn: (r) => (r.run ? Math.round(r.run.realisation_rate * 100) : null), cell: ({ getValue }) => (getValue<number | null>() === null ? <span className="mw-text-muted">Not yet</span> : `${getValue<number>()}%`), meta: { numeric: true, csv: (r) => (r.run ? Math.round(r.run.realisation_rate * 100) : '') } },
       { id: 'neutral', header: 'Flats no worse off', accessorFn: (r) => (r.run ? `${r.run.bill_neutral_flats} of ${r.run.flats_verified}` : ''), meta: { numeric: true } },
       { id: 'tu', header: 'Charge changes', accessorFn: (r) => r.run?.true_ups.length ?? 0, meta: { numeric: true } },
     ],
@@ -83,11 +83,11 @@ function Body({ d }: { d: Loaded }) {
         ]}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="nsw-display-grid mw-gap-4 mw-lg-grid-cols-2">
         <ChartBox
           title="Projects by stage"
           chart={
-            <ChartContainer config={pipeCfg} className="h-56 w-full">
+            <ChartContainer config={pipeCfg} className="mw-h-56 nsw-width-100">
               <BarChart data={pipeline} layout="vertical" margin={{ left: 8, right: 24 }} accessibilityLayer>
                 <CartesianGrid horizontal={false} />
                 <YAxis dataKey="stage" type="category" width={90} tickLine={false} axisLine={false} />
@@ -110,9 +110,9 @@ function Body({ d }: { d: Loaded }) {
           }
           chart={
             monthly.length === 0 ? (
-              <p className="text-muted-foreground">No charges have been billed yet.</p>
+              <p className="mw-text-muted">No charges have been billed yet.</p>
             ) : (
-              <ChartContainer config={moneyCfg} className="h-56 w-full">
+              <ChartContainer config={moneyCfg} className="mw-h-56 nsw-width-100">
                 <LineChart data={monthly} margin={{ left: 4, right: 12 }} accessibilityLayer>
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="month" tickFormatter={(m: string) => monthLabel(m).slice(0, 3) + ' ' + m.slice(2, 4)} interval="preserveStartEnd" minTickGap={20} />
@@ -128,19 +128,19 @@ function Body({ d }: { d: Loaded }) {
         />
       </div>
 
-      <div className="mt-4">
+      <div className="mw-mt-4">
         <ChartBox
           title="Measured savings against the model"
           description="Latest savings check for each project, per flat per month."
           legend={
             <>
-              <span className="inline-flex items-center gap-1.5">
+              <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
                 <svg width="14" height="14" aria-hidden="true">
                   <rect width="14" height="14" fill="var(--chart-2)" />
                 </svg>
                 Modelled (grey, left bar)
               </span>
-              <span className="inline-flex items-center gap-1.5">
+              <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1_5">
                 <svg width="14" height="14" aria-hidden="true">
                   <rect width="14" height="14" fill="var(--chart-1)" />
                 </svg>
@@ -150,9 +150,9 @@ function Body({ d }: { d: Loaded }) {
           }
           chart={
             mvChart.length === 0 ? (
-              <p className="text-muted-foreground">No project has a savings check yet. A project needs about a year of readings first.</p>
+              <p className="mw-text-muted">No project has a savings check yet. A project needs about a year of readings first.</p>
             ) : (
-              <ChartContainer config={mvCfg} className="h-60 w-full">
+              <ChartContainer config={mvCfg} className="mw-h-60 nsw-width-100">
                 <BarChart data={mvChart} margin={{ left: 4, right: 12 }} accessibilityLayer>
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="name" interval={0} tick={{ fontSize: 11 }} />
@@ -168,7 +168,7 @@ function Body({ d }: { d: Loaded }) {
         />
       </div>
 
-      <div className="mt-4">
+      <div className="mw-mt-4">
         <Panel title="Projects" description="No tenant names are shown. Measured figures come from simulated meters." actions={<SimulatedBadge label="Simulated readings" />}>
           <DataTable columns={cols} data={rows} caption="Project figures" csvName="funder-projects" searchPlaceholder="Search projects" getRowId={(r) => String(r.p.id)} initialHidden={{ gap: false, charge: false, neutral: false }} emptyTitle="No projects" />
         </Panel>

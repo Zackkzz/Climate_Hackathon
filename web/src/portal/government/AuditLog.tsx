@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { ShieldCheck } from 'lucide-react'
+import { ShieldCheck } from '@/portal/components/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { govApi } from '@/console/api-gov'
@@ -20,7 +20,7 @@ function VerifyResult({ v }: { v: AuditVerify }) {
   const ok = v.valid ?? v.ok ?? bad == null
   const n = v.entries ?? v.checked
   return (
-    <Alert variant={ok ? 'default' : 'destructive'} role="status" className="mb-3">
+    <Alert variant={ok ? 'default' : 'destructive'} role="status" className="mw-mb-3">
       <ShieldCheck aria-hidden="true" />
       <AlertTitle>{ok ? 'The audit log chain is intact' : 'The audit log chain is broken'}</AlertTitle>
       <AlertDescription>
@@ -42,13 +42,13 @@ export default function AuditLog() {
 
   const cols = useMemo<ColumnDef<Row>[]>(
     () => [
-      { accessorKey: 'at', header: 'When', meta: { label: 'When' }, cell: (c) => <span className="whitespace-nowrap">{c.getValue<string>().replace('T', ' ').replace('Z', '')}</span> },
+      { accessorKey: 'at', header: 'When', meta: { label: 'When' }, cell: (c) => <span className="nsw-text-nowrap">{c.getValue<string>().replace('T', ' ').replace('Z', '')}</span> },
       { accessorKey: 'by', header: 'Who', meta: { label: 'Who' } },
       { accessorKey: 'role', header: 'Role', meta: { label: 'Role' } },
       { accessorKey: 'action', header: 'Action', meta: { label: 'Action' }, cell: (c) => c.getValue<string>().replace(/_/g, ' ') },
       { accessorKey: 'project_id', header: 'Project', meta: { label: 'Project', csv: (r) => r.project_id ?? '' }, cell: (c) => (c.getValue<number | null>() ? <Link to={`/government/projects/${c.getValue<number>()}`}>Project {c.getValue<number>()}</Link> : '-') },
       { accessorKey: 'detail', header: 'Detail', meta: { label: 'Detail' } },
-      { accessorKey: 'hash', header: 'Hash', meta: { label: 'Hash', csv: (r) => r.hash ?? '' }, cell: (c) => <code className="text-sm">{(c.getValue<string | undefined>() ?? '').slice(0, 10)}</code> },
+      { accessorKey: 'hash', header: 'Hash', meta: { label: 'Hash', csv: (r) => r.hash ?? '' }, cell: (c) => <code className="nsw-small">{(c.getValue<string | undefined>() ?? '').slice(0, 10)}</code> },
     ],
     [],
   )
@@ -74,7 +74,7 @@ export default function AuditLog() {
       <ErrorAlert error={verify.error} title="We could not verify the chain" />
       {result && <VerifyResult v={result} />}
       {res.data === null && res.error && /cannot use this|access/i.test(res.error) ? (
-        <p className="border bg-card p-4 text-muted-foreground">Your role can check that the log has not been changed, but cannot read individual entries. Use the button above.</p>
+        <p className="mw-border nsw-fill-white mw-p-4 mw-text-muted">Your role can check that the log has not been changed, but cannot read individual entries. Use the button above.</p>
       ) : (
       <Gate res={res} rows={8}>
         {(rows) => {
@@ -90,11 +90,11 @@ export default function AuditLog() {
               searchPlaceholder="Search the audit log"
               emptyTitle="No entries yet"
               filters={
-                <div className="flex items-center gap-2">
-                  <label htmlFor="al-role" className="text-sm text-muted-foreground">
+                <div className="nsw-display-flex nsw-align-items-center mw-gap-2">
+                  <label htmlFor="al-role" className="nsw-small mw-text-muted">
                     Role
                   </label>
-                  <select id="al-role" className="h-9 border border-input bg-background px-2 text-base" value={role} onChange={(e) => setRole(e.target.value)}>
+                  <select id="al-role" className="mw-h-9 mw-border mw-border-strong nsw-fill-white mw-px-2" value={role} onChange={(e) => setRole(e.target.value)}>
                     <option value="all">All roles</option>
                     {roles.map((r) => (
                       <option key={r} value={r}>

@@ -1,6 +1,6 @@
 // Renders the response of GET /api/government/controls without assuming its exact shape: objects become sections,
 // lists become lists, true and false become "On" and "Off". Used by the Trust and security page and the IT assurance page.
-import { Check, Minus } from 'lucide-react'
+import { Check, Minus } from '@/portal/components/icons'
 import type { ReactNode } from 'react'
 import { api } from '@/console/api'
 import { useRes } from '@/console/useRes'
@@ -12,22 +12,22 @@ const label = (k: string) => {
 }
 
 function Value({ v, depth }: { v: unknown; depth: number }): ReactNode {
-  if (v === null || v === undefined) return <span className="text-muted-foreground">Not set</span>
+  if (v === null || v === undefined) return <span className="mw-text-muted">Not set</span>
   if (typeof v === 'boolean')
     return v ? (
-      <span className="inline-flex items-center gap-1 font-medium text-success">
-        <Check className="size-4" aria-hidden="true" /> On
+      <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1 nsw-text-medium mw-text-success">
+        <Check /> On
       </span>
     ) : (
-      <span className="inline-flex items-center gap-1 font-medium text-warning">
-        <Minus className="size-4" aria-hidden="true" /> Off
+      <span className="nsw-display-inline-flex nsw-align-items-center mw-gap-1 nsw-text-medium mw-text-warning">
+        <Minus /> Off
       </span>
     )
   if (typeof v === 'string' || typeof v === 'number') return <span>{String(v)}</span>
   if (Array.isArray(v)) {
-    if (v.length === 0) return <span className="text-muted-foreground">None</span>
+    if (v.length === 0) return <span className="mw-text-muted">None</span>
     return (
-      <ul className="list-disc space-y-0.5 pl-5">
+      <ul className="mw-list">
         {v.map((x, i) => (
           <li key={i}>{typeof x === 'object' && x !== null ? <Obj o={x as Record<string, unknown>} depth={depth + 1} /> : <Value v={x} depth={depth + 1} />}</li>
         ))}
@@ -39,11 +39,11 @@ function Value({ v, depth }: { v: unknown; depth: number }): ReactNode {
 
 function Obj({ o, depth }: { o: Record<string, unknown>; depth: number }) {
   return (
-    <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[minmax(10rem,16rem)_1fr]">
+    <dl className="mw-facts mw-facts--wide">
       {Object.entries(o).map(([k, v]) => (
-        <div key={k} className="contents">
-          <dt className="text-muted-foreground">{label(k)}</dt>
-          <dd className="min-w-0 pb-1 sm:pb-0">
+        <div key={k} className="mw-contents">
+          <dt className="mw-text-muted">{label(k)}</dt>
+          <dd>
             <Value v={v} depth={depth} />
           </dd>
         </div>
@@ -53,16 +53,16 @@ function Obj({ o, depth }: { o: Record<string, unknown>; depth: number }) {
 }
 
 export function ControlsView({ data }: { data: unknown }) {
-  if (!data || typeof data !== 'object') return <p className="text-muted-foreground">No controls were reported.</p>
+  if (!data || typeof data !== 'object') return <p className="mw-text-muted">No controls were reported.</p>
   const entries = Object.entries(data as Record<string, unknown>)
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       {entries.map(([k, v]) => (
-        <section key={k} className="border bg-card" aria-labelledby={`ctl-${k}`}>
-          <h3 id={`ctl-${k}`} className="border-b px-4 py-2 text-base font-semibold">
+        <section key={k} className="mw-panel" aria-labelledby={`ctl-${k}`}>
+          <h3 id={`ctl-${k}`} className="mw-panel__head nsw-h5">
             {label(k)}
           </h3>
-          <div className="p-4">
+          <div className="mw-panel__body">
             <Value v={v} depth={0} />
           </div>
         </section>

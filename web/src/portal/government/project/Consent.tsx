@@ -68,24 +68,24 @@ export default function Consent(props: TabProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4 lg:grid-cols-2">
+    <div className="mw-space-y-4">
+      <div className="nsw-display-grid mw-gap-4 mw-lg-grid-cols-2">
         <Panel title={strata ? 'Owners corporation signature' : 'Owner signature'}>
           {c.owner_signed ? (
             <p>
-              <StatusBadge tone="good">Signed</StatusBadge> <span className="ml-1">The owner has signed the agreement.</span>
+              <StatusBadge tone="good">Signed</StatusBadge> <span className="mw-ml-1">The owner has signed the agreement.</span>
             </p>
           ) : !editable ? (
-            <p className="text-muted-foreground">The owner has not signed yet.</p>
+            <p className="mw-text-muted">The owner has not signed yet.</p>
           ) : (
             <Form {...form}>
-              <form className="space-y-3" noValidate onSubmit={(e) => e.preventDefault()} aria-label="Owner signature">
+              <form className="mw-space-y-3" noValidate onSubmit={(e) => e.preventDefault()} aria-label="Owner signature">
                 <TextField control={form.control} name="name" label="Full name of the person signing" autoComplete="name" />
                 {strata && (
-                  <fieldset className="space-y-3 border p-3">
-                    <legend className="px-1 text-sm font-medium">Strata meeting resolution (ordinary)</legend>
+                  <fieldset className="mw-space-y-3 mw-border mw-p-3">
+                    <legend className="mw-px-1 nsw-small nsw-text-medium">Strata meeting resolution (ordinary)</legend>
                     <DateField control={form.control} name="meeting_date" label="Meeting date" />
-                    <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="nsw-display-grid mw-gap-3 mw-sm-grid-cols-2">
                       <NumberField control={form.control} name="votes_for" label="Votes for" min={0} />
                       <NumberField control={form.control} name="votes_against" label="Votes against" min={0} />
                     </div>
@@ -103,11 +103,11 @@ export default function Consent(props: TabProps) {
         </Panel>
 
         <Panel title="Tenant agreement" description={`${Math.round(c.threshold * 100)}% of flats must agree before the project can go to quotes.`}>
-          <p className="text-lg font-semibold tabular-nums" role="status">
+          <p className="mw-text-lg nsw-text-semibold mw-tabular" role="status">
             {c.tenants_agreed} of {c.tenants_total} flats agreed ({Math.round(ratio * 100)}%)
           </p>
-          <Progress value={Math.min(100, ratio * 100)} className="my-2 h-3" aria-label={`${Math.round(ratio * 100)} percent of flats have agreed`} />
-          <p className="text-muted-foreground">
+          <Progress value={Math.min(100, ratio * 100)} className="mw-my-2 mw-h-3" aria-label={`${Math.round(ratio * 100)} percent of flats have agreed`} />
+          <p className="mw-text-muted">
             Needed: {needed} flats ({Math.round(c.threshold * 100)}%). {c.tenants_agreed >= needed ? 'The threshold is met.' : `${needed - c.tenants_agreed} more needed.`} {c.tenants_declined} declined.
           </p>
         </Panel>
@@ -142,7 +142,7 @@ export default function Consent(props: TabProps) {
                     cell: ({ row }: { row: { original: Flat } }) => {
                       const f = row.original
                       return (
-                        <div className="flex gap-1">
+                        <div className="nsw-display-flex mw-gap-1">
                           <Confirm title={`Record that flat ${f.unit} agrees?`} description="Only do this with the tenant's agreement. They can also agree themselves with their access code." confirmLabel="Record agreement" onConfirm={() => setConsent(f, 'agreed')}>
                             <Button size="sm" variant="outline" disabled={flatAct.busy || f.consent === 'agreed'} aria-label={`Record that flat ${f.unit} agrees`}>
                               Agree

@@ -21,7 +21,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form } from '@/portal/components/ui/form'
 import { useAction } from '@/portal/lib/actions'
 import { Confirm } from '@/portal/components/Confirm'
-import { toast } from 'sonner'
+import { toast } from '@/portal/components/ui/sonner'
 
 const TONE: Record<Grant['status'], Tone> = { requested: 'warn', approved: 'good', declined: 'bad', paid: 'info' }
 const WORD: Record<Grant['status'], string> = { requested: 'Waiting for a decision', approved: 'Approved', declined: 'Declined', paid: 'Paid' }
@@ -59,11 +59,11 @@ function Decide({ grant, left, onClose, onDone }: { grant: Grant; left: number; 
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
+          <form className="mw-space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
             <NumberField control={form.control} name="approved" label="Amount to approve ($)" min={1} step={100} description={amount > left ? 'This is more than is left in the pool, so it will be refused.' : undefined} />
             <TextAreaField control={form.control} name="note" label="Note (optional)" />
             <ErrorAlert error={act.error} title="We could not record the decision" />
-            <DialogFooter className="gap-2">
+            <DialogFooter className="mw-gap-2">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
@@ -99,7 +99,7 @@ function Request({ onClose, onDone }: { onClose: () => void; onDone: () => void 
         </DialogHeader>
         <Form {...form}>
           <form
-            className="space-y-3"
+            className="mw-space-y-3"
             noValidate
             onSubmit={form.handleSubmit(async (v) => {
               if (!pending) {
@@ -207,11 +207,11 @@ export default function Grants() {
                 emptyTitle="No grants yet"
                 emptyText="Grant requests appear here."
                 filters={
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="g-status" className="text-sm text-muted-foreground">
+                  <div className="nsw-display-flex nsw-align-items-center mw-gap-2">
+                    <label htmlFor="g-status" className="nsw-small mw-text-muted">
                       Status
                     </label>
-                    <select id="g-status" className="h-9 border border-input bg-background px-2 text-base" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <select id="g-status" className="mw-h-9 mw-border mw-border-strong nsw-fill-white mw-px-2" value={status} onChange={(e) => setStatus(e.target.value)}>
                       <option value="all">All</option>
                       <option value="requested">Waiting for a decision</option>
                       <option value="approved">Approved</option>

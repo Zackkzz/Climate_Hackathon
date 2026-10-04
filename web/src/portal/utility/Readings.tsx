@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { Download, Upload } from 'lucide-react'
+import { Download, Upload } from '@/portal/components/icons'
 import { useEffect, useMemo, useState } from 'react'
 import { utilityApi } from '@/console/api-utility'
 import type { ReadingsResult } from '@/console/types-utility'
@@ -15,7 +15,7 @@ import { CsvInput, parseWithColumns } from './shared'
 type Rej = ReadingsResult['rejected'][number]
 const columns: ColumnDef<Rej>[] = [
   { accessorKey: 'row', header: 'Row in file', meta: { numeric: true } },
-  { accessorKey: 'meter_id', header: 'Meter id', cell: (c) => <span className="font-mono text-sm">{c.getValue<string>() ?? ''}</span> },
+  { accessorKey: 'meter_id', header: 'Meter id', cell: (c) => <span className="mw-mono nsw-small">{c.getValue<string>() ?? ''}</span> },
   { accessorKey: 'reason', header: 'Why it was rejected' },
 ]
 
@@ -38,7 +38,7 @@ export default function Readings() {
         title="Meter readings"
         description="Send monthly meter data for the programme's meters. The measured savings checks use it instead of simulated readings."
       />
-      <div className="space-y-4">
+      <div className="mw-space-y-4">
         <Panel title="1. Get the template" description="A CSV with the meters whose readings are due.">
           <Button
             variant="outline"
@@ -50,14 +50,14 @@ export default function Readings() {
           >
             <Download aria-hidden="true" /> Download the template
           </Button>
-          <div className="mt-2">
+          <div className="mw-mt-2">
             <ErrorAlert error={tpl.error} />
           </div>
         </Panel>
 
         <Panel title="2. Upload readings" description="Columns: meter_id, month (like 2027-03), electricity_kwh, gas_mj. Up to 5,000 rows.">
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Rows are rejected for a meter that is not in your network area, or where the tenant has not given data consent, or has withdrawn it. Nothing is stored for a rejected row.</p>
+          <div className="mw-space-y-3">
+            <p className="nsw-small mw-text-muted">Rows are rejected for a meter that is not in your network area, or where the tenant has not given data consent, or has withdrawn it. Nothing is stored for a rejected row.</p>
             <CsvInput value={text} onChange={(t) => { setText(t); setResult(null) }} parsed={parsed} label="Readings" previewCols={['meter_id', 'month', 'electricity_kwh', 'gas_mj']} />
             <ErrorAlert error={up.error} title="We could not upload the readings" />
             <Button

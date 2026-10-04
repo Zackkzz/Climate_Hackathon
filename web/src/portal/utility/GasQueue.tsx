@@ -116,7 +116,7 @@ function EditDialog({ g, onClose, onSaved }: { g: GasDisconnection; onClose: () 
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form className="space-y-3" noValidate onSubmit={form.handleSubmit((v) => setPending(v))}>
+            <form className="mw-space-y-3" noValidate onSubmit={form.handleSubmit((v) => setPending(v))}>
               <SelectField
                 control={form.control}
                 name="status"
@@ -126,7 +126,7 @@ function EditDialog({ g, onClose, onSaved }: { g: GasDisconnection; onClose: () 
               <DateField control={form.control} name="scheduled_for" label="Scheduled for" description="Needed when the status is Scheduled." />
               <TextAreaField control={form.control} name="note" label="Note" />
               <ErrorAlert error={act.error} />
-              <div className="flex justify-end gap-2">
+              <div className="nsw-display-flex nsw-justify-content-end mw-gap-2">
                 <Button type="button" variant="outline" onClick={onClose}>
                   Cancel
                 </Button>

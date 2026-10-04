@@ -1,13 +1,18 @@
-import { ChevronsUpDown, LogOut, Search } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+// Page shells on the NSW Design System: notice strip, skip link, header, navigation, main, footer.
+//   PortalShell  signed-in portals: header with user menu, side navigation (grouped), page, footer.
+//   PublicLayout front page, sign-in, enquiry and legal pages: header with main navigation, page, footer.
+// Navigation is implemented in React (open and close state, focus return, Escape), not with the package's scripts.
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import { ROLE_LABEL, signOut, useUser } from '@/console/auth'
 import { Button } from '@/portal/components/ui/button'
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/portal/components/ui/command'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/portal/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/portal/components/ui/dropdown-menu'
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from '@/portal/components/ui/sidebar'
+import { Icon } from './icons'
+import type { IconType } from './icons'
+import { BrandLogo } from './BrandLogo'
+import { DemoNotice } from './DemoNotice'
 import { ExampleBadge } from './Status'
 import { Footer } from './Footer'
 import { SessionGuard } from './Session'
@@ -15,7 +20,7 @@ import { SessionGuard } from './Session'
 export interface NavItem {
   to: string
   label: string
-  icon: LucideIcon
+  icon: IconType
   end?: boolean
 }
 export interface NavGroup {
@@ -23,18 +28,94 @@ export interface NavGroup {
   items: NavItem[]
 }
 
-/** The shell for a signed-in portal: sidebar navigation, a top bar with search and the user menu, the page, the footer. */
-export function PortalShell({ portal, groups }: { portal: string; groups: NavGroup[] }) {
+export const SITE_NAME = 'Meterwise'
+export const SITE_DESCRIPTOR = 'Rental upgrade programme: concept demonstration'
+
+/** Skip link (.nsw-skip). Visible on focus. */
+export function SkipLink() {
+  return (
+    <div className="nsw-skip">
+      <a href="#main">Skip to content</a>
+    </div>
+  )
+}
+
+/** The site header (.nsw-header). `menu` is the mobile menu button, `end` is anything to show at the right (the user menu). */
+export function SiteHeader({ menu, end }: { menu?: ReactNode; end?: ReactNode }) {
+  return (
+    <header className="nsw-header nsw-header--simple">
+      <div className="nsw-header__container">
+        <div className="nsw-header__inner mw-header-inner">
+          {menu}
+          <div className="nsw-header__main">
+            <div className="nsw-header__logo">
+              <BrandLogo />
+            </div>
+            <div className="nsw-header__name mw-header-name">
+              <div className="nsw-header__title">
+                <Link to="/">{SITE_NAME}</Link>
+              </div>
+              <div className="nsw-header__description">{SITE_DESCRIPTOR}</div>
+            </div>
+          </div>
+          {end && <div className="mw-header-end">{end}</div>}
+        </div>
+      </div>
+    </header>
+  )
+}
+
+function UserMenu() {
   const user = useUser()
   const nav = useNavigate()
+  if (!user) return null
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="mw-user-button">
+          <span className="mw-truncate">{user.name}</span>
+          <Icon name="arrow_drop_down" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>
+          <div className="nsw-text-semibold">{user.name}</div>
+          <div className="nsw-small mw-text-muted">
+            {ROLE_LABEL[user.role]}
+            {user.org?.name ? `, ${user.org.name}` : ''}
+          </div>
+          <div className="mw-mt-1">
+            <ExampleBadge>Example account</ExampleBadge>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={async () => {
+            await signOut()
+            nav('/signin')
+          }}
+        >
+          <Icon name="logout" /> Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+/** The shell for a signed-in portal: header, side navigation, the page, the footer. */
+export function PortalShell({ portal, groups }: { portal: string; groups: NavGroup[] }) {
+  const nav = useNavigate()
   const loc = useLocation()
-  const [open, setOpen] = useState(false)
+  const [find, setFind] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [q, setQ] = useState('')
+  const menuBtn = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault()
-        setOpen((o) => !o)
+        setFind((o) => !o)
       }
     }
     document.addEventListener('keydown', onKey)
@@ -43,143 +124,155 @@ export function PortalShell({ portal, groups }: { portal: string; groups: NavGro
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
+    setMenuOpen(false)
   }, [loc.pathname])
 
   const all = groups.flatMap((g) => g.items)
-  const go = (to: string) => {
-    setOpen(false)
-    nav(to)
-  }
+  const hits = all.filter((it) => it.label.toLowerCase().includes(q.trim().toLowerCase()))
 
   return (
-    <SidebarProvider defaultOpen>
+    <>
+      <DemoNotice />
       <SessionGuard />
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
-        Skip to content
-      </a>
-      <Sidebar>
-        <SidebarHeader className="border-b px-3 py-3">
-          <Link to="/" className="text-lg font-bold text-foreground no-underline">
-            Meterwise
-          </Link>
-          <span className="text-sm text-muted-foreground">{portal}</span>
-        </SidebarHeader>
-        <SidebarContent>
+      <SkipLink />
+      <SiteHeader end={<UserMenu />} />
+      <div className="nsw-container mw-portal-bar no-print">
+        <p className="nsw-text-semibold mw-portal-name">{portal}</p>
+        <div className="mw-portal-actions">
+          <Button variant="outline" size="sm" onClick={() => setFind(true)}>
+            <Icon name="search" /> Find a page <kbd className="mw-kbd">Ctrl K</kbd>
+          </Button>
+          <Button ref={menuBtn} variant="outline" size="sm" className="mw-only-narrow" aria-expanded={menuOpen} aria-controls="portal-nav" onClick={() => setMenuOpen((o) => !o)}>
+            <Icon name={menuOpen ? 'close' : 'menu'} /> Menu
+          </Button>
+        </div>
+      </div>
+      <div className="nsw-container mw-portal-body">
+        <nav id="portal-nav" aria-label={`${portal} pages`} className={'mw-portal-nav no-print' + (menuOpen ? ' is-open' : '')}>
           {groups.map((g, i) => (
-            <SidebarGroup key={i}>
-              {g.label && <SidebarGroupLabel className="text-sm">{g.label}</SidebarGroupLabel>}
-              <SidebarMenu>
+            <div className="nsw-side-nav mw-side-nav" key={i}>
+              {g.label && <p className="mw-side-nav__label">{g.label}</p>}
+              <ul>
                 {g.items.map((it) => (
-                  <SidebarMenuItem key={it.to}>
-                    <NavLink to={it.to} end={it.end}>
+                  <li key={it.to}>
+                    <NavLink to={it.to} end={it.end} className={({ isActive }) => (isActive ? 'current' : undefined)}>
                       {({ isActive }) => (
-                        <SidebarMenuButton asChild isActive={isActive} className="h-9 text-base no-underline">
-                          <span aria-current={isActive ? 'page' : undefined}>
-                            <it.icon aria-hidden="true" />
-                            <span>{it.label}</span>
-                          </span>
-                        </SidebarMenuButton>
+                        <span className="mw-side-nav__link" aria-current={isActive ? 'page' : undefined}>
+                          <it.icon className="mw-side-nav__icon" />
+                          <span>{it.label}</span>
+                        </span>
                       )}
                     </NavLink>
-                  </SidebarMenuItem>
+                  </li>
                 ))}
-              </SidebarMenu>
-            </SidebarGroup>
-          ))}
-        </SidebarContent>
-      </Sidebar>
-      <SidebarInset className="min-w-0">
-        <div className="flex min-h-svh flex-col">
-          <div className="flex items-center gap-2 border-b bg-card px-3 py-2 no-print">
-            <SidebarTrigger aria-label="Show or hide the menu" />
-            <Button variant="outline" size="sm" className="min-w-0 flex-1 justify-start text-muted-foreground sm:w-64 sm:flex-none" onClick={() => setOpen(true)}>
-              <Search aria-hidden="true" /> Search pages <kbd className="ml-auto hidden text-xs sm:inline">Ctrl K</kbd>
-            </Button>
-            <div className="ml-auto flex items-center gap-2">
-              {user && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="max-w-[7rem] sm:max-w-[14rem]">
-                      <span className="truncate">{user.name}</span>
-                      <ChevronsUpDown aria-hidden="true" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-64">
-                    <DropdownMenuLabel>
-                      <div className="font-semibold">{user.name}</div>
-                      <div className="text-sm font-normal text-muted-foreground">
-                        {ROLE_LABEL[user.role]}
-                        {user.org?.name ? `, ${user.org.name}` : ''}
-                      </div>
-                      <div className="mt-1">
-                        <ExampleBadge>Example account</ExampleBadge>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onSelect={async () => {
-                        await signOut()
-                        nav('/signin')
-                      }}
-                    >
-                      <LogOut aria-hidden="true" /> Sign out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+              </ul>
             </div>
+          ))}
+        </nav>
+        <main id="main" tabIndex={-1} className="mw-portal-main">
+          <Outlet />
+        </main>
+      </div>
+      <Footer />
+      <Dialog open={find} onOpenChange={setFind}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Find a page</DialogTitle>
+            <DialogDescription>Type to filter the pages, then choose one.</DialogDescription>
+          </DialogHeader>
+          <div className="nsw-form__group">
+            <label className="nsw-form__label" htmlFor="find-q">
+              Page name
+            </label>
+            <input id="find-q" className="nsw-form__input" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" />
           </div>
-          <main id="main" tabIndex={-1} className="flex-1 px-3 py-4 sm:px-6">
-            <Outlet />
-          </main>
-          <Footer />
-        </div>
-      </SidebarInset>
-      {open && <CommandDialog open={open} onOpenChange={setOpen} title="Search pages" description="Type to find a page, then press Enter.">
-        <CommandInput placeholder="Search pages" />
-        <CommandList>
-          <CommandEmpty>No page matches.</CommandEmpty>
-          <CommandGroup heading={portal}>
-            {all.map((it) => (
-              <CommandItem key={it.to} value={it.label} onSelect={() => go(it.to)}>
-                <it.icon aria-hidden="true" /> {it.label}
-              </CommandItem>
+          <ul className="mw-find-list">
+            {hits.map((it) => (
+              <li key={it.to}>
+                <button
+                  type="button"
+                  className="mw-link-button"
+                  onClick={() => {
+                    setFind(false)
+                    setQ('')
+                    nav(it.to)
+                  }}
+                >
+                  {it.label}
+                </button>
+              </li>
             ))}
-          </CommandGroup>
-          <CommandGroup heading="Other">
-            <CommandItem value="Public block finder" onSelect={() => (window.location.href = '/finder')}>
-              Public block finder
-            </CommandItem>
-            <CommandItem value="Trust and security" onSelect={() => go('/trust')}>
-              Trust and security
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </CommandDialog>}
-    </SidebarProvider>
+            {hits.length === 0 && <li className="mw-text-muted">No page matches.</li>}
+            <li>
+              <a href="/finder">Public block finder</a>
+            </li>
+            <li>
+              <Link to="/trust" onClick={() => setFind(false)}>
+                Trust and security
+              </Link>
+            </li>
+          </ul>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
-/** A plain page: header with a link home, centred column, footer. Used for the front page, sign-in and legal pages. */
+/** A plain page: header with main navigation, centred column, footer. Used for the front page, sign-in and legal pages. */
 export function PublicLayout({ children }: { children?: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const loc = useLocation()
+  useEffect(() => setOpen(false), [loc.pathname])
+  useEffect(() => {
+    document.body.classList.toggle('main-nav-active', open)
+    return () => document.body.classList.remove('main-nav-active')
+  }, [open])
+  const close = () => setOpen(false)
   return (
-    <div className="flex min-h-svh flex-col">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
-        Skip to content
-      </a>
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-          <Link to="/" className="text-lg font-bold text-foreground no-underline">
-            Meterwise
-          </Link>
-          <nav aria-label="Main" className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-            <Link to="/signin">Sign in</Link>
-            <a href="/finder">Block finder</a>
-            <Link to="/enquiry">Landlord or strata enquiry</Link>
-          </nav>
+    <div className="mw-public">
+      <DemoNotice />
+      <SkipLink />
+      <SiteHeader
+        menu={
+          <div className="nsw-header__menu">
+            <button type="button" aria-expanded={open} aria-controls="main-nav" onClick={() => setOpen(true)}>
+              <Icon name="menu" />
+              <span>Menu</span>
+            </button>
+          </div>
+        }
+      />
+      <nav
+        id="main-nav"
+        className={'nsw-main-nav' + (open ? ' active' : '')}
+        aria-label="Main menu"
+        onKeyDown={(e) => e.key === 'Escape' && close()}
+        // when closed on narrow screens the panel is off screen and hidden from assistive technology by the system's CSS
+      >
+        <div className="nsw-main-nav__header">
+          <div className="nsw-main-nav__title">Menu</div>
+          <button type="button" className="nsw-icon-button" onClick={close}>
+            <Icon name="close" />
+            <span className="sr-only">Close menu</span>
+          </button>
         </div>
-      </header>
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
+        <ul className="nsw-main-nav__list">
+          <li>
+            <NavLink to="/signin" onClick={close}>
+              Sign in
+            </NavLink>
+          </li>
+          <li>
+            <a href="/finder">Block finder</a>
+          </li>
+          <li>
+            <NavLink to="/enquiry" onClick={close}>
+              Landlord or strata enquiry
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+      <main id="main" tabIndex={-1} className="nsw-container mw-public-main">
         {children ?? <Outlet />}
       </main>
       <Footer />

@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink } from '@/portal/components/icons'
 import { api } from '@/console/api'
 import type { Doc } from '@/console/types'
 import { useRes } from '@/console/useRes'
@@ -23,7 +23,7 @@ export function DocumentList({ projectId, flatLabels }: { projectId: number; fla
   return (
     <Gate res={res} rows={3}>
       {(docs) => (
-        <div className="space-y-2">
+        <div className="mw-space-y-2">
           <ErrorAlert error={act.error} title="We could not open the document" />
           <DataTable<Doc>
             caption="Documents"
@@ -34,7 +34,7 @@ export function DocumentList({ projectId, flatLabels }: { projectId: number; fla
             searchPlaceholder="Search documents"
             csvName={`project-${projectId}-documents`}
             columns={[
-              { accessorKey: 'title', header: 'Document', cell: ({ row }) => <span className="font-medium">{row.original.title}</span> },
+              { accessorKey: 'title', header: 'Document', cell: ({ row }) => <span className="nsw-text-medium">{row.original.title}</span> },
               { id: 'flat', header: 'Flat', accessorFn: (d) => (d.flat_id ? flatLabels?.[d.flat_id] ?? `Flat ${d.flat_id}` : 'Whole block'), meta: { label: 'Flat' } },
               { id: 'when', header: 'Made', accessorFn: (d) => dateLabelAu(d.generated_at), meta: { csv: (d) => d.generated_at } },
               {

@@ -15,7 +15,7 @@ export function Confirm({ title, description, confirmLabel = 'Confirm', onConfir
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => void onConfirm()} className={destructive ? 'bg-destructive text-white hover:bg-destructive/90' : ''}>
+          <AlertDialogAction onClick={() => void onConfirm()} className={destructive ? 'nsw-button--danger' : ''}>
             {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

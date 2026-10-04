@@ -36,7 +36,7 @@ export default function Charges() {
       <PageHeader crumbs={[{ label: 'Property', to: '/property' }, { label: 'Charges' }]} title="Charges" description="Every flat with a charge on the meter, across your blocks. Download the rent ledger to load into your own systems." />
       <Gate res={res}>
         {(d) => (
-          <div className="space-y-3">
+          <div className="mw-space-y-3">
             <ExportBar defaultMonth={d.month} />
             <DataTable columns={cols} data={d.rows} caption="Charges across my blocks" csvName="meterwise-charges" searchPlaceholder="Search flats or blocks" emptyTitle="No charges yet" emptyText="Charges start the month after a block is signed off as working." getRowId={(r) => String(r.id)} />
           </div>

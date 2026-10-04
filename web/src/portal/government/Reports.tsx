@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react'
+import { Download } from '@/portal/components/icons'
 import { useEffect, useState } from 'react'
 import { govApi } from '@/console/api-gov'
 import type { ReportKind } from '@/console/types-gov'
@@ -39,10 +39,10 @@ export default function Reports() {
     <>
       <PageHeader crumbs={[{ label: 'Government', to: '/government' }, { label: 'Reports' }]} title="Reports" description="Download a report as a CSV file that opens in a spreadsheet. Downloads are recorded in the audit log." />
       <ErrorAlert error={act.error} title="We could not download the report" />
-      <p role="status" className="mb-2 min-h-6 text-success">
+      <p role="status" className="mw-mb-2 mw-min-h-6 mw-text-success">
         {done}
       </p>
-      <div className="overflow-x-auto border bg-card" role="region" aria-label="Reports" tabIndex={0}>
+      <div className="nsw-overflow-x-auto mw-border nsw-fill-white" role="region" aria-label="Reports" tabIndex={0}>
         <Table>
           <TableHeader>
             <TableRow>
@@ -56,7 +56,7 @@ export default function Reports() {
           <TableBody>
             {REPORTS.map((r) => (
               <TableRow key={r.kind}>
-                <TableCell className="font-medium">{r.name}</TableCell>
+                <TableCell className="nsw-text-medium">{r.name}</TableCell>
                 <TableCell>{r.text}</TableCell>
                 <TableCell>
                   <Button size="sm" variant="outline" disabled={busy !== null} onClick={() => void get(r.kind)} aria-label={`Download the ${r.name.toLowerCase()} report as CSV`}>

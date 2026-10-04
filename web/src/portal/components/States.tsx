@@ -1,10 +1,9 @@
-import { AlertTriangle, Inbox } from 'lucide-react'
+import { Inbox } from '@/portal/components/icons'
 import type { ReactNode } from 'react'
 import { ProgError } from '@/console/api'
 import type { Res } from '@/console/useRes'
 import { Alert, AlertDescription, AlertTitle } from '@/portal/components/ui/alert'
 import { Button } from '@/portal/components/ui/button'
-import { Skeleton } from '@/portal/components/ui/skeleton'
 
 /** An error with, for a stage guard, the list of what is still needed. */
 export function ErrorAlert({ error, title = 'That did not work', onRetry }: { error: Error | string | null; title?: string; onRetry?: () => void }) {
@@ -13,19 +12,18 @@ export function ErrorAlert({ error, title = 'That did not work', onRetry }: { er
   const conditions = error instanceof ProgError ? error.conditions : []
   return (
     <Alert variant="destructive" role="alert">
-      <AlertTriangle aria-hidden="true" />
       <AlertTitle>{title}</AlertTitle>
       <AlertDescription>
         <p>{message}</p>
         {conditions.length > 0 && (
-          <ul className="mt-1 list-disc pl-5">
+          <ul className="mw-list">
             {conditions.map((c, i) => (
               <li key={i}>{c}</li>
             ))}
           </ul>
         )}
         {onRetry && (
-          <Button variant="outline" size="sm" className="mt-2" onClick={onRetry}>
+          <Button variant="outline" size="sm" className="mw-mt-2" onClick={onRetry}>
             Try again
           </Button>
         )}
@@ -36,22 +34,21 @@ export function ErrorAlert({ error, title = 'That did not work', onRetry }: { er
 
 export function EmptyState({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-start gap-1 border border-dashed bg-card p-6 text-sm">
-      <Inbox className="size-5 text-muted-foreground" aria-hidden="true" />
-      <p className="font-medium">{title}</p>
-      {children && <p className="text-muted-foreground">{children}</p>}
-      {action && <div className="mt-2">{action}</div>}
+    <div className="mw-empty">
+      <Inbox />
+      <p className="nsw-text-medium">{title}</p>
+      {children && <p className="mw-text-muted">{children}</p>}
+      {action && <div className="mw-mt-2">{action}</div>}
     </div>
   )
 }
 
-export function LoadingRows({ rows = 5, label = 'Loading' }: { rows?: number; label?: string }) {
+/** The system's loader (.nsw-loader) with a text label for assistive technology. */
+export function LoadingRows({ label = 'Loading' }: { rows?: number; label?: string }) {
   return (
-    <div role="status" aria-label={label} className="space-y-2">
-      <span className="sr-only">{label}</span>
-      {Array.from({ length: rows }, (_, i) => (
-        <Skeleton key={i} className="h-8 w-full" />
-      ))}
+    <div role="status" className="mw-loading">
+      <div className="nsw-loader" aria-hidden="true" />
+      <span>{label}</span>
     </div>
   )
 }

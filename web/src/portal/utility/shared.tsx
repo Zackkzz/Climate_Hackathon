@@ -1,7 +1,7 @@
 import { useId, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
-import { toast } from 'sonner'
+import { toast } from '@/portal/components/ui/sonner'
 import { csvObjects } from '@/console/api-utility'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/portal/components/ui/alert-dialog'
 import { Button } from '@/portal/components/ui/button'
@@ -59,8 +59,8 @@ export function CsvInput({ value, onChange, parsed, label, previewCols }: { valu
   const [fileName, setFileName] = useState('')
   const preview = parsed.rows.slice(0, 5)
   return (
-    <div className="space-y-3">
-      <div className="space-y-1">
+    <div className="mw-space-y-3">
+      <div className="mw-space-y-1">
         <Label htmlFor={fid}>{label}: choose a CSV file</Label>
         <Input
           id={fid}
@@ -79,30 +79,30 @@ export function CsvInput({ value, onChange, parsed, label, previewCols }: { valu
             onChange(await f.text())
           }}
         />
-        {fileName && <p className="text-sm text-muted-foreground">Loaded {fileName}.</p>}
+        {fileName && <p className="nsw-small mw-text-muted">Loaded {fileName}.</p>}
       </div>
-      <div className="space-y-1">
+      <div className="mw-space-y-1">
         <Label htmlFor={tid}>Or paste the CSV text here</Label>
-        <Textarea id={tid} rows={4} value={value} onChange={(e) => onChange(e.target.value)} className="font-mono text-sm" spellCheck={false} />
+        <Textarea id={tid} rows={4} value={value} onChange={(e) => onChange(e.target.value)} className="mw-mono nsw-small" spellCheck={false} />
       </div>
       {parsed.problems.length > 0 && (
-        <ul className="list-disc pl-5 text-destructive" role="alert">
+        <ul className="mw-list-disc mw-pl-5 mw-text-danger" role="alert">
           {parsed.problems.map((p) => (
             <li key={p}>{p}</li>
           ))}
         </ul>
       )}
       {parsed.problems.length === 0 && parsed.rows.length > 0 && (
-        <div className="space-y-1" role="status">
+        <div className="mw-space-y-1" role="status">
           <p>
             <strong>{parsed.rows.length.toLocaleString('en-AU')}</strong> row{parsed.rows.length === 1 ? '' : 's'} found. Preview of the first {preview.length}:
           </p>
-          <div className="overflow-x-auto border" role="region" aria-label="Preview of the file" tabIndex={0}>
-            <table className="w-full text-sm">
+          <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Preview of the file" tabIndex={0}>
+            <table className="nsw-width-100 nsw-small">
               <thead>
-                <tr className="bg-muted text-left">
+                <tr className="nsw-fill-off-white nsw-text-left">
                   {previewCols.map((c) => (
-                    <th key={c} className="px-2 py-1 font-semibold">
+                    <th key={c} className="mw-px-2 mw-py-1 nsw-text-semibold">
                       {c}
                     </th>
                   ))}
@@ -110,9 +110,9 @@ export function CsvInput({ value, onChange, parsed, label, previewCols }: { valu
               </thead>
               <tbody>
                 {preview.map((r, i) => (
-                  <tr key={i} className="border-t">
+                  <tr key={i} className="mw-border-t">
                     {previewCols.map((c) => (
-                      <td key={c} className="px-2 py-1">
+                      <td key={c} className="mw-px-2 mw-py-1">
                         {r[c]}
                       </td>
                     ))}

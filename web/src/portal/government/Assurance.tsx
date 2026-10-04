@@ -105,7 +105,7 @@ function Body({ data }: { data: unknown }) {
   ]
   const demo = flatten(data).some(([k, v]) => /demo_mode_on|demo_mode$/i.test(k) && v === true)
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       {demo && (
         <Alert role="status">
           <AlertTitle>Demo mode is on</AlertTitle>
@@ -114,15 +114,15 @@ function Body({ data }: { data: unknown }) {
       )}
       <DataTable columns={cols} data={rows} caption="Controls and their status" csvName="it-assurance-controls" searchPlaceholder="Search controls" pageSize={25} getRowId={(r) => String(r.n)} />
       <Panel title="What is not claimed" description="Whatever the controls above say, this prototype does not have the following.">
-        <ul className="list-disc space-y-1 pl-5">
+        <ul className="mw-list-disc mw-space-y-1 mw-pl-5">
           {NOT_CLAIMED.map((n) => (
             <li key={n}>No {n.charAt(0).toLowerCase() + n.slice(1)}</li>
           ))}
         </ul>
-        <p className="mt-2 text-muted-foreground">Building to a requirement is not the same as being assessed against it. The evidence column says what has been checked and how.</p>
+        <p className="mw-mt-2 mw-text-muted">Building to a requirement is not the same as being assessed against it. The evidence column says what has been checked and how.</p>
       </Panel>
       <section aria-labelledby="raw-h">
-        <h2 id="raw-h" className="mb-2 text-base font-semibold">
+        <h2 id="raw-h" className="mw-mb-2 nsw-text-semibold">
           Full list from the server
         </h2>
         <ControlsView data={data} />

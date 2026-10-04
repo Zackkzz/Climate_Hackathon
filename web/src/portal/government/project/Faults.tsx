@@ -53,7 +53,7 @@ function ReportDialog({ p, onDone }: { p: TabProps['p']; onDone: () => void }) {
           <DialogDescription>Reporting a fault pauses that flat's charge from this month until it is fixed.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
+          <form className="mw-space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
             <SelectField control={form.control} name="flat_id" label="Flat" options={p.flats_list.map((f) => ({ value: String(f.id), label: `Flat ${f.unit}` }))} />
             <SelectField control={form.control} name="item" label="What is wrong" options={ITEMS} />
             <TextAreaField control={form.control} name="description" label="Describe the problem" />
@@ -89,13 +89,13 @@ function ResolveDialog({ fault, onDone }: { fault: Fault; onDone: () => void }) 
             {itemLabel(fault.item)}: {fault.description}. The charge starts again next month. The paused months are covered from the reserve and the term is not extended.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-1">
-          <label htmlFor={`rn-${fault.id}`} className="text-sm font-medium">
+        <div className="mw-space-y-1">
+          <label htmlFor={`rn-${fault.id}`} className="nsw-small nsw-text-medium">
             What was done
           </label>
           <Textarea id={`rn-${fault.id}`} value={note} onChange={(e) => setNote(e.target.value)} rows={3} aria-invalid={!!err} aria-describedby={err ? `rn-err-${fault.id}` : undefined} />
           {err && (
-            <p id={`rn-err-${fault.id}`} className="text-sm text-destructive">
+            <p id={`rn-err-${fault.id}`} className="nsw-small mw-text-danger">
               {err}
             </p>
           )}
@@ -153,9 +153,9 @@ export default function Faults(props: TabProps) {
             emptyText="Nothing has been reported for this block."
             initialSort={[{ id: 'opened', desc: true }]}
             columns={[
-              { id: 'opened', header: 'Reported', accessorFn: (f) => f.opened_on, cell: ({ row }) => <>{dateLabelAu(row.original.opened_on)}<div className="text-sm text-muted-foreground">by {row.original.reported_by}</div></>, meta: { csv: (f) => f.opened_on } },
+              { id: 'opened', header: 'Reported', accessorFn: (f) => f.opened_on, cell: ({ row }) => <>{dateLabelAu(row.original.opened_on)}<div className="nsw-small mw-text-muted">by {row.original.reported_by}</div></>, meta: { csv: (f) => f.opened_on } },
               { id: 'flat', header: 'Flat', accessorFn: (f) => unit(f.flat_id) },
-              { id: 'item', header: 'Problem', accessorFn: (f) => `${itemLabel(f.item)} ${f.description}`, cell: ({ row }) => <><span className="font-medium">{itemLabel(row.original.item)}</span><div>{row.original.description}</div></>, meta: { csv: (f) => `${itemLabel(f.item)}: ${f.description}` } },
+              { id: 'item', header: 'Problem', accessorFn: (f) => `${itemLabel(f.item)} ${f.description}`, cell: ({ row }) => <><span className="nsw-text-medium">{itemLabel(row.original.item)}</span><div>{row.original.description}</div></>, meta: { csv: (f) => `${itemLabel(f.item)}: ${f.description}` } },
               {
                 id: 'status',
                 header: 'Status',
@@ -163,7 +163,7 @@ export default function Faults(props: TabProps) {
                 cell: ({ row }) => (
                   <>
                     {row.original.status === 'open' ? <StatusBadge tone="warn">Open</StatusBadge> : <StatusBadge tone="good">Fixed {dateLabelAu(row.original.resolved_on)}</StatusBadge>}
-                    {row.original.charge_paused && <div className="text-sm text-muted-foreground">Charge paused{row.original.months_paused ? `, ${row.original.months_paused} months` : ''}</div>}
+                    {row.original.charge_paused && <div className="nsw-small mw-text-muted">Charge paused{row.original.months_paused ? `, ${row.original.months_paused} months` : ''}</div>}
                   </>
                 ),
               },

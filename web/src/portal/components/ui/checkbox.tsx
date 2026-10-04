@@ -1,31 +1,17 @@
-"use client"
+// NSW Design System checkbox. The system draws the box on the label that follows the input
+// (.nsw-form__checkbox-input then .nsw-form__checkbox-label), so this renders the pair. The drawn label is empty: the
+// control's accessible name comes from aria-label or from the page's own <label htmlFor>, so there is one visible text.
+import { useId } from 'react'
+import type { ComponentProps } from 'react'
+import { cn } from '@/portal/lib/utils'
 
-import * as React from "react"
-import { cn } from "@/portal/lib/utils"
-import { CheckIcon } from "lucide-react"
-import { Checkbox as CheckboxPrimitive } from "radix-ui"
-
-function Checkbox({
-  className,
-  ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+export function Checkbox({ checked, onCheckedChange, className, id, ...props }: Omit<ComponentProps<'input'>, 'type' | 'onChange' | 'checked'> & { checked?: boolean; onCheckedChange?: (v: boolean) => void }) {
+  const auto = useId()
+  const cid = id ?? auto
   return (
-    <CheckboxPrimitive.Root
-      data-slot="checkbox"
-      className={cn(
-        "peer size-6 shrink-0 rounded-[4px] border border-input shadow-xs transition-shadow outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:bg-input/30 dark:aria-invalid:ring-destructive/40 dark:data-[state=checked]:bg-primary",
-        className
-      )}
-      {...props}
-    >
-      <CheckboxPrimitive.Indicator
-        data-slot="checkbox-indicator"
-        className="grid place-content-center text-current transition-none"
-      >
-        <CheckIcon className="size-3.5" />
-      </CheckboxPrimitive.Indicator>
-    </CheckboxPrimitive.Root>
+    <span className={cn('mw-checkbox', className)}>
+      <input id={cid} type="checkbox" className="nsw-form__checkbox-input" checked={!!checked} onChange={(e) => onCheckedChange?.(e.target.checked)} {...props} />
+      <label htmlFor={cid} className="nsw-form__checkbox-label mw-checkbox__box" aria-hidden="true" />
+    </span>
   )
 }
-
-export { Checkbox }

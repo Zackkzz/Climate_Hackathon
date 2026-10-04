@@ -21,21 +21,21 @@ import { dateLabel, itemLabel, LEDGER_LABEL, monthLabel } from '@/portal/lib/dat
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="border bg-card">
-      <h2 id={id} className="border-b px-4 py-3 text-lg font-semibold">
+    <section aria-labelledby={id} className="mw-border nsw-fill-white">
+      <h2 id={id} className="mw-border-b mw-px-4 mw-py-3 mw-text-lg nsw-text-semibold">
         {title}
       </h2>
-      <div className="space-y-3 p-4">{children}</div>
+      <div className="mw-space-y-3 mw-p-4">{children}</div>
     </section>
   )
 }
 
 function Big({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
-    <div className="min-w-0 bg-card p-3">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-2xl font-semibold tabular-nums">{value}</dd>
-      {note && <dd className="text-sm text-muted-foreground">{note}</dd>}
+    <div className="mw-min-w-0 nsw-fill-white mw-p-3">
+      <dt className="nsw-small mw-text-muted">{label}</dt>
+      <dd className="mw-text-2xl nsw-text-semibold mw-tabular">{value}</dd>
+      {note && <dd className="nsw-small mw-text-muted">{note}</dd>}
     </div>
   )
 }
@@ -57,7 +57,7 @@ function ReportDialog({ flatId, items, open, onOpenChange, onDone }: { flatId: n
         </DialogHeader>
         <Form {...form}>
           <form
-            className="space-y-3"
+            className="mw-space-y-3"
             noValidate
             onSubmit={form.handleSubmit(async (v) => {
               const r = await act.run(() => tenantApi.reportFault(flatId, v.item, v.description), 'Problem reported. Your charge is paused until it is fixed.')
@@ -71,7 +71,7 @@ function ReportDialog({ flatId, items, open, onOpenChange, onDone }: { flatId: n
             <SelectField control={form.control} name="item" label="What is not working" options={[...items.map((i) => ({ value: i.key, label: i.label })), { value: 'other', label: 'Something else' }]} />
             <TextAreaField control={form.control} name="description" label="What is wrong" description="For example: no hot water since Monday." />
             <ErrorAlert error={act.error} title="We could not send your report" />
-            <DialogFooter className="gap-2">
+            <DialogFooter className="mw-gap-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
@@ -96,10 +96,10 @@ function DataConsent({ flatId }: { flatId: number }) {
   return (
     <Section id="dc-h" title="Your meter data">
       <p>If you agree, your electricity and gas meter readings can be used to check that the upgrades are saving you money. This is separate from agreeing to the upgrades. You can say no and still have them.</p>
-      <p className="text-muted-foreground">You can withdraw at any time. We then stop using new readings.</p>
+      <p className="mw-text-muted">You can withdraw at any time. We then stop using new readings.</p>
       <Gate res={res} rows={2}>
         {(c) => (
-          <div className="space-y-3">
+          <div className="mw-space-y-3">
             <p>
               {c.given ? (
                 <StatusBadge tone="good">You have agreed</StatusBadge>
@@ -108,33 +108,33 @@ function DataConsent({ flatId }: { flatId: number }) {
               )}
             </p>
             {c.given && c.expires_on && <p>Your consent ends on {dateLabel(c.expires_on)}.</p>}
-            {c.given && c.recorded_note && <p className="text-muted-foreground">Recorded: {c.recorded_note}</p>}
+            {c.given && c.recorded_note && <p className="mw-text-muted">Recorded: {c.recorded_note}</p>}
             {(c.scope || c.purpose) && (
-              <dl className="space-y-1">
+              <dl className="mw-space-y-1">
                 {c.scope && (
                   <div>
-                    <dt className="font-medium">What it covers</dt>
+                    <dt className="nsw-text-medium">What it covers</dt>
                     <dd>{c.scope}</dd>
                   </div>
                 )}
                 {c.purpose && (
                   <div>
-                    <dt className="font-medium">Why we ask</dt>
+                    <dt className="nsw-text-medium">Why we ask</dt>
                     <dd>{c.purpose}</dd>
                   </div>
                 )}
               </dl>
             )}
-            {c.note && <p className="text-muted-foreground">{c.note}</p>}
+            {c.note && <p className="mw-text-muted">{c.note}</p>}
             <ErrorAlert error={act.error} />
             {c.given ? (
               <Confirm title="Withdraw your consent?" description="We will stop using your meter readings. Savings checks for your flat may be less accurate." confirmLabel="Withdraw" destructive onConfirm={() => set(false)}>
-                <Button variant="outline" className="min-h-11 w-full sm:w-auto" disabled={act.busy}>
+                <Button variant="outline" className="mw-min-h-11 nsw-width-100 mw-sm-w-auto" disabled={act.busy}>
                   Withdraw my consent
                 </Button>
               </Confirm>
             ) : (
-              <Button className="min-h-11 w-full sm:w-auto" disabled={act.busy} onClick={() => void set(true)}>
+              <Button className="mw-min-h-11 nsw-width-100 mw-sm-w-auto" disabled={act.busy} onClick={() => void set(true)}>
                 I agree to share my meter data
               </Button>
             )}
@@ -165,13 +165,13 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
   const openFaults = d.faults.filter((f) => f.status === 'open')
 
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">My flat</h1>
-        <p className="text-muted-foreground">
+        <h1 className="mw-text-2xl nsw-text-semibold">My flat</h1>
+        <p className="mw-text-muted">
           Flat {flat.unit}, {d.project.label}
         </p>
-        <p className="mt-1">
+        <p className="mw-mt-1">
           <ExampleBadge>Example flat</ExampleBadge>
         </p>
       </div>
@@ -180,23 +180,23 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
         <Section id="cons-h" title="Do you agree to the upgrades?">
           <p>Your housing provider would like to upgrade this block. You would pay {money(d.deal.charge_per_month)} a month, and keep part of what you save. You pay nothing upfront.</p>
           <ErrorAlert error={act.error} />
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="nsw-display-flex nsw-flex-column mw-gap-2 mw-sm-flex-row">
             <Confirm title="Agree to the upgrades?" description={`You agree to a charge of ${money(d.deal.charge_per_month)} a month on your meter. It never takes more than your savings allow.`} confirmLabel="Yes, I agree" onConfirm={() => decide('agreed')}>
-              <Button className="min-h-11" disabled={act.busy}>
+              <Button className="mw-min-h-11" disabled={act.busy}>
                 I agree
               </Button>
             </Confirm>
             <Confirm title="Decline the upgrades?" description="Nothing changes for you. Your flat gets no charge and no work inside it." confirmLabel="Yes, I decline" destructive onConfirm={() => decide('declined')}>
-              <Button variant="outline" className="min-h-11" disabled={act.busy}>
+              <Button variant="outline" className="mw-min-h-11" disabled={act.busy}>
                 I decline
               </Button>
             </Confirm>
           </div>
         </Section>
       )}
-      {flat.consent === 'declined' && <p className="border bg-card p-3">You declined the upgrades. You pay no charge.</p>}
+      {flat.consent === 'declined' && <p className="mw-border nsw-fill-white mw-p-3">You declined the upgrades. You pay no charge.</p>}
 
-      <dl className="grid grid-cols-1 gap-px border bg-border min-[360px]:grid-cols-2" aria-label="Your numbers">
+      <dl className="nsw-display-grid mw-grid-cols-1 mw-gap-px mw-border mw-bg-border mw-xs-grid-cols-2" aria-label="Your numbers">
         <Big label="You pay each month" value={money(d.deal.charge_per_month)} note={flat.charge_status === 'paused' ? 'Paused for now' : `Until ${monthLabel(d.deal.term_ends)}`} />
         <Big label="You keep each month" value={money(d.deal.net_saving_per_month)} note="Modelled saving, after the charge" />
         <Big label="Modelled saving" value={money(d.deal.modelled_saving_per_month)} note="On your bills each month" />
@@ -205,15 +205,15 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
 
       <Section id="inst-h" title="What was installed">
         {d.deal.installed.length === 0 ? (
-          <p className="text-muted-foreground">Nothing is installed yet.</p>
+          <p className="mw-text-muted">Nothing is installed yet.</p>
         ) : (
-          <ul className="list-disc space-y-1 pl-5">
+          <ul className="mw-list-disc mw-space-y-1 mw-pl-5">
             {d.deal.installed.map((i) => (
               <li key={i.key}>{i.label}</li>
             ))}
           </ul>
         )}
-        <p className="text-muted-foreground">The block is at the stage: {d.project.stage}.</p>
+        <p className="mw-text-muted">The block is at the stage: {d.project.stage}.</p>
       </Section>
 
       <Section id="sav-h" title="What you are saving">
@@ -225,13 +225,13 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
             Checked against your real meter readings (as of {dateLabel(verified.as_of)}), the saving is <strong>{money(verified.verified_saving_per_month)}</strong> a month. That is {Math.round(verified.realisation_rate * 100)}% of the modelled figure. If it falls short, your charge goes down and you are refunded.
           </p>
         ) : (
-          <p className="text-muted-foreground">We have not checked this against real readings yet. That happens after about a year of readings.</p>
+          <p className="mw-text-muted">We have not checked this against real readings yet. That happens after about a year of readings.</p>
         )}
       </Section>
 
       <Section id="stmt-h" title="My statement">
         {ledger.length === 0 ? (
-          <p className="text-muted-foreground">There is nothing on your statement yet. Charges start the month after the work is signed off.</p>
+          <p className="mw-text-muted">There is nothing on your statement yet. Charges start the month after the work is signed off.</p>
         ) : (
           <>
             <p>
@@ -245,22 +245,22 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
                 </>
               )}
             </p>
-            <ul className="divide-y border" aria-label="Statement entries, newest first">
+            <ul className="mw-divide-y mw-border" aria-label="Statement entries, newest first">
               {shown.map((l) => (
-                <li key={l.id} className="flex items-start justify-between gap-3 px-3 py-2">
-                  <div className="min-w-0">
-                    <div className="font-medium">{LEDGER_LABEL[l.kind] ?? l.kind}</div>
-                    <div className="text-sm text-muted-foreground">{monthLabel(l.month)}</div>
+                <li key={l.id} className="nsw-display-flex nsw-align-items-start nsw-justify-content-between mw-gap-3 mw-px-3 mw-py-2">
+                  <div className="mw-min-w-0">
+                    <div className="nsw-text-medium">{LEDGER_LABEL[l.kind] ?? l.kind}</div>
+                    <div className="nsw-small mw-text-muted">{monthLabel(l.month)}</div>
                   </div>
-                  <div className="text-right tabular-nums">
-                    <div className="font-medium">{money(l.amount)}</div>
-                    <div className="text-sm text-muted-foreground">{l.balance_after < 0 ? `Credit ${money(-l.balance_after)}` : `Owing ${money(l.balance_after)}`}</div>
+                  <div className="nsw-text-right mw-tabular">
+                    <div className="nsw-text-medium">{money(l.amount)}</div>
+                    <div className="nsw-small mw-text-muted">{l.balance_after < 0 ? `Credit ${money(-l.balance_after)}` : `Owing ${money(l.balance_after)}`}</div>
                   </div>
                 </li>
               ))}
             </ul>
             {ledger.length > 8 && (
-              <Button variant="outline" className="min-h-11" onClick={() => setAll((v) => !v)} aria-expanded={all}>
+              <Button variant="outline" className="mw-min-h-11" onClick={() => setAll((v) => !v)} aria-expanded={all}>
                 {all ? 'Show fewer' : `Show all ${ledger.length} entries`}
               </Button>
             )}
@@ -270,9 +270,9 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
 
       <Section id="prot-h" title="What protects me">
         {d.protections.length === 0 ? (
-          <p className="text-muted-foreground">No protections were listed.</p>
+          <p className="mw-text-muted">No protections were listed.</p>
         ) : (
-          <ul className="list-disc space-y-2 pl-5">
+          <ul className="mw-list-disc mw-space-y-2 mw-pl-5">
             {d.protections.map((p, i) => (
               <li key={i}>{p}</li>
             ))}
@@ -282,23 +282,23 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
 
       <Section id="prob-h" title="Problems">
         {d.faults.length === 0 ? (
-          <p className="text-muted-foreground">You have not reported any problems.</p>
+          <p className="mw-text-muted">You have not reported any problems.</p>
         ) : (
-          <ul className="divide-y border" aria-label="Problems you reported">
+          <ul className="mw-divide-y mw-border" aria-label="Problems you reported">
             {d.faults.map((f) => (
-              <li key={f.id} className="px-3 py-2">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-medium">{itemLabel(f.item)}</span>
+              <li key={f.id} className="mw-px-3 mw-py-2">
+                <div className="nsw-display-flex nsw-flex-wrap nsw-align-items-center nsw-justify-content-between mw-gap-2">
+                  <span className="nsw-text-medium">{itemLabel(f.item)}</span>
                   {f.status === 'open' ? <StatusBadge tone="warn">Open</StatusBadge> : <StatusBadge tone="good">Fixed {dateLabel(f.resolved_on)}</StatusBadge>}
                 </div>
                 <p>{f.description}</p>
-                <p className="text-sm text-muted-foreground">Reported {dateLabel(f.opened_on)}</p>
+                <p className="nsw-small mw-text-muted">Reported {dateLabel(f.opened_on)}</p>
               </li>
             ))}
           </ul>
         )}
-        {openFaults.length > 0 && <p className="text-muted-foreground">While a problem is open your charge is paused.</p>}
-        <Button className="min-h-11 w-full sm:w-auto" onClick={() => setReport(true)}>
+        {openFaults.length > 0 && <p className="mw-text-muted">While a problem is open your charge is paused.</p>}
+        <Button className="mw-min-h-11 nsw-width-100 mw-sm-w-auto" onClick={() => setReport(true)}>
           Report a problem
         </Button>
         <ReportDialog flatId={flat.id} items={d.deal.installed} open={report} onOpenChange={setReport} onDone={reload} />
@@ -306,13 +306,13 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
 
       <Section id="docs-h" title="My documents">
         {d.documents.length === 0 ? (
-          <p className="text-muted-foreground">No documents yet.</p>
+          <p className="mw-text-muted">No documents yet.</p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="mw-space-y-2">
             {d.documents.map((x) => (
-              <li key={x.url} className="flex flex-wrap items-center justify-between gap-2">
-                <span className="min-w-0">{x.title}</span>
-                <Button variant="outline" className="min-h-11" disabled={docs.busy} onClick={() => void open(x.url)} aria-label={`Open ${x.title} in a new tab`}>
+              <li key={x.url} className="nsw-display-flex nsw-flex-wrap nsw-align-items-center nsw-justify-content-between mw-gap-2">
+                <span className="mw-min-w-0">{x.title}</span>
+                <Button variant="outline" className="mw-min-h-11" disabled={docs.busy} onClick={() => void open(x.url)} aria-label={`Open ${x.title} in a new tab`}>
                   Open
                 </Button>
               </li>
@@ -320,7 +320,7 @@ function Body({ d, reload }: { d: MyFlatData; reload: () => void }) {
           </ul>
         )}
         <ErrorAlert error={docs.error} title="We could not open that document" />
-        <p className="text-sm text-muted-foreground">Documents are examples made by a prototype. They are not legal or financial advice.</p>
+        <p className="nsw-small mw-text-muted">Documents are examples made by a prototype. They are not legal or financial advice.</p>
       </Section>
 
       <DataConsent flatId={flat.id} />

@@ -69,7 +69,7 @@ export function ConsentTab({ p, orgKind, reload }: { p: PropertyProject; orgKind
         enableSorting: false,
         enableHiding: false,
         cell: ({ row }) => (
-          <span className="flex gap-1">
+          <span className="nsw-display-flex mw-gap-1">
             <Confirm title={`Record unit ${row.original.unit} as agreed?`} description="Only record this when the tenant has said yes. They can change their mind later." confirmLabel="Record agreed" onConfirm={() => setConsent(row.original, 'agreed')}>
               <Button size="sm" variant="outline" disabled={row.original.consent === 'agreed' || act.busy}>
                 Agreed
@@ -89,11 +89,11 @@ export function ConsentTab({ p, orgKind, reload }: { p: PropertyProject; orgKind
     [act.busy],
   )
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       <Panel title="Owner consent" description={strata ? 'For a strata scheme, record the meeting resolution that approves the work.' : 'The owner must sign before tenants are asked.'}>
         {c.owner_signed ? (
           <div>
-            <p className="font-medium text-success">Signed.</p>
+            <p className="nsw-text-medium mw-text-success">Signed.</p>
             {p.resolution && (
               <Facts
                 items={[
@@ -117,11 +117,11 @@ export function ConsentTab({ p, orgKind, reload }: { p: PropertyProject; orgKind
               <>
                 <TextField control={form.control} name="name" label="Name of the person signing for the committee" autoComplete="name" />
                 <DateField control={form.control} name="meeting_date" label="Meeting date" />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="nsw-display-grid mw-grid-cols-2 mw-gap-3">
                   <NumberField control={form.control} name="votes_for" label="Votes for" min={0} />
                   <NumberField control={form.control} name="votes_against" label="Votes against" min={0} />
                 </div>
-                <p className="text-sm text-muted-foreground">Kind of resolution: ordinary (more votes for than against).</p>
+                <p className="nsw-small mw-text-muted">Kind of resolution: ordinary (more votes for than against).</p>
                 <VoteWarning form={form} />
               </>
             )}
@@ -156,12 +156,12 @@ export function ConsentTab({ p, orgKind, reload }: { p: PropertyProject; orgKind
         )}
       </Panel>
       <Panel title="Tenant consent" description="Meter-data consent is separate. See the Flats tab.">
-        <div className="mb-3 max-w-xl">
-          <p className="mb-1" id="thr">
+        <div className="mw-mb-3 mw-max-w-xl">
+          <p className="mw-mb-1" id="thr">
             {c.tenants_agreed} of {c.tenants_total} tenants have agreed, {c.tenants_declined} declined. At least {Math.round(c.threshold * 100)}% must agree.
           </p>
           <Progress value={pct * 100} aria-labelledby="thr" />
-          <p className="mt-1 text-sm text-muted-foreground">{pct >= c.threshold ? 'The threshold is met.' : 'The threshold is not met yet.'}</p>
+          <p className="mw-mt-1 nsw-small mw-text-muted">{pct >= c.threshold ? 'The threshold is met.' : 'The threshold is not met yet.'}</p>
         </div>
         <ErrorAlert error={act.error} />
         <DataTable columns={cols} data={p.flats_list} caption="Tenant consent by flat" searchPlaceholder="Search flats" getRowId={(r) => String(r.id)} pageSize={25} />
@@ -227,7 +227,7 @@ export function FlatsTab({ p, reload, readOnly }: { p: PropertyProject; reload: 
         cell: ({ row }) => {
           const f = row.original
           return (
-            <span className="flex flex-wrap gap-1">
+            <span className="nsw-display-flex nsw-flex-wrap mw-gap-1">
               <Button size="sm" variant="outline" onClick={() => setSheet(f)}>
                 Ledger<span className="sr-only"> for unit {f.unit}</span>
               </Button>
@@ -292,19 +292,19 @@ export function FlatsTab({ p, reload, readOnly }: { p: PropertyProject; reload: 
     [consents.data, readOnly],
   )
   return (
-    <div className="space-y-3">
-      <p className="max-w-3xl text-muted-foreground">
+    <div className="mw-space-y-3">
+      <p className="mw-max-w-3xl mw-text-muted">
         Upgrade consent (agreeing to the work and the charge) and meter-data consent (letting the programme use meter readings) are separate. The tenant gives or withdraws each one themselves.
       </p>
       {consents.error && <ErrorAlert error={consents.error} onRetry={consents.reload} title="We could not check meter-data consent" />}
       <DataTable columns={cols} data={p.flats_list} caption="Flats and charges" csvName={`meterwise-flats-${p.id}`} searchPlaceholder="Search flats" getRowId={(r) => String(r.id)} initialHidden={{ principal_remaining: false }} emptyTitle="No flats" />
       <Sheet open={!!sheet} onOpenChange={(o) => !o && setSheet(null)}>
-        <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+        <SheetContent className="nsw-width-100 nsw-overflow-y-auto mw-sm-max-w-xl">
           <SheetHeader>
             <SheetTitle>Ledger, unit {sheet?.unit}</SheetTitle>
             <SheetDescription>Every charge and payment on this meter.</SheetDescription>
           </SheetHeader>
-          <div className="space-y-4 px-4 pb-4">{sheet && <LedgerBody flatId={sheet.id} />}{sheet && !readOnly && <FlatPrivacy flatId={sheet.id} unit={sheet.unit} onChanged={consents.reload} />}</div>
+          <div className="mw-space-y-4 mw-px-4 mw-pb-4">{sheet && <LedgerBody flatId={sheet.id} />}{sheet && !readOnly && <FlatPrivacy flatId={sheet.id} unit={sheet.unit} onChanged={consents.reload} />}</div>
         </SheetContent>
       </Sheet>
     </div>
@@ -314,7 +314,7 @@ export function FlatsTab({ p, reload, readOnly }: { p: PropertyProject; reload: 
 // ---------- charges and export ----------
 export function ChargesTab({ p }: { p: PropertyProject }) {
   return (
-    <div className="space-y-3">
+    <div className="mw-space-y-3">
       <ExportBar projectId={p.id} defaultMonth="" />
       <DataTable
         columns={[
@@ -347,18 +347,18 @@ export function ExportBar({ projectId, defaultMonth }: { projectId?: number; def
   return (
     <Form {...form}>
       <form
-        className="flex flex-wrap items-end gap-2 border bg-card p-3"
+        className="nsw-display-flex nsw-flex-wrap nsw-align-items-end mw-gap-2 mw-border nsw-fill-white mw-p-3"
         noValidate
         onSubmit={form.handleSubmit(async (v) => {
           const t = await act.run(() => api.billingExport(v.month, projectId))
           if (t !== undefined) downloadText(`meterwise-rent-ledger-${v.month}.csv`, t, 'text/csv')
         })}
       >
-        <TextField control={form.control} name="month" label="Month" type="month" className="w-48" />
+        <TextField control={form.control} name="month" label="Month" type="month" className="mw-w-48" />
         <Button type="submit" variant="outline" disabled={act.busy || !month}>
           {act.busy ? 'Preparing' : 'Download rent ledger (CSV)'}
         </Button>
-        <div className="basis-full">
+        <div className="mw-basis-full">
           <ErrorAlert error={act.error} title="We could not make the file" />
         </div>
       </form>

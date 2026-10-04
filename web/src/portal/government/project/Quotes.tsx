@@ -41,35 +41,35 @@ function QuoteItems({ q }: { q: Quote }) {
           Line items
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="mw-max-w-2xl">
         <DialogHeader>
           <DialogTitle>{q.installer_org.name}</DialogTitle>
           <DialogDescription>
             Quote {dateLabelAu(q.submitted_on)}, valid until {dateLabelAu(q.valid_until)}. {q.note}
           </DialogDescription>
         </DialogHeader>
-        <div className="overflow-x-auto border" role="region" aria-label="Quote line items" tabIndex={0}>
+        <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Quote line items" tabIndex={0}>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Item</TableHead>
-                <TableHead className="text-right">Quantity</TableHead>
-                <TableHead className="text-right">Unit price</TableHead>
-                <TableHead className="text-right">Total</TableHead>
+                <TableHead className="nsw-text-right">Quantity</TableHead>
+                <TableHead className="nsw-text-right">Unit price</TableHead>
+                <TableHead className="nsw-text-right">Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {q.items.map((i) => (
                 <TableRow key={i.key}>
                   <TableCell>{i.label}</TableCell>
-                  <TableCell className="text-right tabular-nums">{i.qty}</TableCell>
-                  <TableCell className="text-right tabular-nums">{money(i.unit_price)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{money(i.total)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{i.qty}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(i.unit_price)}</TableCell>
+                  <TableCell className="nsw-text-right mw-tabular">{money(i.total)}</TableCell>
                 </TableRow>
               ))}
-              <TableRow className="font-semibold">
+              <TableRow className="nsw-text-semibold">
                 <TableCell colSpan={3}>Total</TableCell>
-                <TableCell className="text-right tabular-nums">{money(q.total)}</TableCell>
+                <TableCell className="nsw-text-right mw-tabular">{money(q.total)}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -89,7 +89,7 @@ export default function Quotes(props: TabProps) {
   const hasAccepted = p.quotes.some((q) => q.status === 'accepted')
 
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       {manager && (
         <Panel title="Open a tender" description="Invite installers to quote. They see the quantities and the modelled prices.">
           <Gate res={orgs} rows={2}>
@@ -98,7 +98,7 @@ export default function Quotes(props: TabProps) {
               return (
                 <Form {...form}>
                   <form
-                    className="space-y-3"
+                    className="mw-space-y-3"
                     noValidate
                     onSubmit={form.handleSubmit(async (v) => {
                       const r = await tender.run(() => api.openTender(p.id, v.installer_org_ids, v.closes_on), 'Tender opened')
@@ -111,11 +111,11 @@ export default function Quotes(props: TabProps) {
                       render={({ field }) => (
                         <FormItem>
                           <fieldset>
-                            <legend className="mb-1 text-sm font-medium">Installers to invite</legend>
-                            {installers.length === 0 && <p className="text-muted-foreground">No installers are registered.</p>}
-                            <div className="space-y-1">
+                            <legend className="mw-mb-1 nsw-small nsw-text-medium">Installers to invite</legend>
+                            {installers.length === 0 && <p className="mw-text-muted">No installers are registered.</p>}
+                            <div className="mw-space-y-1">
                               {installers.map((o) => (
-                                <div key={o.id} className="flex items-center gap-2">
+                                <div key={o.id} className="nsw-display-flex nsw-align-items-center mw-gap-2">
                                   <FormControl>
                                     <Checkbox
                                       id={`inst-${o.id}`}
@@ -123,7 +123,7 @@ export default function Quotes(props: TabProps) {
                                       onCheckedChange={(c) => field.onChange(c ? [...field.value, o.id] : field.value.filter((x: number) => x !== o.id))}
                                     />
                                   </FormControl>
-                                  <FormLabel htmlFor={`inst-${o.id}`} className="font-normal">
+                                  <FormLabel htmlFor={`inst-${o.id}`} className="nsw-text-normal">
                                     {o.name} {o.example ? '(example)' : ''}
                                   </FormLabel>
                                 </div>
@@ -134,7 +134,7 @@ export default function Quotes(props: TabProps) {
                         </FormItem>
                       )}
                     />
-                    <DateField control={form.control} name="closes_on" label="Tender closes on" className="max-w-xs" />
+                    <DateField control={form.control} name="closes_on" label="Tender closes on" className="mw-max-w-xs" />
                     <ErrorAlert error={tender.error} title="We could not open the tender" />
                     <Button type="submit" disabled={tender.busy || installers.length === 0}>
                       {tender.busy ? 'Opening' : 'Open tender'}
@@ -169,7 +169,7 @@ export default function Quotes(props: TabProps) {
                 const d = row.original.total - row.original.modelled_total
                 const r = row.original.modelled_total ? (d / row.original.modelled_total) * 100 : 0
                 return (
-                  <span className={d > 0 ? 'text-warning' : 'text-success'}>
+                  <span className={d > 0 ? 'mw-text-warning' : 'mw-text-success'}>
                     {d > 0 ? '+' : d < 0 ? '-' : ''}
                     {money(Math.abs(d))} ({d > 0 ? 'over' : d < 0 ? 'under' : 'on'} by {pct(Math.abs(r), 1)})
                   </span>
@@ -188,7 +188,7 @@ export default function Quotes(props: TabProps) {
               cell: ({ row }) => {
                 const q = row.original
                 return (
-                  <div className="flex gap-1">
+                  <div className="nsw-display-flex mw-gap-1">
                     <QuoteItems q={q} />
                     {manager && q.status === 'submitted' && !hasAccepted && (
                       <Confirm

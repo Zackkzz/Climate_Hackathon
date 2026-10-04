@@ -1,127 +1,58 @@
-import * as React from "react"
-import { cn } from "@/portal/lib/utils"
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  MoreHorizontalIcon,
-} from "lucide-react"
+// NSW Design System pagination (.nsw-pagination): a nav landmark with a list of links. Previous and Next are always
+// present; the current page is marked with aria-current="page"; a disabled end is aria-disabled and out of the tab order.
+import { cn } from '@/portal/lib/utils'
 
-import { buttonVariants, type Button } from "@/portal/components/ui/button"
+function windowOf(page: number, count: number): (number | '…')[] {
+  if (count <= 7) return Array.from({ length: count }, (_, i) => i + 1)
+  const out: (number | '…')[] = [1]
+  const lo = Math.max(2, page - 1)
+  const hi = Math.min(count - 1, page + 1)
+  if (lo > 2) out.push('…')
+  for (let i = lo; i <= hi; i++) out.push(i)
+  if (hi < count - 1) out.push('…')
+  out.push(count)
+  return out
+}
 
-function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
+/** `page` is 1-based. */
+export function Pagination({ page, count, onPage, label = 'Pagination' }: { page: number; count: number; onPage: (p: number) => void; label?: string }) {
+  const go = (p: number) => (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (p >= 1 && p <= count) onPage(p)
+  }
   return (
-    <nav
-      role="navigation"
-      aria-label="pagination"
-      data-slot="pagination"
-      className={cn("mx-auto flex w-full justify-center", className)}
-      {...props}
-    />
+    <nav className="nsw-pagination" aria-label={label}>
+      <ul>
+        <li className={cn(page <= 1 && 'disabled')}>
+          <a href="#previous" aria-label="Previous page" aria-disabled={page <= 1} tabIndex={page <= 1 ? -1 : undefined} onClick={go(page - 1)}>
+            <span className="material-icons nsw-material-icons" aria-hidden="true">
+              keyboard_arrow_left
+            </span>
+            <span>Previous</span>
+          </a>
+        </li>
+        {windowOf(page, count).map((p, i) =>
+          p === '…' ? (
+            <li key={`e${i}`}>
+              <span aria-hidden="true">…</span>
+            </li>
+          ) : (
+            <li key={p}>
+              <a href={`#page-${p}`} className={cn(p === page && 'active')} aria-current={p === page ? 'page' : undefined} aria-label={`Page ${p}`} onClick={go(p)}>
+                {p}
+              </a>
+            </li>
+          ),
+        )}
+        <li className={cn(page >= count && 'disabled')}>
+          <a href="#next" aria-label="Next page" aria-disabled={page >= count} tabIndex={page >= count ? -1 : undefined} onClick={go(page + 1)}>
+            <span>Next</span>
+            <span className="material-icons nsw-material-icons" aria-hidden="true">
+              keyboard_arrow_right
+            </span>
+          </a>
+        </li>
+      </ul>
+    </nav>
   )
-}
-
-function PaginationContent({
-  className,
-  ...props
-}: React.ComponentProps<"ul">) {
-  return (
-    <ul
-      data-slot="pagination-content"
-      className={cn("flex flex-row items-center gap-1", className)}
-      {...props}
-    />
-  )
-}
-
-function PaginationItem({ ...props }: React.ComponentProps<"li">) {
-  return <li data-slot="pagination-item" {...props} />
-}
-
-type PaginationLinkProps = {
-  isActive?: boolean
-} & Pick<React.ComponentProps<typeof Button>, "size"> &
-  React.ComponentProps<"a">
-
-function PaginationLink({
-  className,
-  isActive,
-  size = "icon",
-  ...props
-}: PaginationLinkProps) {
-  return (
-    <a
-      aria-current={isActive ? "page" : undefined}
-      data-slot="pagination-link"
-      data-active={isActive}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "outline" : "ghost",
-          size,
-        }),
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function PaginationPrevious({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) {
-  return (
-    <PaginationLink
-      aria-label="Go to previous page"
-      size="default"
-      className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
-      {...props}
-    >
-      <ChevronLeftIcon />
-      <span className="hidden sm:block">Previous</span>
-    </PaginationLink>
-  )
-}
-
-function PaginationNext({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) {
-  return (
-    <PaginationLink
-      aria-label="Go to next page"
-      size="default"
-      className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
-      {...props}
-    >
-      <span className="hidden sm:block">Next</span>
-      <ChevronRightIcon />
-    </PaginationLink>
-  )
-}
-
-function PaginationEllipsis({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
-  return (
-    <span
-      aria-hidden
-      data-slot="pagination-ellipsis"
-      className={cn("flex size-9 items-center justify-center", className)}
-      {...props}
-    >
-      <MoreHorizontalIcon className="size-4" />
-      <span className="sr-only">More pages</span>
-    </span>
-  )
-}
-
-export {
-  Pagination,
-  PaginationContent,
-  PaginationLink,
-  PaginationItem,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
 }

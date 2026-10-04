@@ -41,7 +41,7 @@ export default function PortalApp() {
     <BrowserRouter>
       <TooltipProvider delayDuration={200}>
         <Titles />
-        <Suspense fallback={<div className="p-6"><LoadingRows label="Loading the page" /></div>}>
+        <Suspense fallback={<div className="mw-p-6"><LoadingRows label="Loading the page" /></div>}>
           <Routes>
             <Route element={<PublicLayout />}>
               <Route index element={<Front />} />
@@ -72,8 +72,8 @@ export default function PortalApp() {
 function NotFound() {
   return (
     <div>
-      <h1 className="text-xl font-semibold">Page not found</h1>
-      <p className="mt-1 text-muted-foreground">There is no page at this address. Check the address, or go to the <a href="/">front page</a>.</p>
+      <h1 className="mw-text-xl nsw-text-semibold">Page not found</h1>
+      <p className="mw-mt-1 mw-text-muted">There is no page at this address. Check the address, or go to the <a href="/">front page</a>.</p>
     </div>
   )
 }

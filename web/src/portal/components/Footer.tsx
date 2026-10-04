@@ -1,19 +1,40 @@
+// NSW Design System footer (.nsw-footer): a link list in the upper part, the notice and disclaimer in the lower part.
 import { Link } from 'react-router'
 import { MOCK } from '@/console/api'
+import { DemoNotice } from './DemoNotice'
 
 export function Footer() {
   return (
-    <footer className="mt-8 border-t bg-card px-4 py-4 text-sm text-muted-foreground no-print">
-      <nav aria-label="Legal and trust" className="flex flex-wrap gap-x-5 gap-y-1">
-        <Link to="/privacy">Privacy notice</Link>
-        <Link to="/accessibility">Accessibility statement</Link>
-        <Link to="/trust">Trust and security</Link>
-        <Link to="/terms">Terms of use</Link>
-      </nav>
-      <p className="mt-2 max-w-3xl">
-        Meterwise is a prototype. The organisations, people, meters and readings are examples made up for the demo. Documents are not legal or financial advice.
-        {MOCK ? ' This copy runs on built-in demo data with no server.' : ''}
-      </p>
+    <footer className="nsw-footer">
+      <div className="nsw-footer__upper no-print">
+        <div className="nsw-container">
+          <nav aria-label="Legal and trust">
+            <ul className="mw-footer-links">
+              <li>
+                <Link to="/privacy">Privacy notice</Link>
+              </li>
+              <li>
+                <Link to="/accessibility">Accessibility statement</Link>
+              </li>
+              <li>
+                <Link to="/trust">Trust and security</Link>
+              </li>
+              <li>
+                <Link to="/terms">Terms of use</Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <div className="nsw-footer__lower">
+        <div className="nsw-container">
+          <p className="nsw-footer__copyright mw-footer-note">
+            Meterwise is a prototype. Documents are not legal or financial advice.
+            {MOCK ? ' This copy runs on built-in demo data with no server.' : ''}
+          </p>
+          <DemoNotice where="footer" />
+        </div>
+      </div>
     </footer>
   )
 }

@@ -43,7 +43,7 @@ export default function Summary({ p, role, onChange }: TabProps) {
   })
 
   return (
-    <div className="space-y-4">
+    <div className="mw-space-y-4">
       <Figures
         label="Deal figures"
         items={[
@@ -56,13 +56,13 @@ export default function Summary({ p, role, onChange }: TabProps) {
         ]}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="nsw-display-grid mw-gap-4 mw-lg-grid-cols-2">
         <Panel title="Next step">
           <p>{p.next_step}</p>
           {p.blocked_by.length > 0 && (
-            <div className="mt-3">
-              <p className="font-medium">Blocking this step</p>
-              <ul className="list-disc pl-5">
+            <div className="mw-mt-3">
+              <p className="nsw-text-medium">Blocking this step</p>
+              <ul className="mw-list-disc mw-pl-5">
                 {p.blocked_by.map((b, i) => (
                   <li key={i}>{b}</li>
                 ))}
@@ -70,7 +70,7 @@ export default function Summary({ p, role, onChange }: TabProps) {
             </div>
           )}
           {p.flags.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mw-mt-3 nsw-display-flex nsw-flex-wrap mw-gap-2">
               {p.flags.map((f) => (
                 <StatusBadge key={f} tone="warn">
                   {f === 'charge_paused' ? 'Charge paused' : f === 'true_up_due' ? 'Charge check due' : f.replace(/_/g, ' ')}
@@ -79,12 +79,12 @@ export default function Summary({ p, role, onChange }: TabProps) {
             </div>
           )}
           {canManage(role) && next && (
-            <div className="mt-4 space-y-2">
+            <div className="mw-mt-4 mw-space-y-2">
               {next === 'active' && (
-                <div className="max-w-xs space-y-1">
+                <div className="mw-max-w-xs mw-space-y-1">
                   <Label htmlFor="start-month">Start month for charges</Label>
                   <Input id="start-month" type="month" value={startMonth} onChange={(e) => setStartMonth(e.target.value)} aria-invalid={!!startErr} aria-describedby="start-month-h" />
-                  <p id="start-month-h" className={'text-sm ' + (startErr ? 'text-destructive' : 'text-muted-foreground')}>
+                  <p id="start-month-h" className={'nsw-small ' + (startErr ? 'mw-text-danger' : 'mw-text-muted')}>
                     {startErr || 'Charges begin the month after this one.'}
                   </p>
                 </div>
@@ -103,19 +103,19 @@ export default function Summary({ p, role, onChange }: TabProps) {
               <ErrorAlert error={adv.error} title={`Not ready for ${STAGE_LABEL[next]} yet`} />
             </div>
           )}
-          {!next && <p className="mt-3 text-muted-foreground">This project is at the last stage.</p>}
+          {!next && <p className="mw-mt-3 mw-text-muted">This project is at the last stage.</p>}
         </Panel>
 
         <Panel title="Where the project is">
-          <ol className="space-y-1" aria-label="Stages">
+          <ol className="mw-space-y-1" aria-label="Stages">
             {STAGES.map((st, i) => {
               const h = history.filter((x) => x.stage === st).pop()
               const state = st === p.stage ? 'Current' : i < idx || reached.has(st) ? 'Done' : 'To come'
               return (
-                <li key={st} className="flex flex-wrap items-baseline gap-x-3 border-b py-1 last:border-0" aria-current={st === p.stage ? 'step' : undefined}>
-                  <span className={'w-28 ' + (st === p.stage ? 'font-semibold' : '')}>{STAGE_LABEL[st]}</span>
-                  <span className="w-16 text-sm text-muted-foreground">{state}</span>
-                  <span className="min-w-0 flex-1 text-sm text-muted-foreground">{h ? `${dateLabelAu(h.at)}${h.by ? ', ' + h.by : ''}${h.note ? '. ' + h.note : ''}` : ''}</span>
+                <li key={st} className="nsw-display-flex nsw-flex-wrap nsw-align-items-baseline mw-gap-x-3 mw-border-b mw-py-1 mw-last-no-border" aria-current={st === p.stage ? 'step' : undefined}>
+                  <span className={'mw-w-28 ' + (st === p.stage ? 'nsw-text-semibold' : '')}>{STAGE_LABEL[st]}</span>
+                  <span className="mw-w-16 nsw-small mw-text-muted">{state}</span>
+                  <span className="mw-min-w-0 mw-flex-1 nsw-small mw-text-muted">{h ? `${dateLabelAu(h.at)}${h.by ? ', ' + h.by : ''}${h.note ? '. ' + h.note : ''}` : ''}</span>
                 </li>
               )
             })}
@@ -123,7 +123,7 @@ export default function Summary({ p, role, onChange }: TabProps) {
         </Panel>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="nsw-display-grid mw-gap-4 mw-lg-grid-cols-2">
         <Panel title="The block">
           <Facts
             items={[
@@ -139,8 +139,8 @@ export default function Summary({ p, role, onChange }: TabProps) {
         {canManage(role) && (
           <Panel title="Grant" description="The grant covers the part of the cost the capped charge cannot repay.">
             <Form {...form}>
-              <form className="space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
-                <NumberField control={form.control} name="grant" label="Grant allocated (dollars)" min={0} step={500} description={`Funding gap now ${money(s.funding_gap)}.`} className="max-w-xs" />
+              <form className="mw-space-y-3" noValidate onSubmit={(e) => e.preventDefault()}>
+                <NumberField control={form.control} name="grant" label="Grant allocated (dollars)" min={0} step={500} description={`Funding gap now ${money(s.funding_gap)}.`} className="mw-max-w-xs" />
                 <ErrorAlert error={patch.error} />
                 <Confirm title="Change the grant?" description={`This changes the money set aside for ${p.label} and reassesses the deal.`} confirmLabel="Change grant" onConfirm={() => void saveGrant()}>
                   <Button type="button" variant="outline" disabled={patch.busy}>

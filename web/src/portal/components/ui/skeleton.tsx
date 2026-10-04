@@ -1,13 +1,7 @@
-import { cn } from "@/portal/lib/utils"
+// Loading placeholder: a quiet grey block (the system's own loader is used for page-level loading).
+import type { HTMLAttributes } from 'react'
+import { cn } from '@/portal/lib/utils'
 
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="skeleton"
-      className={cn("animate-pulse rounded-md bg-accent", className)}
-      {...props}
-    />
-  )
+export function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div aria-hidden="true" className={cn('mw-skeleton', className)} {...props} />
 }
-
-export { Skeleton }

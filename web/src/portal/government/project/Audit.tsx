@@ -76,13 +76,13 @@ export default function Audit({ p, role, onChange }: TabProps) {
   })
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+    <div className="nsw-display-grid mw-gap-4 mw-xl-cols-3fr-2fr">
       <Panel title="Site audit" description="What was found on the visit. Saving it corrects the open-data guess and reassesses the deal.">
-        {!editable && <p className="mb-3 text-muted-foreground">Only the programme office and the owner can change the audit.</p>}
+        {!editable && <p className="mw-mb-3 mw-text-muted">Only the programme office and the owner can change the audit.</p>}
         <Form {...form}>
-          <form className="space-y-3" noValidate onSubmit={submit} aria-label="Site audit form">
-            <fieldset disabled={!editable || act.busy} className="space-y-3">
-              <div className="grid gap-3 sm:grid-cols-2">
+          <form className="mw-space-y-3" noValidate onSubmit={submit} aria-label="Site audit form">
+            <fieldset disabled={!editable || act.busy} className="mw-space-y-3">
+              <div className="nsw-display-grid mw-gap-3 mw-sm-grid-cols-2">
                 <DateField control={form.control} name="visited_on" label="Date of visit" />
                 <TextField control={form.control} name="by" label="Visited by" />
                 <NumberField control={form.control} name="storeys" label="Storeys" min={1} />
@@ -106,28 +106,28 @@ export default function Audit({ p, role, onChange }: TabProps) {
         </Form>
       </Panel>
 
-      <div className="space-y-4">
+      <div className="mw-space-y-4">
         <Panel title="What changed from the open-data guess" description={a ? `Visit on ${dateLabelAu(a.visited_on)} by ${a.by}` : undefined}>
           {!a ? (
-            <p className="text-muted-foreground">No audit has been saved yet. The deal uses the open-data estimate.</p>
+            <p className="mw-text-muted">No audit has been saved yet. The deal uses the open-data estimate.</p>
           ) : changes.length === 0 ? (
             <p>The visit found nothing different from the open-data guess.</p>
           ) : (
-            <div className="overflow-x-auto border" role="region" aria-label="Changes from the open-data guess" tabIndex={0}>
+            <div className="nsw-overflow-x-auto mw-border" role="region" aria-label="Changes from the open-data guess" tabIndex={0}>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Item</TableHead>
-                    <TableHead className="text-right">Open data</TableHead>
-                    <TableHead className="text-right">Site visit</TableHead>
+                    <TableHead className="nsw-text-right">Open data</TableHead>
+                    <TableHead className="nsw-text-right">Site visit</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {changes.map((c) => (
                     <TableRow key={c.field}>
                       <TableCell>{FIELD_LABEL[c.field] ?? c.field.replace(/_/g, ' ')}</TableCell>
-                      <TableCell className="text-right tabular-nums">{show(c.from)}</TableCell>
-                      <TableCell className="text-right font-medium tabular-nums">{show(c.to)}</TableCell>
+                      <TableCell className="nsw-text-right mw-tabular">{show(c.from)}</TableCell>
+                      <TableCell className="nsw-text-right nsw-text-medium mw-tabular">{show(c.to)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

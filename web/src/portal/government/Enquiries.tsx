@@ -36,8 +36,8 @@ export default function Enquiries() {
       { accessorKey: 'address', header: 'Block' },
       { accessorKey: 'flats', header: 'Flats', meta: { numeric: true } },
       { id: 'kind', header: 'From', accessorFn: (e) => KIND[e.org_kind] ?? e.org_kind },
-      { accessorKey: 'name', header: 'Contact', cell: ({ row }) => <span>{row.original.name}<span className="block text-sm text-muted-foreground">{row.original.email}</span></span>, meta: { csv: (e: Enquiry) => `${e.name} <${e.email}>` } },
-      { accessorKey: 'message', header: 'Message', cell: ({ row }) => <span className="block min-w-40 whitespace-normal">{row.original.message}</span> },
+      { accessorKey: 'name', header: 'Contact', cell: ({ row }) => <span>{row.original.name}<span className="nsw-display-block nsw-small mw-text-muted">{row.original.email}</span></span>, meta: { csv: (e: Enquiry) => `${e.name} <${e.email}>` } },
+      { accessorKey: 'message', header: 'Message', cell: ({ row }) => <span className="nsw-display-block mw-min-w-40 mw-ws-normal">{row.original.message}</span> },
       {
         id: 'status',
         header: 'Status',

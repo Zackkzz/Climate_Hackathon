@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { Plus } from 'lucide-react'
+import { Plus } from '@/portal/components/icons'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { api } from '@/console/api'
@@ -31,7 +31,7 @@ export default function Projects() {
       { id: 'owner', header: 'Owner', accessorFn: (p) => p.owner_org?.name ?? '' },
       { id: 'capex', header: 'Net cost', accessorFn: (p) => p.summary.net_capex, cell: ({ getValue }) => money(getValue<number>()), meta: { numeric: true, csv: (p) => p.summary.net_capex } },
       { id: 'gap', header: 'Funding gap', accessorFn: (p) => p.summary.funding_gap, cell: ({ getValue }) => money(getValue<number>()), meta: { numeric: true, csv: (p) => p.summary.funding_gap } },
-      { id: 'next', header: 'Next step', accessorFn: (p) => p.next_step, cell: ({ row }) => <span className="block min-w-48 whitespace-normal">{row.original.next_step}</span> },
+      { id: 'next', header: 'Next step', accessorFn: (p) => p.next_step, cell: ({ row }) => <span className="nsw-display-block mw-min-w-48 mw-ws-normal">{row.original.next_step}</span> },
       { id: 'blocked', header: 'Blockers', accessorFn: (p) => p.blocked_by.length, meta: { numeric: true, csv: (p) => p.blocked_by.join('; ') }, cell: ({ row }) => (row.original.blocked_by.length ? <StatusBadge tone="warn">{row.original.blocked_by.length}</StatusBadge> : 'None') },
       { id: 'flags', header: 'Flags', accessorFn: (p) => p.flags.join(', ').replace(/_/g, ' ') },
     ],
@@ -66,12 +66,12 @@ export default function Projects() {
         emptyText="Start a project from a pilot building."
         initialHidden={{ gap: false, flags: false }}
         filters={
-          <div className="flex flex-col gap-1">
+          <div className="nsw-display-flex nsw-flex-column mw-gap-1">
             <label htmlFor="stage-filter" className="sr-only">
               Filter by stage
             </label>
             <Select value={stage} onValueChange={setStage}>
-              <SelectTrigger id="stage-filter" className="w-44">
+              <SelectTrigger id="stage-filter" className="mw-w-44">
                 <SelectValue placeholder="All stages" />
               </SelectTrigger>
               <SelectContent>

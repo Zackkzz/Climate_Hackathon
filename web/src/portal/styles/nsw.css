@@ -1,0 +1,21 @@
+/* NSW Design System 3.28.1, as shipped: tokens, grid, utilities and component styles. */
+@import "nsw-design-system/dist/css/main.css";
+
+/* The system names its typeface "Public Sans"; the bundled variable font is registered under that name.
+   Fonts are served from this origin only (font-src 'self'). */
+@font-face {
+  font-family: "Public Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("../../../node_modules/@fontsource-variable/public-sans/files/public-sans-latin-wght-normal.woff2") format("woff2-variations");
+}
+/* The system draws its icons with the Material Icons font; bundled locally, no CDN. */
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("../../../node_modules/@fontsource/material-icons/files/material-icons-latin-400-normal.woff2") format("woff2"),
+    url("../../../node_modules/@fontsource/material-icons/files/material-icons-latin-400-normal.woff") format("woff");
+}
