@@ -15,7 +15,7 @@ to:
 - No code, design or asset from before the event is included.
 - Before and during the event the team explored other ideas, which are not part of this submission.
 - The idea started from a research-style proposal generated with an AI research tool during the event
-  ("COP31 Hackathon Proposal Strategy"). **Team: name the tool here.** Its example results (a 240-flat testbed)
+  ("COP31 Hackathon Proposal Strategy", now in [docs/research](research/README.md)). **Team: name the tool here.** Its example results (a 240-flat testbed)
   were never simulated and are not used anywhere in this project. Every result here comes from code in this
   repository.
 
