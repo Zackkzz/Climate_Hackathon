@@ -79,7 +79,7 @@ docker compose up --build -d
 
 The block finder map needs the Google Maps browser key at build time. Put it in a `.env` file in the project root
 (git ignores it) as `VITE_GOOGLE_MAPS_API_KEY=...`, or set that variable in your shell, before building. Without it the
-app still runs and the map panel says the map could not load.
+app still runs and the maps show OpenStreetMap instead.
 
 Open http://localhost:8000. The image builds the frontend with Node 22 and runs the backend with Python 3.12.
 The first start seeds the example programme and can take a little longer; check progress with

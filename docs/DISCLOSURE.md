@@ -50,7 +50,9 @@ The team directed the work, chose the idea and is responsible for the submission
 | UNSW Cool Roofs Cost Benefit Analysis (2022) | Cool roof costs; validation | Public report |
 | National Construction Code, YourHome, Energy Rating | Building fabric and equipment efficiency | Public |
 | Pay As You Save programme rules and field reviews (EEI, Clean Energy Works, Berkeley Lab) | Finance rules | Public |
-| Google Maps Platform (Maps JavaScript API) | Base map in the block finder | Google Maps Platform Terms of Service; Google's logo and attribution shown on the map |
+| Google Maps Platform (Maps JavaScript API) | Base map in the block finder and on the government Areas page | Google Maps Platform Terms of Service; Google's logo and attribution shown on the map |
+| OpenStreetMap standard tiles (tile.openstreetmap.org, run by the OpenStreetMap Foundation) | Fallback base map on the same two pages, used only when Google Maps cannot load | Map data ODbL; OpenStreetMap Tile Usage Policy; "© OpenStreetMap contributors" shown on the map |
+| MapLibre GL JS | Draws the fallback OpenStreetMap map; bundled with the app and loaded only when the fallback is needed | BSD-3-Clause |
 | NSW Cyber Security Policy 2026-27, OLG Cyber Security Guidelines for Local Government, NSW Design Standards | The security, privacy and accessibility controls | Public; see `docs/research-gov-it-standards.md` for what was read directly and what came from search summaries |
 
 The Landsat scene IDs and the full method are in `data/pilot/README.md`.
@@ -59,11 +61,16 @@ The Landsat scene IDs and the full method are in `data/pilot/README.md`.
 
 - **Backend:** Python, FastAPI, Uvicorn, Pydantic, NumPy, SciPy, Requests, pytest, and for the data pipeline
   Shapely, pyproj, rasterio, pystac-client, planetary-computer and matplotlib.
-- **Frontend:** React, Vite, TypeScript, Google Maps JavaScript API (loaded with `@googlemaps/js-api-loader`),
+- **Frontend:** React, Vite, TypeScript, Google Maps JavaScript API (loaded with `@googlemaps/js-api-loader`), MapLibre
+  GL JS for the OpenStreetMap fallback map,
   Tailwind CSS, shadcn/ui components (built on Radix UI), TanStack Table, React Hook Form, Zod, Recharts, React
   Router, cmdk, sonner, react-day-picker, date-fns and Lucide icons. Public Sans typeface, bundled locally (SIL Open
   Font Licence). Colour ramp from ColorBrewer. Nothing is loaded from a CDN; the Google map's code comes from Google
-  when the block finder opens.
+  when a page with a map opens.
+- **Maps and privacy:** maps are provided by Google Maps. When Google Maps cannot load (no key, the script blocked, the
+  key refused, or too slow), the map falls back to OpenStreetMap tiles served by the OpenStreetMap Foundation. In either
+  case the visitor's browser contacts that provider directly, so the provider sees the visitor's IP address and the map
+  area requested. Meterwise sends neither provider any account or tenant data.
 - **Programme system:** Python standard library only (sqlite3, hashlib, hmac) on top of FastAPI.
 - **Checks:** axe-core through Playwright for accessibility; a Playwright end-to-end script (`web/scripts/e2e.mjs`).
 - **Development tools:** Git, Node.js, Playwright (browser checks), Google Cloud CLI.

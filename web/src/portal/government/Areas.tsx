@@ -1,42 +1,50 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef } from 'react'
 import { govApi } from '@/console/api-gov'
 import type { AreaRow, BuildingPoint } from '@/console/types-gov'
 import { useRes } from '@/console/useRes'
 import { heatWord, num } from '@/format'
 import { HEAT_COLORS, HEAT_ORDER } from '@/heat'
-import type { HeatBand } from '@/types'
-import { MAPS_KEY, MAP_STYLE, loadMaps, mapsAuthFailures } from '@/portal/lib/maps'
+import { MAP_STYLE, startGoogleMaps, useGoogleFirst } from '@/portal/lib/maps'
 import { ChartBox } from '@/portal/components/ChartBox'
 import { DataTable } from '@/portal/components/DataTable'
 import { PageHeader } from '@/portal/components/PageHeader'
 import { Gate } from '@/portal/components/States'
 import { STAGE_LABEL } from '@/portal/components/Status'
 import type { Stage } from '@/console/types'
+import { RING, dotStyle, ringOf, titleOf, type Ring } from './areasMapData'
 
-const LIVE = ['commissioned', 'active', 'closed']
-// Project rings in NSW brand colours: dark for built or active, blue for the pipeline.
-const RING = { live: '#002664', pipeline: '#146cfd' }
+// The OpenStreetMap fallback lives in the same lazily loaded chunk as the block finder's, so MapLibre loads only when
+// Google Maps fails.
+const AreasOsmMap = lazy(() => import('@/portal/finder/OsmMap').then((m) => ({ default: m.AreasOsmMap })))
 
-type Ring = 'none' | 'live' | 'pipeline'
-const ringOf = (p: BuildingPoint): Ring => (p.project_stage ? (LIVE.includes(p.project_stage) ? 'live' : 'pipeline') : 'none')
-const titleOf = (p: BuildingPoint) =>
-  `${p.building_id}: ${heatWord(p.heat_band)}, about ${p.flats_est} flats${p.project_stage ? `, project at ${STAGE_LABEL[p.project_stage as Stage] ?? p.project_stage}` : ', no project'}`
-
-/** The buildings on the Google map: a dot per building in the finder's heat colours, bigger for hotter bands, with a
- * ring for a project. A visual aid; "Show as table" has the same data for keyboard and screen reader users. */
+/** The buildings on the map: a dot per building in the finder's heat colours, bigger for hotter bands, with a ring for a
+ * project. Google Maps when it works; on any Google failure (no key, script not loading, key refused, too slow) the
+ * OpenStreetMap map takes its place. A visual aid; "Show as table" has the same data for keyboard and screen reader users. */
 function AreasMap({ pts }: { pts: BuildingPoint[] }) {
+  const [onGoogle, fallBack] = useGoogleFirst()
+  const withProject = pts.filter((p) => p.project_stage).length
+  return (
+    <div className="mw-areas-map" role="region" aria-label={`Map of ${pts.length} buildings in the building dataset, coloured by heat band. ${withProject} have a project. The same data is in the table.`}>
+      {onGoogle ? (
+        <AreasGoogleMap pts={pts} onFail={fallBack} />
+      ) : (
+        <Suspense fallback={null}>
+          <AreasOsmMap pts={pts} />
+        </Suspense>
+      )}
+    </div>
+  )
+}
+
+function AreasGoogleMap({ pts, onFail }: { pts: BuildingPoint[]; onFail: () => void }) {
   const box = useRef<HTMLDivElement>(null)
-  const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>(MAPS_KEY ? 'loading' : 'failed')
+  const failRef = useRef(onFail)
+  failRef.current = onFail
   useEffect(() => {
-    if (!MAPS_KEY || pts.length === 0) return
-    let gone = false
-    const fail = () => {
-      if (!gone) setStatus('failed')
-    }
-    mapsAuthFailures.add(fail)
-    loadMaps().then(([maps, core]) => {
-      if (gone || !box.current) return
+    if (pts.length === 0) return
+    return startGoogleMaps(([maps, core]) => {
+      if (!box.current) return
       const map = new maps.Map(box.current, {
         styles: MAP_STYLE,
         backgroundColor: '#ebebeb',
@@ -54,20 +62,11 @@ function AreasMap({ pts }: { pts: BuildingPoint[] }) {
       }
       map.fitBounds(bounds, 32)
       map.data.setStyle((f) => {
-        const band = f.getProperty('band') as HeatBand
-        const i = Math.max(0, HEAT_ORDER.indexOf(band))
-        const ring = f.getProperty('ring') as Ring
+        const d = dotStyle(f.getProperty('band') as string, f.getProperty('ring') as Ring)
         return {
           title: f.getProperty('title') as string,
-          zIndex: i + (ring === 'none' ? 0 : 10),
-          icon: {
-            path: core.SymbolPath.CIRCLE,
-            scale: 4 + i,
-            fillColor: HEAT_COLORS[band] ?? '#cdd3d6',
-            fillOpacity: 0.95,
-            strokeColor: ring === 'none' ? '#495054' : RING[ring],
-            strokeWeight: ring === 'none' ? 1 : 3,
-          },
+          zIndex: d.z,
+          icon: { path: core.SymbolPath.CIRCLE, scale: d.radius, fillColor: d.fill, fillOpacity: 0.95, strokeColor: d.stroke, strokeWeight: d.strokeWidth },
         }
       })
       const info = new maps.InfoWindow()
@@ -76,24 +75,9 @@ function AreasMap({ pts }: { pts: BuildingPoint[] }) {
         info.setPosition(e.latLng)
         info.open({ map })
       })
-      setStatus('ready')
-    }, fail)
-    return () => {
-      gone = true
-      mapsAuthFailures.delete(fail)
-    }
+    }, () => failRef.current())
   }, [pts])
-  const withProject = pts.filter((p) => p.project_stage).length
-  return (
-    <div className="mw-areas-map" role="region" aria-label={`Map of ${pts.length} buildings in the building dataset, coloured by heat band. ${withProject} have a project. The same data is in the table.`}>
-      <div ref={box} className="mw-areas-map__canvas" />
-      {status === 'failed' && (
-        <p className="mw-areas-map__status" role="status">
-          The map could not load. Choose Show as table for the same data.
-        </p>
-      )}
-    </div>
-  )
+  return <div ref={box} className="mw-areas-map__canvas" />
 }
 
 function Dot({ fill, ring, size = 14 }: { fill: string; ring?: string; size?: number }) {

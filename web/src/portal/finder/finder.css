@@ -54,6 +54,8 @@
 .map-tip { position: absolute; transform: translate(-50%, calc(-100% - 10px)); white-space: nowrap; pointer-events: none; background: var(--nsw-white); color: var(--nsw-text-dark); padding: 4px 8px; border-radius: 2px; box-shadow: var(--nsw-box-shadow); font: 600 0.85rem/1.3 var(--nsw-font-family); }
 .map-pin { position: absolute; transform: translate(-50%, -100%); pointer-events: none; }
 .map-pin svg { display: block; }
+.map-pin-ml { pointer-events: none; }
+.map-pin-ml svg { display: block; }
 
 @media print {
   @page { size: A4; margin: 12mm; }

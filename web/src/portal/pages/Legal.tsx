@@ -62,7 +62,8 @@ function Privacy() {
       <H>How long we keep it</H>
       <p>Charge and reading records are kept for the term of the charge plus the retention period set by the programme. Staff details are kept while the account is active. Enquiry details are kept for two years or until they are turned into a project. The Trust and security page shows the data inventory when you are signed in.</p>
       <H>Cookies, trackers and outside services</H>
-      <p>Meterwise sets no cookies and loads no analytics or trackers. Your sign-in is kept in the browser tab's session storage and is cleared when you close the tab or sign out. The map in the block finder is Google Maps. Opening the block finder loads the map's code, images and fonts from Google, which tells Google your internet address, your browser and the area of the map you are viewing. Google handles that under the <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Google Privacy Policy</a>. No other page loads anything from another site.</p>
+      <p>Meterwise sets no cookies and loads no analytics or trackers. Your sign-in is kept in the browser tab's session storage and is cleared when you close the tab or sign out.</p>
+      <p>Maps are provided by Google Maps. They appear in the block finder and, for staff, on the Areas page. When Google Maps cannot load, the map falls back to OpenStreetMap map images served by the OpenStreetMap Foundation. In either case your browser contacts that provider directly, so the provider sees your internet address and the area of the map you asked for. Google also sends the map's code and fonts, and handles what it receives under the <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Google Privacy Policy</a>. The OpenStreetMap Foundation handles map image requests under the <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noreferrer">OSMF Privacy Policy</a>. Meterwise sends neither provider any account or tenant data. No other page loads anything from another site.</p>
       <H>Questions and complaints</H>
       <p>Contact the programme officer at your housing provider or council. Their contact details are on the letter you received about the programme. If you are not satisfied with the response, you can complain to the NSW Information and Privacy Commission or the Office of the Australian Information Commissioner.</p>
     </>
@@ -81,7 +82,7 @@ function Accessibility() {
         <li>Pages reflow at a width of 320 pixels and at 400 percent zoom. Wide tables scroll inside their own labelled region.</li>
         <li>Forms have visible labels and say in words what is wrong. Status messages are announced to screen readers.</li>
         <li>Every chart has a "Show as table" switch, and status is never shown by colour alone.</li>
-        <li>The typeface, Public Sans, is served from this site. The only thing loaded from another site is the Google map in the block finder.</li>
+        <li>The typeface, Public Sans, is served from this site. The only thing loaded from another site is the map in the block finder and on the Areas page: Google Maps, or OpenStreetMap when Google Maps cannot load.</li>
       </UL>
       <H>How we check</H>
       <UL>
@@ -114,7 +115,7 @@ function Terms() {
         <li>Keep your sign-in details and tenant access codes private. Do not share them, and tell your programme officer if you think someone else has used them.</li>
         <li>Use the service only for the programme's purposes. Do not try to reach information or functions you have not been given access to, and do not upload anything that is unlawful or harmful.</li>
         <li>We work to keep the service available, but we do not promise it will always be available or error-free.</li>
-        <li>The map in the block finder is Google Maps. Your use of it is subject to the <a href="https://maps.google.com/help/terms_maps.html" target="_blank" rel="noreferrer">Google Maps/Google Earth Additional Terms of Service</a>.</li>
+        <li>The maps are Google Maps. Your use of them is subject to the <a href="https://maps.google.com/help/terms_maps.html" target="_blank" rel="noreferrer">Google Maps/Google Earth Additional Terms of Service</a>. When Google Maps cannot load, an OpenStreetMap map is shown instead. Its data is © OpenStreetMap contributors.</li>
         <li>Your use of personal information is covered by the <Link to="/privacy">privacy notice</Link>.</li>
       </UL>
     </>

@@ -1,57 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
-import { MAPS_KEY as API_KEY, MAP_STYLE, loadMaps, mapsAuthFailures as authFailures } from '@/portal/lib/maps'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { MAP_STYLE, startGoogleMaps, useGoogleFirst } from '@/portal/lib/maps'
 import { HEAT_COLORS } from '../../heat'
 import { heatWord } from '../../format'
-import type { BuildingCollection, BuildingFeature, HeatBand } from '../../types'
+import type { HeatBand } from '../../types'
+import { CLOSE_ZOOM, PIN_SVG, centroid, points, polygons, type MapProps } from './mapData'
 
-const PIN_SVG =
-  '<svg width="30" height="38" viewBox="0 0 30 38" aria-hidden="true"><path d="M15 36S3 24.500 3 14.500a12 12 0 0 1 24 0C27 24.500 15 36 15 36z" fill="#002664" stroke="#fff" stroke-width="2.500"/><circle cx="15" cy="14.500" r="4.500" fill="#fff"/></svg>'
-// Zoom at or above which a selected block counts as easy to see.
-const CLOSE_ZOOM = 17
-
-interface Props {
-  data: BuildingCollection
-  selectedId: string | null
-  hoverId: string | null
-  onSelect: (id: string | null) => void
-  onHover: (id: string | null) => void
-  pickMode: boolean
-  pin: { lat: number; lon: number } | null
-  onPick: (lat: number, lon: number) => void
-  bottomPad: number
-  /** Pilot area [west, south, east, north] from /api/meta; the first view fits this. */
-  bbox?: [number, number, number, number]
-}
+// MapLibre and the OpenStreetMap map load only when Google Maps fails, so the normal bundle stays small.
+const OsmMap = lazy(() => import('./OsmMap'))
 
 /** Linear ramp between two zoom levels, held at the end values outside them. */
 function ramp(zoom: number, z0: number, z1: number, from: number, to: number): number {
   return from + (to - from) * Math.min(1, Math.max(0, (zoom - z0) / (z1 - z0)))
-}
-
-function centroid(f: BuildingFeature): [number, number] {
-  const ring = f.geometry.type === 'Polygon' ? f.geometry.coordinates[0] : f.geometry.coordinates[0][0]
-  let x = 0
-  let y = 0
-  for (const [lx, ly] of ring) {
-    x += lx
-    y += ly
-  }
-  return [x / ring.length, y / ring.length]
-}
-
-function polygons(data: BuildingCollection) {
-  return { type: 'FeatureCollection' as const, features: data.features }
-}
-
-function points(data: BuildingCollection) {
-  return {
-    type: 'FeatureCollection' as const,
-    features: data.features.map((f) => ({
-      type: 'Feature' as const,
-      geometry: { type: 'Point' as const, coordinates: centroid(f) },
-      properties: { id: f.properties.id, heat_band: f.properties.heat_band, label: f.properties.label },
-    })),
-  }
 }
 
 function replaceFeatures(layer: google.maps.Data, geojson: object) {
@@ -100,29 +59,36 @@ interface Live {
   restyle: () => void
 }
 
-export default function MapView(props: Props) {
+/**
+ * The block finder map: Google Maps when it works, otherwise the OpenStreetMap map. Any Google failure (no key at build
+ * time, the script not loading, the key refused through gm_authFailure even after the map is up, or a load taking longer
+ * than 8 seconds; see startGoogleMaps) swaps in the fallback in place. Selection, filters and the shortlist live in the parent, so
+ * they carry over.
+ */
+export default function MapView(props: MapProps) {
+  const [onGoogle, fallBack] = useGoogleFirst()
+  if (onGoogle) return <GoogleMap {...props} onFail={fallBack} />
+  return (
+    <Suspense fallback={<div className="map-wrap" aria-busy="true" />}>
+      <OsmMap {...props} />
+    </Suspense>
+  )
+}
+
+function GoogleMap(props: MapProps & { onFail: () => void }) {
   const { data, selectedId, hoverId, pickMode, pin, bottomPad } = props
   const box = useRef<HTMLDivElement>(null)
   const cb = useRef(props)
   cb.current = props
   const live = useRef<Live | null>(null)
-  const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>(API_KEY ? 'loading' : 'failed')
+  const [status, setStatus] = useState<'loading' | 'ready'>('loading')
   const fitted = useRef(false)
   const lastEased = useRef<string | null>(null)
 
   // load the API and create the map once
   useEffect(() => {
-    if (!API_KEY) {
-      console.warn('Map: VITE_GOOGLE_MAPS_API_KEY is not set. Put the .env.local file with the Google Maps key in web/ and restart.')
-      return
-    }
-    let gone = false
-    const fail = () => {
-      if (!gone) setStatus('failed')
-    }
-    authFailures.add(fail)
-    loadMaps().then(([maps, core]) => {
-      if (gone || !box.current) return
+    const stop = startGoogleMaps(([maps, core]) => {
+      if (!box.current) return
       const map = new maps.Map(box.current, {
         center: { lat: -33.92, lng: 151.075 },
         zoom: 16,
@@ -224,11 +190,10 @@ export default function MapView(props: Props) {
       live.current = { map, core, shapes, dots, tip: htmlOverlay(maps.OverlayView, tipEl), tipEl, pin: htmlOverlay(maps.OverlayView, pinEl), restyle }
       restyle()
       setStatus('ready')
-    }, fail)
+    }, () => cb.current.onFail())
 
     return () => {
-      gone = true
-      authFailures.delete(fail)
+      stop()
       const l = live.current
       if (l) {
         l.tip.setMap(null)
@@ -313,11 +278,6 @@ export default function MapView(props: Props) {
         <div ref={box} className="map-host" />
       </div>
       {pickMode && status === 'ready' && <div className="map-banner">Tap the map to place your block</div>}
-      {status === 'failed' && (
-        <div className="map-status" role="status">
-          The map could not load. You can still choose a block from the table.
-        </div>
-      )}
     </div>
   )
 }

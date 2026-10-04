@@ -53,7 +53,7 @@ function accountsSecret(): string | null {
 
 const accountKey = (a: ExampleAccount) => a.email ?? a.code ?? a.name
 
-/** A dropdown of example accounts, shown only to someone with the secret. */
+/** A dropdown of example accounts, shown when the server lists them: to everyone, or only to someone with the secret. */
 function ExampleAccounts({ busy, onPick }: { busy: boolean; onPick: (a: ExampleAccount) => void }) {
   const [list, setList] = useState<ExampleAccount[]>([])
   const [chosen, setChosen] = useState('')
@@ -65,10 +65,10 @@ function ExampleAccounts({ busy, onPick }: { busy: boolean; onPick: (a: ExampleA
     return () => window.removeEventListener('hashchange', on)
   }, [])
   useEffect(() => {
+    // With METERWISE_LIST_ACCOUNTS=1 the server lists the accounts to everyone, so ask even without a secret.
     const secret = accountsSecret()
-    if (!secret) return
     let live = true
-    fetch('/api/auth/demo-users', { headers: { 'X-Accounts-Secret': secret } })
+    fetch('/api/auth/demo-users', secret ? { headers: { 'X-Accounts-Secret': secret } } : undefined)
       .then((r) => (r.ok ? r.json() : []))
       .then((l: unknown) => {
         if (live && Array.isArray(l)) setList(l as ExampleAccount[])

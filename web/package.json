@@ -19,6 +19,7 @@
     "@hookform/resolvers": "^5.9.1",
     "@tanstack/react-table": "^8.21.3",
     "date-fns": "^4.4.0",
+    "maplibre-gl": "^6.11.2",
     "nsw-design-system": "^3.28.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

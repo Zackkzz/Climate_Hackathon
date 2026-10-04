@@ -29,8 +29,12 @@ MAX_BODY = 2_000_000
 # the two Maps hosts, not *.googleapis.com, which would also admit files anyone can host on storage.googleapis.com.
 GMAPS_SCRIPT = "https://maps.googleapis.com https://maps.gstatic.com"
 GMAPS_DATA = "https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com"
+# OpenStreetMap standard tiles for the fallback map (MapLibre GL) shown when Google Maps fails; MapLibre fetches them,
+# so they need connect-src as well as img-src. Its web worker loads from this site, so no worker-src is needed.
+OSM_TILES = "https://tile.openstreetmap.org https://*.tile.openstreetmap.org"
 CSP = (f"default-src 'self'; script-src 'self' {GMAPS_SCRIPT}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-       f"img-src 'self' data: blob: {GMAPS_DATA}; font-src 'self' https://fonts.gstatic.com; connect-src 'self' {GMAPS_DATA}; "
+       f"img-src 'self' data: blob: {GMAPS_DATA} {OSM_TILES}; font-src 'self' https://fonts.gstatic.com; "
+       f"connect-src 'self' {GMAPS_DATA} {OSM_TILES}; "
        "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
 
 
