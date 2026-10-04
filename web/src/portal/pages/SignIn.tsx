@@ -16,6 +16,17 @@ import { useAction } from '@/portal/lib/actions'
 
 const loginSchema = z.object({ email: z.string().min(1, 'Enter your email address.').email('Enter an email address like name@organisation.com.au.'), password: z.string().min(1, 'Enter your password.') })
 const codeSchema = z.object({ code: z.string().trim().min(1, 'Enter your access code.').regex(/^[A-Za-z0-9-]{6,}$/, 'An access code looks like FLAT-7K2Q.') })
+/** A seeded account from GET /api/auth/demo-users. The route answers only when the server runs with METERWISE_LIST_ACCOUNTS=1. */
+interface ExampleAccount {
+  role: string
+  name: string
+  email?: string
+  password?: string
+  code?: string
+  org?: { name: string }
+}
+const ROLE_LABEL: Record<string, string> = { manager: 'Programme manager', government: 'Government', owner: 'Property owner', funder: 'Funder', installer: 'Installer', utility: 'Utility', tenant: 'Tenant' }
+
 const mfaSchema = z.object({ code: z.string().trim().regex(/^\d{6}$/, 'Enter the 6 digits from your authenticator app.') })
 
 export default function SignIn() {
@@ -34,6 +45,20 @@ export default function SignIn() {
   useEffect(() => {
     if (user) nav(homeFor(user.role), { replace: true })
   }, [user, nav])
+
+  const [examples, setExamples] = useState<ExampleAccount[]>([])
+  useEffect(() => {
+    let live = true
+    fetch('/api/auth/demo-users')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list) => {
+        if (live && Array.isArray(list)) setExamples(list)
+      })
+      .catch(() => {})
+    return () => {
+      live = false
+    }
+  }, [])
 
   const finish = (token: string, u: User) => {
     signIn(token, u)
@@ -118,7 +143,30 @@ export default function SignIn() {
           </form>
         </Form>
       </div>
-
+      {examples.length > 0 && (
+        <section className="mt-4 border bg-card p-4" aria-labelledby="example-accounts">
+          <h2 id="example-accounts" className="text-base font-semibold">
+            Example accounts
+          </h2>
+          <p className="text-muted-foreground">This is a demonstration system. Every organisation and person below is invented. Choose one to sign in as them.</p>
+          <ul className="mt-3 grid gap-2 md:grid-cols-2">
+            {examples.map((a) => (
+              <li key={a.email ?? a.code}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto w-full flex-col items-start gap-0 whitespace-normal py-2 text-left"
+                  disabled={login.busy || tenant.busy}
+                  onClick={() => (a.code ? doCode(a.code) : doLogin(a.email ?? '', a.password ?? ''))}
+                >
+                  <span className="font-semibold">{ROLE_LABEL[a.role] ?? a.role}</span>
+                  <span className="font-normal text-muted-foreground">{a.org ? `${a.name}, ${a.org.name}` : a.name}</span>
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   )
 }
