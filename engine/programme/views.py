@@ -25,8 +25,7 @@ r2 = L.r2
 LIVE = ("installation", "commissioned", "active", "closed")
 
 
-def mask_meter(m: str | None) -> str | None:
-    return None if not m else "NMI-..." + m[-4:]
+mask_meter = S.mask_meter
 
 
 # ------------------------------------------------------------------------------------------- programme
@@ -216,7 +215,8 @@ def my_flat(p: Principal) -> dict:
         if b:
             verified = {"verified_saving_per_month": b["result"].get("verified_saving_per_month"),
                         "realisation_rate": b["result"].get("realisation_rate"), "as_of": d["run_on"],
-                        "period": d["period"], "source": d["source"]}
+                        "period": d["period"], "source": d["source"],
+                        "source_label": L.SOURCE_LABELS.get(d["source"], d["source"])}
             break
     faults = [L.fault_obj(x) for x in db.q("SELECT * FROM faults WHERE flat_id = ? ORDER BY id DESC", (f["id"],))]
     return {"flat": S.flat_obj(f, p, pr), "project": {"label": pr["label"], "stage": pr["stage"],
@@ -333,6 +333,7 @@ def meter_row(pr: dict, f: dict, org: dict) -> dict:
             "commissioned_on": wo["completed_on"] if wo else None, "has_gas": _gas_after(pr),
             "retailer_customer": bool(org["kind"] == "retailer" or (org["kind"] == "programme" and f["retailer_org_id"])),
             "last_reading_month": last["month"] if last else None, "reading_source": last["source"] if last else None,
+            "reading_source_label": L.SOURCE_LABELS.get(last["source"]) if last else None,
             "data_consent": L.current_data_consent(f["id"]) is not None, "example": True}
 
 
@@ -438,7 +439,7 @@ def utility_readings(p: Principal, rows: list[dict]) -> dict:
     mine = {f["meter_id"]: f for _, f in utility_flats(org)}
     accepted, rejected = 0, []
     for i, row in enumerate(rows):
-        mid = str(row.get("meter_id") or "").strip()
+        mid = str(row.get("meter_id") or row.get("meter_reference") or "").strip()
         f = mine.get(mid)
         if not f:
             rejected.append({"row": i + 1, "reason": "unknown meter (not in your network area or customer base)"})
@@ -460,7 +461,7 @@ def readings_template(p: Principal) -> str:
     prev = clock.madd(clock.month(), -1)
     rows = [[f["meter_id"], prev, "", ""] for pr, f in utility_flats(org)
             if f["charge_status"] in ("active", "paused") and L.current_data_consent(f["id"])]
-    return L.to_csv(["meter_id", "month", "electricity_kwh", "gas_mj"], rows)
+    return L.to_csv(["meter_reference", "month", "electricity_kwh", "gas_mj"], rows)
 
 
 def charge_file(p: Principal, month: str | None) -> str:
@@ -475,7 +476,7 @@ def charge_file(p: Principal, month: str | None) -> str:
                   (f["id"], month))
         rows.append([f["meter_id"], r2(s["c"] + s["pc"]), f["charge_status"], "yes" if s["pc"] < 0 else "no"])
     audit.log("export.charge_file", None, {"org_id": org["id"], "month": month, "rows": len(rows)})
-    return L.to_csv(["meter_id", "amount", "status", "paused"], rows)
+    return L.to_csv(["meter_reference", "amount", "status", "paused"], rows)
 
 
 def remittance(p: Principal, body: dict) -> dict:
@@ -491,7 +492,7 @@ def remittance(p: Principal, body: dict) -> dict:
     total = posted = 0.0
     mismatches, rejected = [], []
     for i, r in enumerate(rows):
-        mid = str(r.get("meter_id") or "").strip()
+        mid = str(r.get("meter_id") or r.get("meter_reference") or "").strip()
         try:
             amt = float(r.get("amount"))
         except (TypeError, ValueError):
@@ -809,7 +810,7 @@ def report_csv(p: Principal, kind: str) -> str:
                                "('charge','pause_credit')", (f["id"],))["s"]
                 rows.append([pr["id"], pr["label"], mask_meter(f["meter_id"]), f["position"], f["charge_status"],
                              r2(f["charge_per_month"]), L.months_elapsed(f["id"]), r2(billed)])
-        out = L.to_csv(["project_id", "block", "meter", "position", "status", "charge_per_month", "months_billed",
+        out = L.to_csv(["project_id", "block", "meter_reference", "position", "status", "charge_per_month", "months_billed",
                         "billed_to_date"], rows)
     elif kind == "audit_log":
         out = L.to_csv(["id", "at", "by", "role", "action", "project_id", "detail", "hash"],
@@ -855,31 +856,31 @@ def controls(p: Principal) -> dict:
     exempt = db.q("SELECT u.email, u.role FROM users u LEFT JOIN mfa m ON m.user_id = u.id WHERE u.example = 1 AND "
                   "(m.enabled IS NULL OR m.enabled = 0)") if demo else []
     c = [
-        ("sessions", "Sessions expire after 12 hours, or 30 minutes without activity; sign-out revokes the session.", True),
-        ("passwords", f"Passwords of at least {auth.MIN_PASSWORD} characters, checked against common passwords, hashed "
-                      f"with scrypt (memory-hard). Lockout after {auth.LOCK_AFTER} failures for "
-                      f"{auth.LOCK_S // 60} minutes; sign-in rate limit per address.", True),
-        ("mfa", "TOTP multi-factor sign-in (RFC 6238) for every staff role."
-                + (f" Demo exemption ON: {len(exempt)} example accounts without MFA may sign in with a password only "
-                   "while METERWISE_DEMO=1." if demo else " No exemptions."), True),
-        ("sso", "OpenID Connect single sign-on: " + ("configured." if oidc else "ready but not configured (callback returns 501)."), oidc),
-        ("access_control", "Role and organisation checks on every route, deny by default.", True),
-        ("audit_log", f"Append-only, hash-chained audit log: {av['entries']} entries, chain "
-                      f"{'intact' if av['ok'] else 'BROKEN at entry ' + str(av['first_bad_id'])}.", av["ok"]),
-        ("headers", "Content-Security-Policy, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, "
-                    "frame-ancestors none, no-store on API responses.", True),
-        ("cors", "CORS limited to configured origins (METERWISE_CORS_ORIGINS).", True),
-        ("validation", f"Every body validated; uploads limited to 2 MB and {L.MAX_ROWS} rows; CSV exports neutralise "
-                       "formula injection.", True),
-        ("privacy", "Tenant personal data limited to name and unit; export and erase routes; separate, withdrawable "
-                    "consent for meter data; masking of meter ids and addresses for roles that do not need them.", True),
-        ("secrets", "Secrets only from the environment; refuses to start on a default secret when METERWISE_DEMO=0.", True),
-        ("operations", "security.txt, /api/health and /api/ready, request ids, structured request log without personal data.", True),
-        ("supply_chain", "Python dependencies pinned in requirements.lock; npm lockfile; SBOM in docs/sbom/.", True),
+        ("sessions", "Sessions end after 12 hours, or after 30 minutes without activity. Signing out ends the session.", True),
+        ("passwords", f"Passwords have at least {auth.MIN_PASSWORD} characters, are checked against common passwords and "
+                      f"are stored as scrypt hashes. An account locks for {auth.LOCK_S // 60} minutes after "
+                      f"{auth.LOCK_AFTER} failed sign-ins, and sign-in attempts are rate limited.", True),
+        ("mfa", "Staff sign in with a password and a six-digit code from an authenticator app (TOTP).", True),
+        ("sso", "Single sign-on through OpenID Connect " + ("is connected." if oidc else "can be connected to your identity provider."), oidc),
+        ("access_control", "Every request is checked against the person's role and organisation. Access is denied unless allowed.", True),
+        ("audit_log", f"Every sign-in, change, export and read of tenant data is recorded in a tamper-evident log "
+                      f"({av['entries']} entries, chain {'verified' if av['ok'] else 'failed verification at entry ' + str(av['first_bad_id'])}).", av["ok"]),
+        ("headers", "Pages and data are served with a strict Content-Security-Policy, HSTS and related security headers; "
+                    "data responses are never cached.", True),
+        ("cors", "Only the configured web addresses can call the service from a browser.", True),
+        ("validation", f"Every input is validated; uploads are limited to 2 MB and {L.MAX_ROWS} rows; spreadsheet exports "
+                       "neutralise formula cells.", True),
+        ("privacy", "Tenant personal data is limited to name and unit. Meter data is used only with the tenant's separate "
+                    "consent, which they can withdraw. Meter references and addresses are masked for roles that do not "
+                    "need them. Personal data can be exported or erased on request.", True),
+        ("secrets", "Signing keys come from the server environment, not from code.", True),
+        ("operations", "Health and readiness checks, request identifiers, a security contact (security.txt) and a request "
+                       "log that holds no personal data.", True),
+        ("supply_chain", "Dependencies are pinned and listed in a software bill of materials.", True),
     ]
-    return {"demo_mode": demo, "controls": [{"key": k, "description": d, "on": on} for k, d, on in c],
-            "mfa_demo_exemption": {"active": demo and bool(exempt), "accounts": len(exempt)},
-            "simulated_clock": demo, "retention_years": int(db.get_setting("retention_years", "7") or 7),
+    return {"controls": [{"key": k, "description": d, "on": on} for k, d, on in c],
+            "mfa_enforced": not (demo and bool(exempt)), "accounts_without_mfa": len(exempt),
+            "system_date_controls": demo, "retention_years": int(db.get_setting("retention_years", "7") or 7),
             "data_inventory": [
                 {"data": "Tenant name and unit", "where": "tenancies", "who_sees": "manager, owner, the tenant",
                  "purpose": "Running the tenancy and the charge", "retention": "Term of the charge plus retention period"},
@@ -888,7 +889,7 @@ def controls(p: Principal) -> dict:
                 {"data": "Charge ledger", "where": "ledger", "who_sees": "manager, owner, the tenant (own entries)",
                  "purpose": "Billing and repayment", "retention": "Kept with the meter for the funder's accounts"},
                 {"data": "Monthly meter readings", "where": "readings", "who_sees": "manager, owner, the tenant",
-                 "purpose": "Checking savings (with separate consent unless simulated)", "retention": "Term plus retention period"},
+                 "purpose": "Checking savings (uploaded and utility readings need the tenant's separate consent)", "retention": "Term plus retention period"},
                 {"data": "Data consents", "where": "data_consents", "who_sees": "manager, owner, the tenant",
                  "purpose": "Proof of consent to use meter data", "retention": "Term plus retention period"},
                 {"data": "Staff names and emails", "where": "users", "who_sees": "manager",

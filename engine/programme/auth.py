@@ -198,8 +198,8 @@ class Principal:
     def user_obj(self) -> dict:
         if self.role == "tenant":
             return {"role": "tenant", "flat_id": self.flat_id, "project_id": self.project_id}
-        return {"id": self.user_id, "name": self.name, "email": self.email, "role": self.role, "org": self.org,
-                "mfa_enabled": self.extra.get("mfa_enabled", False)}
+        return {"id": self.user_id, "name": self.name, "email": self.email, "role": self.role,
+                "title": self.extra.get("title"), "org": self.org, "mfa_enabled": self.extra.get("mfa_enabled", False)}
 
 
 def org_obj(org_id: int | None) -> dict | None:
@@ -248,7 +248,7 @@ def _new_session(role: str, user_id: int | None = None, tenancy_id: int | None =
 def _user_principal(u: dict, sid: str = "") -> Principal:
     m = db.q1("SELECT enabled FROM mfa WHERE user_id = ?", (u["id"],))
     return Principal(role=u["role"], session_id=sid, user_id=u["id"], name=u["name"], email=u["email"],
-                     org=org_obj(u["org_id"]), extra={"mfa_enabled": bool(m and m["enabled"])})
+                     org=org_obj(u["org_id"]), extra={"mfa_enabled": bool(m and m["enabled"]), "title": u.get("title")})
 
 
 def principal_from_token(token: str | None) -> Principal:
@@ -450,7 +450,7 @@ def new_access_code(seed_key: str | None = None) -> str:
 
 
 def create_user(name: str, email: str, role: str, org_id: int | None, password: str, example: bool = True,
-                check_policy: bool = True) -> int:
+                check_policy: bool = True, title: str | None = None) -> int:
     if role not in ROLES or role == "tenant":
         raise bad(f"Unknown staff role '{role}'.")
     if check_policy:
@@ -458,4 +458,5 @@ def create_user(name: str, email: str, role: str, org_id: int | None, password: 
         if probs:
             raise bad("Password does not meet the policy: " + " ".join(probs))
     return db.insert("users", name=name, email=email.lower(), role=role, org_id=org_id, pw_hash=hash_password(password),
-                     demo_password=password if example and demo_mode() else None, example=example)
+                     demo_password=password if example and demo_mode() else None, example=example,
+                     title=title)

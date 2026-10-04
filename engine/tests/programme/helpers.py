@@ -32,7 +32,7 @@ def to_consent(client, H, pid, audit=None):
 def consent_all(client, H, pid, decline=0):
     from .conftest import tenant_headers
     ok(client.post(f"/api/programme/projects/{pid}/consent/owner", headers=H("provider"),
-                   json={"signed": True, "name": "Priya Example"}))
+                   json={"signed": True, "name": "Priya Raman"}))
     flats = ok(client.get(f"/api/programme/projects/{pid}/flats", headers=H("manager")))
     for i, f in enumerate(flats):
         c = "declined" if i < decline else "agreed"

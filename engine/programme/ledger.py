@@ -405,7 +405,7 @@ def data_consent_get(p: Principal, fid: int) -> dict:
     return {"flat_id": fid, "current": consent_obj(cur), "active": cur is not None,
             "history": [consent_obj(c) for c in hist], "scope": DATA_SCOPE, "purpose": DATA_PURPOSE,
             "note": "Agreeing to the upgrade does not mean agreeing to share meter data. This consent is separate and "
-                    "can be withdrawn at any time; simulated demo readings do not need it."}
+                    "can be withdrawn at any time. Modelled estimates do not use meter data and do not need it."}
 
 
 def data_consent_set(p: Principal, fid: int, body: dict) -> dict:
@@ -448,8 +448,11 @@ def data_consent_set(p: Principal, fid: int, body: dict) -> dict:
 READING_KEYS = ("month", "electricity_kwh", "gas_mj", "indoor_hours_above_30c", "mean_outdoor_c", "source")
 
 
+SOURCE_LABELS = {"simulated": "Modelled estimate", "uploaded": "Uploaded", "utility": "Utility", "mixed": "Mixed sources"}
+
+
 def reading_obj(r: dict) -> dict:
-    return {k: r[k] for k in READING_KEYS}
+    return {**{k: r[k] for k in READING_KEYS}, "source_label": SOURCE_LABELS.get(r["source"], r["source"])}
 
 
 def readings_of(fid: int) -> list[dict]:
@@ -505,6 +508,8 @@ def parse_csv(text: str, required: tuple[str, ...]) -> list[dict]:
     if len(text) > 2_000_000:
         raise ProgError("too_large", "The file is larger than 2 MB.")
     rd = csv.DictReader(io.StringIO(text.lstrip("﻿")))
+    if rd.fieldnames:  # "meter_reference" is the documented header; "meter_id" is accepted too
+        rd.fieldnames = ["meter_id" if (h or "").strip() == "meter_reference" else (h or "").strip() for h in rd.fieldnames]
     if not rd.fieldnames or any(k not in rd.fieldnames for k in required):
         raise bad("The CSV header must include: " + ",".join(required))
     rows = []
@@ -631,6 +636,7 @@ def run_mv(p: Principal, pid: int, body: dict | None = None) -> dict:
                        "3 after).", by_flat=by_flat)
     src = sources.pop() if len(sources) == 1 else "mixed"
     data = {"project_id": pid, "run_on": clock.today(), "period": {"from": frm, "to": to}, "source": src,
+            "source_label": SOURCE_LABELS.get(src, src),
             "flats_verified": nflat, "flats_skipped": len(by_flat) - nflat,
             "modelled_saving_per_month": r2(mod_sum / nflat), "verified_saving_per_month": r2(ver_sum / nflat),
             "realisation_rate": round(ver_sum / mod_sum, 3) if mod_sum else None, "bill_neutral_flats": neutral,
@@ -716,5 +722,5 @@ def billing_export(p: Principal, month: str | None, project_id: int | None) -> s
             rows.append([pr["id"], pr["label"], f["unit"], f["meter_id"], t["tenant_name"] if t else "", month,
                          r2(ch["c"] + ch["pc"]), status, r2(balance(f["id"]))])
     audit.log("export.billing", project_id, {"month": month, "rows": len(rows)})
-    return to_csv(["project_id", "block", "unit", "meter_id", "tenant", "month", "charge", "status", "balance_owing"],
+    return to_csv(["project_id", "block", "unit", "meter_reference", "tenant", "month", "charge", "status", "balance_owing"],
                   rows)

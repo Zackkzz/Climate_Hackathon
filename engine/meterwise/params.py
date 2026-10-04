@@ -395,7 +395,7 @@ PARAMS: dict[str, Param] = {
 
     # ------------------------------------------------------------------ measurement and verification (simulated data)
     "mv_household_sigma": Param(0.10, "spread", "Household-to-household spread in energy use in simulated readings",
-                                ASSUMPTION, "Log-normal spread. For simulated demo data only.", "mv"),
+                                ASSUMPTION, "Log-normal spread. Used only when readings are modelled estimates.", "mv"),
     "mv_noise_sigma": Param(0.04, "spread", "Month-to-month noise in simulated readings", ASSUMPTION, "", "mv"),
     "mv_weather_sigma_c": Param(1.0, "C", "Spread of a month's mean temperature around the 2025 value in simulated "
                                 "readings", ASSUMPTION, "", "mv"),

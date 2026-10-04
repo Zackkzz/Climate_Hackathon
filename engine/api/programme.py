@@ -65,7 +65,7 @@ def csv_response(text: str, filename: str) -> Response:
 
 def demo_only() -> None:
     if not auth.demo_mode():
-        raise ProgError("forbidden", "The simulated clock and demo accounts are switched off (METERWISE_DEMO=0).")
+        raise ProgError("forbidden", "System date controls are switched off on this server.")
 
 
 async def rows_from_request(request: Request, key: str, required: tuple[str, ...]) -> list[dict]:
@@ -134,7 +134,8 @@ def mfa_login(request: Request, body: dict = Body(...)) -> dict:
 
 @auth_router.get("/demo-users")
 def demo_users() -> list:
-    demo_only()
+    if os.environ.get("METERWISE_LIST_ACCOUNTS", "0") != "1" or not auth.demo_mode():
+        raise ProgError("not_found", "Not found.")
 
     def f():
         out = []
@@ -163,7 +164,7 @@ def oidc_login() -> dict:
                                           "METERWISE_OIDC_CLIENT_ID, METERWISE_OIDC_CLIENT_SECRET and "
                                           "METERWISE_OIDC_REDIRECT_URI to connect your identity provider.")
     raise ProgError("not_configured", "OpenID Connect settings are present, but the token exchange is not implemented "
-                                      "in this prototype. Staff sign in with a password and TOTP.")
+                                      "in this version. Staff sign in with a password and TOTP.")
 
 
 @auth_router.get("/oidc/callback")
@@ -177,7 +178,7 @@ def oidc_settings() -> dict:
     return {"configured": bool(os.environ.get("METERWISE_OIDC_ISSUER") and os.environ.get("METERWISE_OIDC_CLIENT_ID")),
             "settings": {f"METERWISE_OIDC_{k}": bool(os.environ.get(f"METERWISE_OIDC_{k}")) for k in keys + ["CLIENT_SECRET"]},
             "callback_route": "/api/auth/oidc/callback",
-            "note": "Returns 501 until configured. No identity provider is simulated."}
+            "note": "Returns 501 until configured."}
 
 
 # ------------------------------------------------------------------------------------------- programme
@@ -399,6 +400,7 @@ def readings(fid: int, p: Principal = Depends(principal)) -> list:
 
 @pg.post("/flats/{fid}/readings")
 async def post_readings(fid: int, request: Request, p: Principal = Depends(principal)) -> dict:
+    auth.require(p, "manager", "owner")  # role check before reading the body
     rows = await rows_from_request(request, "readings", ("month", "electricity_kwh"))
     return await run_in_threadpool(call, p, L.readings_post, p, fid, rows)
 
@@ -495,6 +497,7 @@ def ut_network(p: Principal = Depends(principal)) -> dict:
 
 @ut.post("/readings")
 async def ut_readings(request: Request, p: Principal = Depends(principal)) -> dict:
+    auth.require(p, "utility")  # role check before reading the body
     rows = await rows_from_request(request, "readings", ("meter_id", "month", "electricity_kwh", "gas_mj"))
     return await run_in_threadpool(call, p, V.utility_readings, p, rows)
 
@@ -511,6 +514,7 @@ def ut_charge_file(month: str | None = None, p: Principal = Depends(principal)):
 
 @ut.post("/remittance")
 async def ut_remittance(request: Request, p: Principal = Depends(principal)) -> dict:
+    auth.require(p, "utility")  # role check before reading the body
     raw = await request.body()
     if len(raw) > MAX_BODY:
         raise ProgError("too_large", "The upload is larger than 2 MB.")
@@ -617,11 +621,10 @@ def p_enquiry(request: Request, body: dict = Body(...)) -> dict:
 
 # ------------------------------------------------------------------------------------------- install
 
-SECURITY_TXT = """Contact: mailto:security@meterwise.example
+SECURITY_TXT = """Contact: https://github.com/Zackkzz/Climate_Hackathon/security/advisories/new
 Expires: 2027-10-04T00:00:00.000Z
 Preferred-Languages: en
-Policy: https://meterwise.example/SECURITY.md
-# Meterwise is a hackathon prototype. See SECURITY.md for how to report a vulnerability.
+Policy: https://github.com/Zackkzz/Climate_Hackathon/blob/main/SECURITY.md
 """
 
 

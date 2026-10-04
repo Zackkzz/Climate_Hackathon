@@ -84,7 +84,7 @@ def test_fault_pauses_charge_and_reserve_covers(client, H):
     assert {e["month"] for e in led if e["kind"] == "pause_credit"} >= {"2026-10", "2026-11", "2026-12"}
     r = client.post(f"/api/programme/faults/{x['id']}/resolve", headers=H("installer2"), json={})
     assert r.status_code == 403  # not their job
-    inst = "installer" if p["installer_org"]["name"].startswith("Cooltop") else "installer2"
+    inst = "installer" if p["installer_org"]["name"].startswith("Quellan") else "installer2"
     x2 = ok(client.post(f"/api/programme/faults/{x['id']}/resolve", headers=H(inst), json={"note": "fixed"}))
     assert x2["status"] == "resolved" and x2["months_paused"] == 3 and x2["reserve_cover"] > 0
     end_before = p["term_ends"]
@@ -186,7 +186,7 @@ def test_billing_export_csv(client, H):
     r = client.get("/api/programme/billing/export", headers=H("provider"))
     assert r.status_code == 200 and r.headers["content-type"].startswith("text/csv")
     lines = r.text.strip().splitlines()
-    assert lines[0].startswith("project_id,block,unit,meter_id,tenant,month,charge,status")
+    assert lines[0].startswith("project_id,block,unit,meter_reference,tenant,month,charge,status")
     assert len(lines) > 10 and any(",billed," in x for x in lines) and any(",paused," in x for x in lines)
     # the landlord only sees its own blocks
     r2 = client.get("/api/programme/billing/export", headers=H("landlord"))

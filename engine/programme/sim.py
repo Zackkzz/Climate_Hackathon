@@ -1,4 +1,4 @@
-"""Simulated clock advance (demo only).
+"""System date advance (the /api/sim routes; switched off when METERWISE_DEMO=0).
 
 Each month, for every active project: simulated readings for the month just finished (``source: "simulated"``; real
 uploaded or utility readings are never overwritten), seeded faults that open and resolve, a billing run, payments with
@@ -19,8 +19,8 @@ SCENARIOS = ("as_modelled", "mixed", "underperforming")
 MIXED = ["as_modelled"] * 6 + ["high_use", "low_use", "underperforming_hot_water", "faulty_ac"]
 FAULT_RATE = 0.012
 LATE_RATE = 0.05
-SYSTEM = Principal(role="manager", name="Simulated clock", user_id=0)
-INSTALLER_SYSTEM = Principal(role="manager", name="Installer (simulated)", user_id=0)
+SYSTEM = Principal(role="manager", name="System date", user_id=0)
+INSTALLER_SYSTEM = Principal(role="manager", name="Installer", user_id=0)
 
 
 def rng(*key) -> random.Random:
@@ -87,7 +87,7 @@ def step(scenario: str, out: dict) -> None:
         # faults the simulator opened earlier get fixed
         for x in db.q("SELECT * FROM faults WHERE project_id = ? AND status = 'open' AND sim_resolve_month IS NOT NULL "
                       "AND sim_resolve_month <= ?", (pr["id"], m)):
-            L.resolve_fault(INSTALLER_SYSTEM, x["id"], {"note": "Repaired under warranty (simulated)"})
+            L.resolve_fault(INSTALLER_SYSTEM, x["id"], {"note": "Repaired under warranty"})
             out["faults_resolved"] += 1
         if pr["charge_start"] <= m <= pr["charge_end"]:
             for f in flats:
@@ -99,13 +99,13 @@ def step(scenario: str, out: dict) -> None:
                     if not items:
                         continue
                     item = items[g.randrange(len(items))]
-                    desc = {"heat_pump_hot_water": "No hot water (simulated report)",
-                            "reverse_cycle": "Air conditioner not cooling (simulated report)"}[item]
+                    desc = {"heat_pump_hot_water": "No hot water",
+                            "reverse_cycle": "Air conditioner not cooling"}[item]
                     tenant = Principal(role="tenant", flat_id=f["id"], project_id=pr["id"], name="tenant")
                     L.open_fault(tenant, f["id"], {"item": item, "description": desc},
                                  sim_resolve_month=clock.madd(m, 1 + g.randrange(2)))
                     out["faults_opened"] += 1
-    L._bill(m, "Simulated clock")
+    L._bill(m, "System date")
     out["billing_runs"] += 1
     for pr in db.q("SELECT * FROM projects WHERE stage IN ('active','closed') ORDER BY id"):
         for f in db.q("SELECT * FROM flats WHERE project_id = ? AND participating = 1 ORDER BY id", (pr["id"],)):
@@ -115,7 +115,7 @@ def step(scenario: str, out: dict) -> None:
             if rng("late", f["id"], m).random() < LATE_RATE:
                 out["late_payments"] += 1
                 continue
-            L.post(f["id"], "payment", -bal, m, "Payment collected with rent (simulated)")
+            L.post(f["id"], "payment", -bal, m, "Payment collected with rent")
             out["payments"] += 1
     for pr in projects:
         pr = S.get_project(pr["id"])

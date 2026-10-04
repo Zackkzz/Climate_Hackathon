@@ -29,6 +29,11 @@ ITEM_LABELS = {"cool_roof": "Reflective cool roof coating", "heat_pump_hot_water
 WARRANTY_YEARS = 5
 
 
+def mask_meter(m: str | None) -> str | None:
+    """Programme meter reference masked to its last 4 characters, for roles that do not need it in full."""
+    return None if not m else m.split("-")[0] + "-..." + m[-4:]
+
+
 def stable_int(*parts: Any) -> int:
     return int(hashlib.sha256(":".join(str(p) for p in parts).encode()).hexdigest()[:8], 16)
 
@@ -190,9 +195,9 @@ def _make_flats(pid: int, storeys: int, n: int) -> None:
     for k in range(1, n + 1):
         pos = "top" if k > n - top else "lower"
         fid = db.insert("flats", project_id=pid, unit=str(k), position=pos,
-                        meter_id=f"NMI-EX-41{pid:03d}{k:05d}", sim_seed=stable_int("flat", pid, k) % 100000,
+                        meter_id=f"MW-{pid * 1000 + k + 100000:06d}", sim_seed=stable_int("flat", pid, k) % 100000,
                         retailer_org_id=(retailer["id"] if retailer and stable_int("ret", pid, k) % 10 < 4 else None))
-        _new_tenancy(fid, f"Tenant of unit {k} (example)", clock.today(), seed_key=f"{pid}:{k}:0")
+        _new_tenancy(fid, f"Unit {k} tenant (name not yet recorded)", clock.today(), seed_key=f"{pid}:{k}:0")
 
 
 def _new_tenancy(fid: int, name: str, start: str, seed_key: str | None = None) -> int:
@@ -886,7 +891,7 @@ def flat_obj(f: dict, p: Principal, pr: dict | None = None) -> dict:
     masked = p.role in ("government", "funder", "installer")
     out = {"id": f["id"], "project_id": f["project_id"],
            "unit": None if p.role in ("government", "funder") else f["unit"], "position": f["position"],
-           "meter_id": ("NMI-..." + f["meter_id"][-4:]) if masked else f["meter_id"],
+           "meter_id": mask_meter(f["meter_id"]) if masked else f["meter_id"],
            "tenant_name": None if p.role in NO_PERSONAL else (t["tenant_name"] if t else None),
            "tenancy_start": t["start_date"] if t else None, "consent": f["consent"],
            "charge_per_month": round(f["charge_per_month"] or 0.0, 2), "offered_charge": f["offered_charge"],
@@ -918,10 +923,31 @@ def project_obj(pr: dict, p: Principal) -> dict:
             "example": True}
 
 
+PLAIN = [("for simulated demo data only", "used for modelled estimates"), ("simulated readings", "modelled readings"),
+         ("simulated demo data", "modelled estimates"), ("Simulated", "Modelled"), ("simulated", "modelled")]
+
+
+def plain_assessment(a: dict) -> dict:
+    """The engine's assumption notes describe the readings model in developer terms; present them plainly."""
+    if not a:
+        return a
+    out = dict(a)
+    rows = []
+    for x in a.get("assumptions", []):
+        x = dict(x)
+        for k in ("label", "note"):
+            if isinstance(x.get(k), str):
+                for old, new in PLAIN:
+                    x[k] = x[k].replace(old, new)
+        rows.append(x)
+    out["assumptions"] = rows
+    return out
+
+
 def project_detail(pr: dict, p: Principal) -> dict:
     from .ledger import mv_runs
     out = project_obj(pr, p)
-    a = pr["assessment"] or {}
+    a = plain_assessment(pr["assessment"] or {})
     quotes = db.q("SELECT * FROM quotes WHERE project_id = ? ORDER BY id", (pr["id"],))
     if p.role == "installer":
         quotes = [q for q in quotes if q["installer_org_id"] == p.org_id]

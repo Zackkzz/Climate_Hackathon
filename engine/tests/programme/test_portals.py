@@ -12,7 +12,7 @@ TENANT_NAMES = None
 
 def _tenant_names(client, H):
     with db.tx():
-        return [t["tenant_name"] for t in db.q("SELECT tenant_name FROM tenancies")] + ["Newcomer"]
+        return [t["tenant_name"] for t in db.q("SELECT tenant_name FROM tenancies")] + ["Castellano"]
 
 
 def _assert_no_personal(text: str, names: list[str]):
@@ -53,15 +53,15 @@ def test_no_tenant_data_for_utility_government_funder_installer(client, H):
 def test_masking_meter_ids_and_units(client, H):
     a = client.get("/api/programme/projects", params={"stage": "active"}, headers=H("manager")).json()[0]
     fl_f = ok(client.get(f"/api/programme/projects/{a['id']}/flats", headers=H("funder")))
-    assert all(f["meter_id"].startswith("NMI-...") and len(f["meter_id"]) == 11 for f in fl_f)
+    assert all(f["meter_id"].startswith("MW-...") and len(f["meter_id"]) == 10 for f in fl_f)
     assert all(f["unit"] is None and f["tenant_name"] is None and "access_code" not in f for f in fl_f)
     fl_m = ok(client.get(f"/api/programme/projects/{a['id']}/flats", headers=H("manager")))
-    assert all(f["meter_id"].startswith("NMI-EX-") and f["tenant_name"] and f["access_code"] for f in fl_m)
+    assert all(f["meter_id"].startswith("MW-1") and f["tenant_name"] and f["access_code"] for f in fl_m)
     d = ok(client.get(f"/api/programme/projects/{a['id']}", headers=H("agency")))
-    assert all(f["meter_id"].startswith("NMI-...") for f in d["flats_list"])
+    assert all(f["meter_id"].startswith("MW-...") for f in d["flats_list"])
     # utility sees its own meters in full but block-level addresses only
     ms = ok(client.get("/api/utility/meters", headers=H("distributor")))
-    assert ms and all(m["meter_id"].startswith("NMI-EX-") and "/" not in m["address"] for m in ms)
+    assert ms and all(m["meter_id"].startswith("MW-1") and "/" not in m["address"] for m in ms)
     log = ok(client.get("/api/programme/audit-log", headers=H("manager")))
     assert any(e["action"] == "personal_data.read" for e in log)
 
@@ -129,10 +129,10 @@ def test_utility_summary_network_charge_file_and_remittance(client, H):
     ni = ok(client.get("/api/utility/network-impact", headers=H("distributor")))
     assert ni["by_project"] and "Not a network study" in ni["basis"]
     cf = client.get("/api/utility/charge-file", headers=H("distributor"))
-    assert cf.status_code == 200 and cf.text.startswith("meter_id,amount,status,paused")
+    assert cf.status_code == 200 and cf.text.startswith("meter_reference,amount,status,paused")
     rows = [line.split(",") for line in cf.text.strip().splitlines()[1:]]
     body = {"month": "2026-10", "rows": [{"meter_id": r[0], "amount": float(r[1])} for r in rows[:3]]
-            + [{"meter_id": rows[3][0], "amount": float(rows[3][1]) + 5}, {"meter_id": "NMI-X", "amount": 1}]}
+            + [{"meter_id": rows[3][0], "amount": float(rows[3][1]) + 5}, {"meter_id": "MW-000000", "amount": 1}]}
     res = ok(client.post("/api/utility/remittance", headers=H("distributor"), json=body))
     assert res["posted"] > 0 and len(res["mismatches"]) == 1 and res["rejected"][0]["reason"] == "unknown meter"
     sr = ok(client.get("/api/utility/supply-requests", headers=H("distributor")))
@@ -171,7 +171,9 @@ def test_government_outcomes_targets_grants_reports(client, H):
     assert [r["key"] for r in routes] == ["community_housing", "council_rates", "meter_attached"]
     assert routes[2]["reach_buildings"] == 358 and routes[0]["reach_buildings"] is None
     c = ok(client.get("/api/government/controls", headers=H("agency")))
-    assert len(c["controls"]) == 13 and c["data_inventory"]
+    assert len(c["controls"]) == 13 and c["data_inventory"] and "mfa_enforced" in c
+    text = json.dumps(c).lower()
+    assert "demo" not in text and "prototype" not in text and "not claimed" not in text
 
 
 def test_property_summary_enquiry_and_convert(client, H):

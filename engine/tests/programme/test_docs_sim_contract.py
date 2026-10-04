@@ -6,7 +6,8 @@ from programme import db
 from .conftest import _use, tenant_headers
 from .helpers import flats, ok
 
-NOTICE = "Example document produced by a prototype. Not legal or financial advice."
+NOTICE = "It does not replace your lease"
+BANNED = ("example", "prototype", "demo", "simulated", "fictional", "not legal or financial advice")
 
 
 def test_every_document_renders_with_key_figures(client, H):
@@ -21,11 +22,13 @@ def test_every_document_renders_with_key_figures(client, H):
         r = client.get(d["url"], headers=H("manager"))
         assert r.status_code == 200 and r.headers["content-type"].startswith("text/html"), d
         html = r.text
+        low = html.lower()
+        assert not [w for w in BANNED if w in low], (d["kind"], [w for w in BANNED if w in low])
         assert NOTICE in html and "@page" in html and "<script" not in html and "http" not in html.split("<style>")[1].split("</style>")[0]
     disc = client.get(f"/api/programme/documents/{pid}/tenant_disclosure.html?flat_id={f['id']}", headers=H("manager")).text
     charge = f"${f['charge_per_month']:,.2f}"
     for s in (charge, "What is installed", "What you pay", "What you are expected to save", "What is guaranteed",
-              "If something breaks", "If you move out", "How to complain", "not a loan", "meter data", f["meter_id"]):
+              "If something breaks", "If you move out", "How to complain", "not a loan", "meter data", "Meter reference", f["meter_id"]):
         assert s in disc, s
     sched = client.get(f"/api/programme/documents/{pid}/charge_schedule.html?flat_id={f['id']}", headers=H("manager")).text
     assert a["charge_start"] in sched

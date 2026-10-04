@@ -6,7 +6,7 @@ from .helpers import (advance, consent_all, create, flats, ok, org_id, tender_an
 def test_create_project_generates_flats_and_deal(client, H):
     p = create(client, H)
     assert p["stage"] == "screened" and p["flats"] == len(p["flats_list"]) > 0
-    assert all(f["meter_id"].startswith("NMI-EX-") for f in p["flats_list"])
+    assert all(f["meter_id"].startswith("MW-") and len(f["meter_id"]) == 9 for f in p["flats_list"])
     assert p["summary"]["net_capex"] > 0 and p["next_step"] and p["blocked_by"] == []
     r = client.post("/api/programme/projects", headers=H("manager"),
                     json={"building_id": p["building_id"], "owner_org_id": org_id(client, H, "community_housing")})

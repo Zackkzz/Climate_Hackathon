@@ -1,3 +1,5 @@
+<img src="web/public/brand/meterwise-logo.svg" alt="Meterwise" height="40">
+
 # Meterwise
 
 **Upgrades for rented flats, repaid from the bill savings.** Meterwise finds the hottest blocks of rented flats and
@@ -97,14 +99,17 @@ documents for every reader. Contracts: [docs/programme-contract.md](docs/program
 **Run it.** `.venv/Scripts/python run.py` as above. On first start the database (`engine/var/meterwise.db`, or the
 path in `METERWISE_DB`) is created and seeded with one example programme: 11 projects on real pilot buildings at every
 stage, two of them with 19 months of billing history, built by driving the real service functions through time
-(about 10 seconds). Sign-in details for every role are listed at `GET /api/auth/demo-users` and on the sign-in page.
-Every organisation, person, meter number and reading in the seed is a fictional example; meter readings are
-simulated and labelled `"simulated"`.
+(about 10 seconds). Every organisation and person in the seed is invented, meter references are programme
+references (`MW-100001`), not National Metering Identifiers, and readings the system generates are stored with
+`source: "simulated"` and shown as "Modelled estimate". The seeded accounts are not listed anywhere on the site; see
+"Seeded accounts for local testing" below.
 
 | Setting | Default | Meaning |
 |---|---|---|
 | `METERWISE_DB` | `engine/var/meterwise.db` | SQLite database path |
-| `METERWISE_DEMO` | `1` | `0` turns off demo users, the simulated clock and reset, and the MFA exemption for demo accounts |
+| `METERWISE_DEMO` | `1` | `0` turns off the system-date controls (`/api/sim/*`), the account list and the MFA exemption for seeded accounts, and requires `METERWISE_SECRET` |
+| `METERWISE_LIST_ACCOUNTS` | `0` | `1` turns on `GET /api/auth/demo-users` (seeded accounts and tenant codes) for local testing; needs `METERWISE_DEMO=1` |
+| `METERWISE_DOCS` | `1` when `METERWISE_DEMO=1`, else `0` | Interactive API docs and `/openapi.json` |
 | `METERWISE_SECRET` | generated and stored in the database (demo only) | Token signing key; required (32+ characters) when `METERWISE_DEMO=0` |
 | `METERWISE_CORS_ORIGINS` | local hosts | Comma-separated allowed origins |
 | `METERWISE_AUTOSEED` | `1` | `0` leaves a fresh database empty |
@@ -112,8 +117,8 @@ simulated and labelled `"simulated"`.
 | `METERWISE_OIDC_*` | unset | Single sign-on settings; the callback returns 501 until configured |
 | `METERWISE_NOW` | real time | Fixes the clock's base date (tests) |
 
-**Simulated clock (demo).** `POST /api/sim/advance {"months": 12, "scenario": "mixed"}` runs a year in a few seconds:
-simulated readings, billing, payments (a seeded few late), occasional faults, and a savings check after every 12
+**System date.** `POST /api/sim/advance {"months": 12, "scenario": "mixed"}` moves the system date on a year in a few
+seconds: modelled readings, billing, payments (a seeded few late), occasional faults, and a savings check after every 12
 months of charge. `POST /api/sim/reset` reseeds. Randomness is seeded, so the same start gives the same result.
 
 **Portals.** Government (`/api/government/*`: outcomes, targets, areas, grants with decisions, CSV reports, delivery
@@ -137,6 +142,32 @@ or utility meter reading is accepted; personal-data export and erase; `/.well-kn
 **What is not real.** No penetration test or certification; no real tenant, meter or payment data; the M&V uses
 simulated readings unless uploaded; the legal status of the service charge under tenancy and credit law is to
 confirm ([docs/policy-australia.md](docs/policy-australia.md)).
+
+## Seeded accounts for local testing
+
+The site does not list these. All use the password `Penrith-demo-2026!`. Staff accounts are exempt from the second
+sign-in factor only while `METERWISE_DEMO=1`. Organisation names are invented and were checked by web search on
+4 October 2026 not to match a real NSW energy, housing, strata or government organisation.
+
+| Role | Email | Person (title), organisation |
+|---|---|---|
+| manager | manager@meterwise.example | Alex Marchetti (Programme manager), Marralong Councils Energy Office |
+| government | council@meterwise.example | Jordan Tran (Council programme officer), Marralong Councils Energy Office |
+| government | agency@meterwise.example | Sam Okoro (Senior policy officer), Rental Energy Upgrades Office |
+| owner | provider@meterwise.example | Priya Raman (Asset officer), Tallis Street Community Housing |
+| owner | landlord@meterwise.example | Lee Harrington (Director), Orrin Property Holdings |
+| owner | strata@meterwise.example | Chris Delaney (Strata secretary), Halloway House Owners Committee |
+| funder | funder@meterwise.example | Morgan Achebe (Investment manager), Brolga Bay Impact Fund |
+| installer | installer@meterwise.example | Taylor Brooks (Operations lead), Quellan Cool Roofs |
+| installer | installer2@meterwise.example | Robin Szabo (Estimator), Varden Electrical and Plumbing |
+| utility | distributor@meterwise.example | Casey Lund (Connections officer), Tarnell Grid (distributor) |
+| utility | retailer@meterwise.example | Drew Fennell (Billing operations), Halvard Energy Retail (retailer) |
+| utility | gas@meterwise.example | Jamie Ortega (Field services coordinator), Tenterra Gas Network |
+
+Tenants sign in with the access code on their flat (`FLAT-` and six characters). Managers and owners see the codes
+in the flat list; with `METERWISE_LIST_ACCOUNTS=1`, `GET /api/auth/demo-users` also lists a few.
+
+Security checks: `scripts/security_check.py` (see [docs/it-assurance.md](docs/it-assurance.md)).
 
 ## Layout
 
